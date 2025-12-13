@@ -18,11 +18,5 @@
   ],
   "commands": [
     "./.claude/commands/viz/"
-  ],
-  "skills": [
-    "./skills/viz/"
-  ],
-  "agents": [
-    "./agents/"
   ]
 }
