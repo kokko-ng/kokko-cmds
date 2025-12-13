@@ -1,0 +1,28 @@
+{
+  "name": "claude-code-viz",
+  "version": "1.0.0",
+  "description": "C4 architecture mapping and Anki flashcard generation for codebases. Automatically maps your codebase using the C4 model (Context, Containers, Components, Code) and generates study flashcards.",
+  "author": {
+    "name": "kokkodev"
+  },
+  "repository": "https://github.com/kokkodev/claude-code-viz",
+  "license": "MIT",
+  "keywords": [
+    "c4-model",
+    "architecture",
+    "documentation",
+    "anki",
+    "flashcards",
+    "visualization",
+    "codebase-analysis"
+  ],
+  "commands": [
+    "./.claude/commands/viz/"
+  ],
+  "skills": [
+    "./skills/viz/"
+  ],
+  "agents": [
+    "./agents/"
+  ]
+}
