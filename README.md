@@ -21,6 +21,12 @@ A Claude Code plugin for C4 architecture mapping and Anki flashcard generation.
    /viz/anki-verify         Verify flashcard accuracy
 ```
 
+## Sample Output
+
+See a real-world example of what this plugin generates:
+
+https://github.com/Insight-Services-APAC/ingenious/tree/main/codemap
+
 ## Installation
 
 ```bash
