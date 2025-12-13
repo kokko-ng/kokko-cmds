@@ -13,13 +13,13 @@ A Claude Code plugin for C4 architecture mapping and Anki flashcard generation.
 ## Installation
 
 ```bash
-/plugin install kokkodev/claude-code-viz
+/plugin install kokko-ng-insight/claude-code-viz
 ```
 
 Or add via marketplace:
 
 ```bash
-/plugin marketplace add kokkodev/claude-code-viz
+/plugin marketplace add kokko-ng-insight/claude-code-viz
 ```
 
 ## Commands

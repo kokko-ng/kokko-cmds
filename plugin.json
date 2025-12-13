@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "C4 architecture mapping and Anki flashcard generation for codebases. Automatically maps your codebase using the C4 model (Context, Containers, Components, Code) and generates study flashcards.",
   "author": {
-    "name": "kokkodev"
+    "name": "kokko-ng-insight"
   },
-  "repository": "https://github.com/kokkodev/claude-code-viz",
+  "repository": "https://github.com/kokko-ng-insight/claude-code-viz",
   "license": "MIT",
   "keywords": [
     "c4-model",
