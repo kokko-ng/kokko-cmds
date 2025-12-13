@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "claude-code-viz",
-      "source": "..",
+      "source": "./",
       "description": "C4 architecture mapping and Anki flashcard generation for codebases. Automatically maps your codebase using the C4 model (Context, Containers, Components, Code) and generates study flashcards.",
       "version": "1.0.0",
       "author": {
