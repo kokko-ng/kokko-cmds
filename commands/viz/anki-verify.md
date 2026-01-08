@@ -23,7 +23,7 @@ Load cards and split into batches for parallel verification.
 
 ```bash
 # Find system folder and cards file
-SYSTEM_ID=$(ls codemap/ | grep -v "README.md" | grep -v ".json" | head -1)
+SYSTEM_ID=$(ls codemap/ | head -1)
 echo "System ID: $SYSTEM_ID"
 
 # Verify cards file exists

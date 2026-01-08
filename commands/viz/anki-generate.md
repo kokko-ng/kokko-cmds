@@ -74,7 +74,7 @@ Discover the system and gather context.
 
 ```bash
 # Find the system folder
-SYSTEM_ID=$(ls codemap/ | grep -v "README.md" | grep -v ".json" | head -1)
+SYSTEM_ID=$(ls codemap/ | head -1)
 echo "System ID: $SYSTEM_ID"
 
 # List all documentation files

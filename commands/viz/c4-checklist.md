@@ -55,7 +55,7 @@ Discover the system and list all diagrams to verify.
 
 ```bash
 # Find the system folder
-SYSTEM_ID=$(ls codemap/ | grep -v "README.md" | grep -v ".json" | grep -v ".md" | head -1)
+SYSTEM_ID=$(ls codemap/ | head -1)
 echo "System ID: $SYSTEM_ID"
 
 # List all PlantUML diagram files
