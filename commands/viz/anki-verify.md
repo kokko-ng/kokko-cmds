@@ -107,7 +107,7 @@ Parameters:
     - FIX: Card has fixable issues, provide correction
     - DELETE: Card is wrong/irrelevant, mark for removal
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "batch_number": N,

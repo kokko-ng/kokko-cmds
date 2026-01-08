@@ -134,7 +134,7 @@ Parameters:
     - Look for LAYOUT_WITH_LEGEND() or SHOW_LEGEND()
     - Identify any custom notation
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "category": "general",
@@ -272,7 +272,7 @@ Parameters:
     - Identify any custom styling
     - Check for explanatory comments
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "category": "elements",
@@ -430,7 +430,7 @@ Parameters:
     - Extract labels and technologies
     - Check for bidirectional relationships
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "category": "relationships",
@@ -569,7 +569,7 @@ Parameters:
        - Why it matters (from C4 perspective)
        - How to fix it (specific PlantUML syntax)
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "synthesis_summary": {

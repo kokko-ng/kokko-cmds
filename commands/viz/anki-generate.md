@@ -149,7 +149,7 @@ Parameters:
       "Back": "API Consumer"
     }
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "category": "context",
@@ -218,7 +218,7 @@ Parameters:
       "Back": "SQL over TCP"
     }
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "category": "containers",
@@ -303,7 +303,7 @@ Parameters:
       "Back": "Composition / Delegation"
     }
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "category": "components_and_code",
@@ -366,7 +366,7 @@ Parameters:
        - Relationships between levels
        - Key decisions/tradeoffs documented
 
-    OUTPUT FORMAT:
+    OUTPUT:
     ```json
     {
       "synthesis_summary": {
