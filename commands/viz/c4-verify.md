@@ -9,28 +9,10 @@ Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` firs
 ## Orchestration
 
 ```
-Phase 0: Preparation
-        │
-        ▼
-Phase 1: Parallel Verification ──────────────────────────────────────────────┐
-        ├── Completeness Check                                               │
-        ├── Accuracy Check                                                   │
-        ├── Hierarchy Validation                                             │
-        ├── Diagram Quality Check                                            │
-        └── Image Pairing Check                                              │
-        │                                                                    │
-        ▼                                                                    │
-Phase 2: Synthesis (intersections, conflicts, prioritization) ───────────────┤
-        │                                                                    │
-        ▼                                                                    │
-Phase 3: Apply Fixes (structural -> diagrams -> docs -> navigation) ─────────┤
-        │                                                                    │
-        ▼                                                                    │
-Phase 4: Re-Verification ────────────────────────────────────────────────────┤
-        │                                                                    │
-        ▼                                                                    │
-Phase 5: Finalization (regenerate PNGs, write report) ───────────────────────┘
+Phase 1: Preparation --> Phase 2: Parallel Verification --> Phase 3: Synthesis --> Phase 4: Apply Fixes --> Phase 5: Re-Verification --> Phase 6: Finalization
 ```
+
+Phase 2 runs five checks in parallel: Completeness, Accuracy, Hierarchy, Diagram Quality, and Image Pairing.
 
 ---
 
