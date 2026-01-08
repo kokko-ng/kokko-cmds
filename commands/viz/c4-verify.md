@@ -208,7 +208,8 @@ Parameters:
 ```
 Tool: Task
 Parameters:
-  subagent_type: "Explore"
+  subagent_type: "general-purpose"
+  model: "opus"
   description: "Synthesize verification"
   prompt: |
     Synthesize findings from all five verification checks.

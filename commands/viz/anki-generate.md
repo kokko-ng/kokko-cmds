@@ -328,6 +328,7 @@ Merge and deduplicate cards from all subagents.
 Tool: Task
 Parameters:
   subagent_type: "general-purpose"
+  model: "opus"
   description: "Synthesize Anki cards"
   prompt: |
     TASK: Synthesize and deduplicate Anki cards from all extraction phases.
