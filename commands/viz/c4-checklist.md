@@ -512,6 +512,7 @@ Aggregate all results and calculate compliance scores.
 Tool: Task
 Parameters:
   subagent_type: "general-purpose"
+  model: "opus"
   description: "Synthesize checklist results"
   prompt: |
     TASK: Synthesize C4 checklist verification results into a unified report.
