@@ -5,8 +5,8 @@ A Claude Code plugin for C4 architecture mapping and Anki flashcard generation.
 ## Installation
 
 ```bash
-/plugin marketplace add kokko-ng-insight/claude-code-viz
-/plugin install claude-code-viz@kokko-ng-insight-claude-code-viz
+/plugin marketplace add kokko-ng/claude-code-viz
+/plugin install claude-code-viz@kokko-ng-claude-code-viz
 ```
 
 ## Suggested Workflow
