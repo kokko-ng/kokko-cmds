@@ -2,6 +2,10 @@
 
 Map the codebase architecture using a hierarchical C4 model (Context -> Containers -> Components -> Code).
 
+## Prerequisites
+
+A codebase to analyze. No existing C4 model required - this command generates the initial map.
+
 ## Orchestration
 
 ```
@@ -242,6 +246,35 @@ Create `codemap/README.md` with entry point to `<system-id>/context.md`.
 
 ```bash
 find codemap -type f | sort
+```
+
+---
+
+## Output Summary
+
+```markdown
+# C4 Mapping Complete
+
+## System: <system-id>
+
+## Structure Generated
+- Context level: 1 diagram
+- Containers: X containers
+- Components: Y components
+- Code: Z class diagrams
+
+## Files Created
+- Total files: N
+- PlantUML diagrams: X
+- Markdown docs: Y
+- PNG images: Z
+
+## Entry Point
+`codemap/<system-id>/context.md`
+
+## Validation
+- Status: PASSED/FAILED
+- Issues: [list if any]
 ```
 
 ---
