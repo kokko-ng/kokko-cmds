@@ -42,7 +42,7 @@ This command uses **parallel verification by card subset** - cards are split int
 
 ---
 
-## PHASE 0: Preparation
+## Phase 1: Preparation
 
 Load cards and split into batches for parallel verification.
 
@@ -70,7 +70,7 @@ print(f"Split into {len(batches)} batches")
 
 ---
 
-## PHASE 1: Parallel Batch Verification
+## Phase 2: Parallel Batch Verification
 
 Launch verification subagents IN PARALLEL, one per batch.
 
@@ -185,15 +185,15 @@ Tool: Task (Batch 3 - cards 50-74)
 Tool: Task (Batch 4 - cards 75-99)
 ```
 
-**WAIT for ALL batch subagents to complete before proceeding to Phase 2.**
+**WAIT for ALL batch subagents to complete before proceeding to Phase 3.**
 
 ---
 
-## PHASE 2: Merge Corrections and Update JSON
+## Phase 3: Merge Corrections and Update JSON
 
 Collect all verification results and apply corrections to the JSON file.
 
-### Step 2A: Merge Results
+### Step 3A: Merge Results
 
 Combine all batch results:
 
@@ -212,7 +212,7 @@ fixed_cards = [r for r in all_results if r["status"] == "fix"]
 deleted_indices = [r["index"] for r in all_results if r["status"] == "delete"]
 ```
 
-### Step 2B: Build Corrected Card List
+### Step 3B: Build Corrected Card List
 
 ```python
 # Start with original cards
@@ -232,7 +232,7 @@ for i, card in enumerate(original_cards):
         final_cards.append(card)
 ```
 
-### Step 2C: Write Updated JSON
+### Step 3C: Write Updated JSON
 
 Write the corrected cards back to `codemap/<system-id>/anki-cards.json`:
 
@@ -241,7 +241,7 @@ with open(f'codemap/{SYSTEM_ID}/anki-cards.json', 'w') as f:
     json.dump(final_cards, f, indent=2)
 ```
 
-### Step 2D: Verify Output
+### Step 3D: Verify Output
 
 ```bash
 # Validate JSON syntax

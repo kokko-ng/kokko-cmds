@@ -34,7 +34,7 @@ Phase 5: Finalization (regenerate PNGs, write report) ────────�
 
 ---
 
-## Phase 0: Preparation
+## Phase 1: Preparation
 
 ```bash
 SYSTEM_ID=$(ls codemap/ | head -1)
@@ -46,7 +46,7 @@ echo "Components: $(find codemap/$SYSTEM_ID -type d -name components -exec ls {}
 
 ---
 
-## Phase 1: Parallel Verification
+## Phase 2: Parallel Verification
 
 Launch ALL FIVE subagents IN PARALLEL in a single message.
 
@@ -221,7 +221,7 @@ Parameters:
 
 ---
 
-## Phase 2: Synthesis
+## Phase 3: Synthesis
 
 ```
 Tool: Task
@@ -270,11 +270,11 @@ Parameters:
 
 ---
 
-## Phase 3: Apply Fixes
+## Phase 4: Apply Fixes
 
 Execute fixes in order from correction_plan.
 
-### Step 3A: Structural Fixes
+### Step 4A: Structural Fixes
 
 ```bash
 # Create missing folders
@@ -284,7 +284,7 @@ mkdir -p <paths>
 rm -rf <paths>
 ```
 
-### Step 3B: Diagram Fixes
+### Step 4B: Diagram Fixes
 
 For each diagram fix, spawn focused subagent:
 
@@ -304,16 +304,16 @@ Parameters:
     OUTPUT: Complete updated file
 ```
 
-### Step 3C: Documentation Fixes
+### Step 4C: Documentation Fixes
 
 For missing docs, spawn analysis subagent (like c4-map).
 For link fixes, update markdown files directly.
 
-### Step 3D: Navigation Fixes
+### Step 4D: Navigation Fixes
 
 Fix broken links, update drill-down tables.
 
-### Step 3E: Image Fixes
+### Step 4E: Image Fixes
 
 ```bash
 # Regenerate stale/missing PNGs
@@ -324,7 +324,7 @@ done
 
 ---
 
-## Phase 4: Re-Verification
+## Phase 5: Re-Verification
 
 ```
 Tool: Task
@@ -354,15 +354,15 @@ Parameters:
 
 ---
 
-## Phase 5: Finalization
+## Phase 6: Finalization
 
-### Step 5A: Regenerate All PNGs
+### Step 6A: Regenerate All PNGs
 
 ```bash
 find codemap -name "*.puml" -exec plantuml -tpng {} \;
 ```
 
-### Step 5B: Write Verification Report
+### Step 6B: Write Verification Report
 
 Create `codemap/VERIFICATION.md`:
 
@@ -392,7 +392,7 @@ Create `codemap/VERIFICATION.md`:
 [List any unfixed issues]
 ```
 
-### Step 5C: Update README
+### Step 6C: Update README
 
 Update `codemap/README.md` with verification timestamp.
 

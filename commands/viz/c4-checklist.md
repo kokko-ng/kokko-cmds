@@ -75,7 +75,7 @@ Based on https://c4model.com/diagrams/checklist:
 
 ---
 
-## PHASE 0: Preparation
+## Phase 1: Preparation
 
 Discover the system and list all diagrams to verify.
 
@@ -98,7 +98,7 @@ Read all diagram files to provide to verification subagents.
 
 ---
 
-## PHASE 1: Parallel Checklist Verification
+## Phase 2: Parallel Checklist Verification
 
 Launch THREE verification subagents IN PARALLEL.
 
@@ -526,11 +526,11 @@ Parameters:
     ```
 ```
 
-**WAIT for ALL THREE subagents to complete before proceeding to Phase 2.**
+**WAIT for ALL THREE subagents to complete before proceeding to Phase 3.**
 
 ---
 
-## PHASE 2: Synthesis and Scoring
+## Phase 3: Synthesis and Scoring
 
 Aggregate all results and calculate compliance scores.
 
@@ -684,11 +684,11 @@ Parameters:
 
 ---
 
-## PHASE 3: Write Checklist Report
+## Phase 4: Write Checklist Report
 
 Generate a markdown report in `codemap/`.
 
-### Step 3A: Write the Report
+### Step 4A: Write the Report
 
 Create `codemap/<system-id>/C4-CHECKLIST.md`:
 
@@ -828,7 +828,7 @@ Based on https://c4model.com/diagrams/checklist:
 - [ ] Do you understand the meaning of all line styles used?
 ```
 
-### Step 3B: Verify Report
+### Step 4B: Verify Report
 
 ```bash
 # Confirm report was created

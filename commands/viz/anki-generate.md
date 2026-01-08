@@ -94,7 +94,7 @@ Generate cards for ALL of the following categories found in the codemap:
 
 ---
 
-## PHASE 0: Preparation
+## Phase 1: Preparation
 
 Discover the system and gather context.
 
@@ -119,7 +119,7 @@ Read key files to understand scope:
 
 ---
 
-## PHASE 1: Parallel Content Extraction
+## Phase 2: Parallel Content Extraction
 
 Launch THREE content extraction subagents IN PARALLEL.
 
@@ -342,11 +342,11 @@ Parameters:
     ```
 ```
 
-**WAIT for ALL THREE subagents to complete before proceeding to Phase 2.**
+**WAIT for ALL THREE subagents to complete before proceeding to Phase 3.**
 
 ---
 
-## PHASE 2: Synthesis and Deduplication
+## Phase 3: Synthesis and Deduplication
 
 Merge and deduplicate cards from all subagents.
 
@@ -422,13 +422,13 @@ Parameters:
 
 ---
 
-## PHASE 3: Write JSON Output
+## Phase 4: Write JSON Output
 
 Write the final JSON file to the codemap folder.
 
-### Step 3A: Create the Anki JSON file
+### Step 4A: Create the Anki JSON file
 
-Write the `final_cards` array from Phase 2 to `codemap/<system-id>/anki-cards.json`:
+Write the `final_cards` array from Phase 3 to `codemap/<system-id>/anki-cards.json`:
 
 ```json
 [
@@ -440,7 +440,7 @@ Write the `final_cards` array from Phase 2 to `codemap/<system-id>/anki-cards.js
 ]
 ```
 
-### Step 3B: Verify JSON validity
+### Step 4B: Verify JSON validity
 
 ```bash
 # Validate JSON syntax
