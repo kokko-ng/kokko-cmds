@@ -869,5 +869,5 @@ https://c4model.com/diagrams/checklist
 
 **If all diagrams fail critical checks:**
 - Generate report with all issues
-- Recommend running `/viz/c4-map` with `--regenerate` flag
+- Recommend running `/viz/c4-map` to regenerate the architecture map
 - Highlight systemic issues
