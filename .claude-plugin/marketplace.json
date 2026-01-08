@@ -1,7 +1,7 @@
 {
-  "name": "kokko-ng-insight-claude-code-viz",
+  "name": "kokko-ng-claude-code-viz",
   "owner": {
-    "name": "kokko-ng-insight"
+    "name": "kokko-ng"
   },
   "plugins": [
     {
@@ -10,7 +10,7 @@
       "description": "C4 architecture mapping and Anki flashcard generation for codebases. Automatically maps your codebase using the C4 model (Context, Containers, Components, Code) and generates study flashcards.",
       "version": "1.0.0",
       "author": {
-        "name": "kokko-ng-insight"
+        "name": "kokko-ng"
       }
     }
   ]
