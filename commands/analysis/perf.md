@@ -19,7 +19,16 @@ If `$ARGUMENTS` is provided, use it as the target or focus area.
 
 ## Steps
 
-### 1. Database and Query Performance
+### 1. Spawn Opus Subagents for Deep Analysis
+
+Use the Task tool with `model: "opus"` to spawn subagents for thorough analysis. Opus excels at:
+- Tracing complex execution paths
+- Identifying subtle performance anti-patterns
+- Understanding system-wide bottleneck interactions
+
+Spawn parallel Opus agents per focus area (database, api, frontend, backend, memory) for comprehensive coverage.
+
+### 2. Database and Query Performance
 
 **Search for:**
 - N+1 query patterns (loops containing database queries)
@@ -40,7 +49,7 @@ grep -rn "for.*in.*:" --include="*.py" -A5 | grep -E "\.get\(|\.filter\(|\.query
 grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ```
 
-### 2. API and Network Performance
+### 3. API and Network Performance
 
 **Search for:**
 - Sequential API calls that could be parallelized
@@ -53,7 +62,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 
 **Check:** API routes, HTTP clients, service layers
 
-### 3. Frontend Performance
+### 4. Frontend Performance
 
 **Search for:**
 - Large inline scripts/data in templates
@@ -67,7 +76,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 
 **Check:** Components, templates, event handlers
 
-### 4. Backend Processing Performance
+### 5. Backend Processing Performance
 
 **Search for:**
 - Synchronous processing of large datasets
@@ -81,7 +90,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 
 **Check:** Service classes, background jobs, data processing
 
-### 5. Memory and Resource Management
+### 6. Memory and Resource Management
 
 **Search for:**
 - Memory leaks (unclosed connections, unreleased resources)
@@ -94,7 +103,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 
 **Check:** Connection handling, cache implementations
 
-### 6. Concurrency and Parallelization
+### 7. Concurrency and Parallelization
 
 **Search for:**
 - Sequential operations that could run in parallel
@@ -105,7 +114,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 
 **Check:** Batch operations, workflow orchestration
 
-### 7. Analysis Approach
+### 8. Analysis Approach
 
 **Prioritize hot paths:**
 1. User-facing request handlers
@@ -118,7 +127,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 - Identify actual bottlenecks vs perceived issues
 - Look for TODO comments mentioning performance
 
-### 8. Output Format
+### 9. Output Format
 
 Provide actionable recommendations:
 
