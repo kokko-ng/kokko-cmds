@@ -122,9 +122,27 @@ uv run pytest
 | Conflicting types | Generic type issues | Use `TypeVar`, `Generic`, or `cast()` appropriately |
 | Protocol errors | Structural typing issues | Implement required methods or use `typing.Protocol` |
 
+## Avoiding `Any` Types
+
+**CRITICAL**: Avoid `Any` types unless absolutely necessary. `Any` defeats the purpose of type checking.
+
+**Instead of `Any`, use:**
+- `object` - for truly unknown types that you won't access
+- `TypeVar` - for generic functions preserving type relationships
+- `Union[X, Y]` - when value can be one of several types
+- `Protocol` - for structural typing (duck typing with safety)
+- `Callable[..., T]` - for functions with unknown parameters
+- `dict[str, object]` - instead of `dict[str, Any]`
+
+**If `Any` is unavoidable:**
+- Add a comment explaining why
+- Limit scope as much as possible (don't let `Any` spread)
+- Consider wrapping in a function with proper types at boundaries
+
 ## Success Criteria
 
 - Zero mypy errors (or only intentionally suppressed ones)
 - All type annotations are accurate
+- No `Any` types without documented justification
 - No `# type: ignore` without explanation
 - Tests still pass after type fixes

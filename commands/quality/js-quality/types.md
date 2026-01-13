@@ -119,9 +119,27 @@ npm test
 | Third-party type errors | Outdated @types package | Update or add to `skipLibCheck` |
 | Generic type issues | Complex inference | Add explicit type parameters |
 
+## Avoiding `any` Types
+
+**CRITICAL**: Avoid `any` types unless absolutely necessary. `any` defeats the purpose of type checking.
+
+**Instead of `any`, use:**
+- `unknown` - for truly unknown types (requires narrowing before use)
+- `never` - for impossible states
+- `Record<string, unknown>` - instead of `Record<string, any>`
+- Generic types `<T>` - to preserve type relationships
+- Union types `X | Y` - when value can be one of several types
+- `Parameters<T>` / `ReturnType<T>` - to extract types from functions
+
+**If `any` is unavoidable:**
+- Add a comment explaining why
+- Limit scope as much as possible (don't let `any` spread)
+- Consider wrapping in a function with proper types at boundaries
+- Use `// eslint-disable-next-line @typescript-eslint/no-explicit-any` with explanation
+
 ## Success Criteria
 
 - Zero TypeScript errors with strict mode
 - All type annotations accurate
-- No `any` types without justification
+- No `any` types without documented justification
 - Build and tests pass
