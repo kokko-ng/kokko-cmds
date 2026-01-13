@@ -17,7 +17,26 @@ Usage: `/git/pr [base-branch] [--title "title"]`
 
 If `$ARGUMENTS` is provided, use it as the base branch or title.
 
-If the target branch, PR scope, or any critical details are unclear, use AskUserQuestion to clarify before creating the PR.
+## Pre-PR Confirmation
+
+ALWAYS use AskUserQuestion to confirm before creating a PR:
+
+1. **PR Method** - How to create the PR:
+   - GitHub PR via `gh` CLI (Recommended) - Creates PR directly on GitHub
+   - Manual - Just show the commands for user to run
+
+2. **Target Branch** - Confirm base branch (default: main)
+
+3. **PR Scope** - If multiple commits/changes exist, confirm what to include
+
+Example:
+```
+AskUserQuestion:
+- Header: "PR method"
+- Options:
+  - "GitHub PR via gh CLI (Recommended)" - Creates PR directly using gh pr create
+  - "Manual" - Shows commands without executing
+```
 
 ## Prerequisites
 
