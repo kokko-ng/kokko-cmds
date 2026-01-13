@@ -33,6 +33,12 @@ Hunt this down relentlessly. Search everywhere - files, code, logs, configs, dep
 EOF
         ;;
 
+    "clarify")
+        cat << 'EOF'
+Proactively use AskUserQuestion throughout this session to clarify ambiguities. Do not assume intent when multiple interpretations exist. Ask about unclear requirements, scope boundaries, implementation preferences, and trade-offs before proceeding. Better to confirm than to redo work.
+EOF
+        ;;
+
     *)
         # No expansion needed, output nothing (prompt passes through unchanged)
         ;;
