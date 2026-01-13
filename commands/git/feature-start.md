@@ -4,25 +4,22 @@ Create a new feature branch with proper tracking and initial structure.
 
 ## Arguments
 
-`$ARGUMENTS` - Required: Feature name or issue reference (e.g., "user-auth", "AB#1234", "#42")
+`$ARGUMENTS` - Required: Feature name or GitHub issue reference (e.g., "user-auth", "#42")
+
+If arguments are unclear or missing critical details, use AskUserQuestion to clarify before proceeding.
 
 ## Process
 
 ### 1. Parse Input
 
 Determine branch type from input:
-- `AB#XXXX` or `#XXXX` → Azure DevOps work item
-- `GH#XX` or just `#XX` → GitHub issue
+- `#XX` → GitHub issue number
 - Plain text → Feature name
+
+If input is ambiguous, ask user to clarify the feature scope.
 
 ### 2. Fetch Issue Details (if applicable)
 
-**For Azure DevOps:**
-```bash
-az boards work-item show --id XXXX --query "{title:fields.\"System.Title\", type:fields.\"System.WorkItemType\", description:fields.\"System.Description\"}"
-```
-
-**For GitHub:**
 ```bash
 gh issue view XX --json title,body,labels
 ```
@@ -36,7 +33,7 @@ Create branch name following convention:
 - `refactor/` - Code improvements
 
 Format: `{type}/{issue-id}-{short-description}`
-Example: `feature/AB1234-user-authentication`
+Example: `feature/42-user-authentication`
 
 ### 4. Create Branch
 
@@ -52,16 +49,9 @@ git checkout -b {branch-name}
 git push -u origin {branch-name}
 ```
 
-### 5. Link to Work Item (if applicable)
+### 5. Link to Issue
 
-**For Azure DevOps:**
-```bash
-# Add branch link to work item
-az boards work-item relation add --id XXXX --relation-type "ArtifactLink" --target-url "vstfs:///Git/Ref/..."
-```
-
-**For GitHub:**
-- Branch name containing issue number auto-links
+Branch name containing issue number auto-links to GitHub issues.
 
 ### 6. Generate Initial TODO List
 
@@ -74,14 +64,14 @@ Based on issue details, create a TODO list using TodoWrite:
 ```
 ## Feature Branch Created
 
-Branch: feature/AB1234-user-authentication
-Tracking: origin/feature/AB1234-user-authentication
+Branch: feature/42-user-authentication
+Tracking: origin/feature/42-user-authentication
 Based on: main (commit abc1234)
 
-### Linked Work Item
+### Linked Issue
 Title: Implement user authentication
-Type: User Story
-Status: Active
+Labels: enhancement
+Status: open
 
 ### Initial TODOs
 - [ ] Review existing auth code

@@ -17,6 +17,8 @@ Usage: `/git/pr [base-branch] [--title "title"]`
 
 If `$ARGUMENTS` is provided, use it as the base branch or title.
 
+If the target branch, PR scope, or any critical details are unclear, use AskUserQuestion to clarify before creating the PR.
+
 ## Prerequisites
 
 - GitHub CLI installed and authenticated: `gh auth status`
