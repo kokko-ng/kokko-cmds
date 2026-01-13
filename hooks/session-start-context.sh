@@ -1,6 +1,6 @@
 #!/bin/bash
 # session-start-context.sh - Detect project context at session start
-# Hook #1: SessionStart - Outputs project type and git branch info
+# SessionStart - Outputs project type and git branch info
 
 # Read input from stdin
 input=$(cat)

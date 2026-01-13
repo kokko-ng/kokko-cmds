@@ -1,6 +1,6 @@
 #!/bin/bash
 # prompt-expand-shorthand.sh - Expand shorthand commands
-# Hook #13: UserPromptSubmit - Expands shorthand to full instructions
+# UserPromptSubmit - Expands shorthand to full instructions
 
 input=$(cat)
 user_prompt=$(echo "$input" | jq -r '.user_prompt // ""')
@@ -29,7 +29,7 @@ EOF
 
     "hunt")
         cat << 'EOF'
-Hunt this down relentlessly. Search everywhere - files, code, logs, configs, dependencies. Try every angle, follow every lead, trace every reference. Do not stop until you find it. If one approach fails, try another. Exhaust all possibilities before concluding it cannot be found.
+Hunt this down relentlessly. Search everywhere - files, code, logs, configs, dependencies. Try every angle, follow every lead, trace every reference. Do not stop until you find or solve it. If one approach fails, try another. Exhaust all possibilities before concluding it cannot be found.
 EOF
         ;;
 
