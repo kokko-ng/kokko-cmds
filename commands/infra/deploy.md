@@ -186,8 +186,10 @@ az containerapp logs show --name prompttuner-backend --resource-group ingen-test
 
 ## Arguments
 
-Usage: `/deploy-ingen-test [soca|prompt-tuner|all]`
+Usage: `/deploy [soca|prompt-tuner|all]`
 
 - `soca` - Deploy only SoCa
 - `prompt-tuner` - Deploy only Prompt Tuner
 - `all` - Deploy both applications
+
+If `$ARGUMENTS` is provided, use it as the application to deploy.

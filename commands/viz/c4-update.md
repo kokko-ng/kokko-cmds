@@ -2,6 +2,14 @@
 
 Update the existing hierarchical C4 model based on code changes.
 
+## Arguments
+
+Usage: `/c4-update [system-id]`
+
+- `system-id` - System ID to update (default: auto-detected from codemap/)
+
+If `$ARGUMENTS` is provided, use it as the system-id to update.
+
 ## Prerequisites
 
 Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` first.

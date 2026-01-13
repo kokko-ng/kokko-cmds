@@ -2,6 +2,14 @@
 
 Validate accuracy and completeness of the hierarchical C4 architecture map.
 
+## Arguments
+
+Usage: `/c4-verify [system-id]`
+
+- `system-id` - System ID to verify (default: auto-detected from codemap/)
+
+If `$ARGUMENTS` is provided, use it as the system-id to verify.
+
 ## Prerequisites
 
 Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` first.

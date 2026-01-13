@@ -2,6 +2,18 @@
 
 Update outdated dependencies safely with validation between updates.
 
+## Arguments
+
+Usage: `/deps-update [package-name|category]`
+
+- `package-name` - Update specific package only
+- `critical` - Update only critical security vulnerabilities
+- `major` - Include major version updates
+- `minor` - Include minor updates only
+- No argument - Interactive mode for all outdated packages
+
+If `$ARGUMENTS` is provided, use it as a package name filter or category.
+
 ## Process
 
 ### 1. Audit Current State

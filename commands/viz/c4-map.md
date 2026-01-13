@@ -2,6 +2,14 @@
 
 Map the codebase architecture using a hierarchical C4 model (Context -> Containers -> Components -> Code).
 
+## Arguments
+
+Usage: `/c4-map [target-directory]`
+
+- `target-directory` - Directory to analyze (default: current working directory)
+
+If `$ARGUMENTS` is provided, use it as the target directory to analyze.
+
 ## Prerequisites
 
 A codebase to analyze. No existing C4 model required - this command generates the initial map.
