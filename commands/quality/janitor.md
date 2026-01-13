@@ -10,7 +10,7 @@ Run code quality checks in parallel using subagents and git worktrees, then merg
 
 ## Arguments
 
-Usage: `/janitor [target-branch] [--tools list]`
+Usage: `/quality/janitor [target-branch] [--tools list]`
 
 - `target-branch` - Branch to merge fixes into (default: current branch)
 - `--tools` - Comma-separated list of tools to run (default: all)
@@ -25,18 +25,18 @@ If `$ARGUMENTS` is provided, use it as the target branch or tool list.
 ## Tools Available
 
 **Python:**
-- `/bandit` - Security linter
-- `/docstrings` - Docstring checker
-- `/mypy` - Type checker
-- `/radon` - Complexity metrics
-- `/vulture` - Dead code finder
+- `/quality/py-quality/security` - Security linter (bandit)
+- `/quality/py-quality/docs` - Docstring checker
+- `/quality/py-quality/types` - Type checker (mypy)
+- `/quality/py-quality/complexity` - Complexity metrics (radon)
+- `/quality/py-quality/deadcode` - Dead code finder (vulture)
 
 **JavaScript/TypeScript:**
-- `/audit` - Dependency vulnerability scan
-- `/complexity` - Code complexity analysis
-- `/jsdoc` - Documentation checker
-- `/knip` - Unused exports/dependencies
-- `/tsc` - TypeScript compiler checks
+- `/quality/js-quality/security` - Dependency vulnerability scan (npm audit)
+- `/quality/js-quality/complexity` - Code complexity analysis
+- `/quality/js-quality/docs` - Documentation checker (jsdoc)
+- `/quality/js-quality/deadcode` - Unused exports/dependencies (knip)
+- `/quality/js-quality/types` - TypeScript compiler checks (tsc)
 
 ## Steps
 

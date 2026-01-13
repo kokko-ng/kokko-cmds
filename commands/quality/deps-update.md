@@ -4,7 +4,7 @@ Update outdated dependencies safely with validation between updates.
 
 ## Arguments
 
-Usage: `/deps-update [package-name|category]`
+Usage: `/quality/deps-update [package-name|category]`
 
 - `package-name` - Update specific package only
 - `critical` - Update only critical security vulnerabilities

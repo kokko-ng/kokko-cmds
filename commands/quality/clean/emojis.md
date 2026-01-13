@@ -10,7 +10,7 @@ Remove all emojis from the codebase while preserving code functionality.
 
 ## Arguments
 
-Usage: `/rm-emojis [target]`
+Usage: `/quality/clean/emojis [target]`
 
 - `target` - Directory or file to clean (default: current project root)
 
