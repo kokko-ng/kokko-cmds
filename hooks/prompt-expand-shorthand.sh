@@ -39,6 +39,17 @@ Proactively use AskUserQuestion throughout this session to clarify ambiguities. 
 EOF
         ;;
 
+    "lgtm")
+        cat << 'EOF'
+Execute the following skills in succession:
+1. /compush
+2. /pr
+3. /merge
+
+If any step fails, stop and report the issue before continuing.
+EOF
+        ;;
+
     *)
         # No expansion needed, output nothing (prompt passes through unchanged)
         ;;
