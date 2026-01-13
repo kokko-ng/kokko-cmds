@@ -10,7 +10,7 @@ Use ESLint complexity rules to identify and refactor high-complexity functions.
 
 ## Arguments
 
-Usage: `/complexity [target] [--threshold number]`
+Usage: `/quality/js-quality/complexity [target] [--threshold number]`
 
 - `target` - Directory or file to analyze (default: auto-detect JS/TS directories)
 - `--threshold` - Maximum complexity allowed (default: 10)

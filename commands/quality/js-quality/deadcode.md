@@ -10,7 +10,7 @@ Use Knip to detect unused exports, dependencies, and dead code in JavaScript/Typ
 
 ## Arguments
 
-Usage: `/knip [target]`
+Usage: `/quality/js-quality/deadcode [target]`
 
 - `target` - Directory to analyze (default: current directory with package.json)
 

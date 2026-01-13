@@ -10,7 +10,7 @@ Use the TypeScript compiler to detect and fix type errors.
 
 ## Arguments
 
-Usage: `/tsc [target]`
+Usage: `/quality/js-quality/types [target]`
 
 - `target` - Directory or tsconfig to check (default: current directory)
 

@@ -10,7 +10,7 @@ Use ESLint JSDoc plugin to ensure all functions, classes, and modules have prope
 
 ## Arguments
 
-Usage: `/jsdoc [target]`
+Usage: `/quality/js-quality/docs [target]`
 
 - `target` - Directory or file to check (default: auto-detect JS/TS directories)
 

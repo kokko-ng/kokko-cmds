@@ -10,7 +10,7 @@ Use ESLint security plugins and npm audit to detect JavaScript/TypeScript securi
 
 ## Arguments
 
-Usage: `/audit [target]`
+Usage: `/quality/js-quality/security [target]`
 
 - `target` - Directory to scan (default: auto-detect from package.json location)
 
