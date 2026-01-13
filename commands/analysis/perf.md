@@ -10,7 +10,7 @@ Perform deep analysis to identify performance bottlenecks across the codebase.
 
 ## Arguments
 
-Usage: `/perf [target] [--focus area]`
+Usage: `/analysis/perf [target] [--focus area]`
 
 - `target` - Directory or module to analyze (default: entire project)
 - `--focus` - Specific area: database, api, frontend, backend, memory

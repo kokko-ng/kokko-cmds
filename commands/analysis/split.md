@@ -11,7 +11,7 @@ Identify and split large files across the codebase to improve maintainability.
 
 ## Arguments
 
-Usage: `/large-files [target] [--threshold lines]`
+Usage: `/analysis/split [target] [--threshold lines]`
 
 - `target` - Directory to analyze (default: current project)
 - `--threshold` - Line count threshold (default: 500)
