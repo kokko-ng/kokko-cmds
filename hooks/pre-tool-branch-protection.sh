@@ -1,6 +1,6 @@
 #!/bin/bash
 # pre-tool-branch-protection.sh - Protect production branches
-# Hook #21: PreToolUse on Bash - Warns on commits/pushes on main, master, production, prod, release
+# PreToolUse on Bash - Warns on commits/pushes on main, master, production, prod, release
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
