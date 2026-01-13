@@ -1,6 +1,6 @@
 #!/bin/bash
-# pre-tool-cloud-ops.sh - Block cloud operations for confirmation
-# Hook #2: PreToolUse on Bash - Blocks az, aws, gcloud, kubectl, terraform, pulumi
+# pre-tool-cloud-ops.sh - Block dangerous cloud operations
+# Hook #2: PreToolUse on Bash - Blocks destructive cloud commands only
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
@@ -8,37 +8,53 @@ source "$SCRIPT_DIR/utils/play-sound.sh"
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command // ""')
 
-# Cloud CLI patterns to block (with word boundary after)
-# Using space or end-of-string to avoid false positives
-cloud_patterns=(
-    '^az[[:space:]]'
-    '[[:space:]]az[[:space:]]'
-    '^aws[[:space:]]'
-    '[[:space:]]aws[[:space:]]'
-    '^gcloud[[:space:]]'
-    '[[:space:]]gcloud[[:space:]]'
-    '^kubectl[[:space:]]'
-    '[[:space:]]kubectl[[:space:]]'
-    '^terraform[[:space:]]'
-    '[[:space:]]terraform[[:space:]]'
-    '^pulumi[[:space:]]'
-    '[[:space:]]pulumi[[:space:]]'
+# Dangerous cloud command patterns (destructive operations only)
+dangerous_patterns=(
+    # Terraform/Pulumi destructive
+    'terraform[[:space:]]+destroy'
+    'terraform[[:space:]]+apply[[:space:]]+-auto-approve'
+    'pulumi[[:space:]]+destroy'
+    'pulumi[[:space:]]+up[[:space:]]+-y'
+    'pulumi[[:space:]]+up[[:space:]]+--yes'
+    # kubectl destructive
+    'kubectl[[:space:]]+delete'
+    'kubectl[[:space:]]+drain'
+    'kubectl[[:space:]]+cordon'
+    'kubectl[[:space:]]+taint'
+    'kubectl[[:space:]]+replace[[:space:]]+--force'
+    'kubectl[[:space:]]+rollout[[:space:]]+undo'
+    # AWS destructive
+    'aws[[:space:]]+.*[[:space:]]+delete-'
+    'aws[[:space:]]+.*[[:space:]]+terminate-'
+    'aws[[:space:]]+.*[[:space:]]+remove-'
+    'aws[[:space:]]+s3[[:space:]]+rm'
+    'aws[[:space:]]+s3[[:space:]]+rb'
+    'aws[[:space:]]+ec2[[:space:]]+stop-instances'
+    'aws[[:space:]]+ec2[[:space:]]+terminate-instances'
+    'aws[[:space:]]+rds[[:space:]]+delete-db'
+    # Azure destructive
+    'az[[:space:]]+.*[[:space:]]+delete'
+    'az[[:space:]]+group[[:space:]]+delete'
+    'az[[:space:]]+vm[[:space:]]+deallocate'
+    'az[[:space:]]+vm[[:space:]]+stop'
+    # GCloud destructive
+    'gcloud[[:space:]]+.*[[:space:]]+delete'
+    'gcloud[[:space:]]+compute[[:space:]]+instances[[:space:]]+stop'
+    'gcloud[[:space:]]+compute[[:space:]]+instances[[:space:]]+reset'
+    'gcloud[[:space:]]+projects[[:space:]]+delete'
 )
 
-for pattern in "${cloud_patterns[@]}"; do
+for pattern in "${dangerous_patterns[@]}"; do
     if echo "$command" | grep -qE "$pattern"; then
         play_sound "warning"
 
-        # Extract the cloud tool name for the message
-        tool_name=$(echo "$command" | grep -oE '(^|[[:space:]])(az|aws|gcloud|kubectl|terraform|pulumi)[[:space:]]' | xargs | head -1)
-
         cat << EOF
 {
-  "decision": "block",
-  "reason": "Cloud operation detected: '$tool_name' command requires confirmation. This hook blocks cloud CLI commands (az, aws, gcloud, kubectl, terraform, pulumi) to prevent accidental infrastructure changes. Review the command and confirm you want to proceed."
+  "decision": "ask",
+  "message": "Destructive cloud operation detected. This command can delete or stop resources. Allow Claude to proceed?"
 }
 EOF
-        exit 2
+        exit 0
     fi
 done
 
