@@ -17,6 +17,8 @@ Usage: `/infra/docker [target-dir] [--runtime python|node|go]`
 
 If `$ARGUMENTS` is provided, use it as target directory or runtime.
 
+If pushing to Azure Container Registry, ALWAYS use AskUserQuestion to confirm subscription, resource group, and registry name before proceeding.
+
 ## Steps
 
 ### 1. Analyze Project Structure

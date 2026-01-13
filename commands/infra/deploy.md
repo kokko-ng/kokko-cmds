@@ -1,14 +1,27 @@
-# Deploy to ingen-test Resource Group
+# Deploy to Azure
 
-Deploy SoCa or Prompt Tuner applications to Azure using the ingen-test resource group.
+Deploy SoCa or Prompt Tuner applications to Azure.
+
+## Pre-Deployment Confirmation
+
+ALWAYS use AskUserQuestion to confirm before any deployment:
+- Which Azure subscription to use
+- Which resource group to deploy to
+- Which application(s) to deploy (soca, prompt-tuner, or both)
+
+Never assume subscription or resource group. List available options:
+```bash
+az account list --query "[].{Name:name, Id:id}" -o table
+az group list --query "[].name" -o tsv
+```
 
 ## Instructions
 
-1. **Determine which application to deploy** based on user input:
+1. **Determine which application to deploy** based on user confirmation:
    - `soca` - Deploy SoCa application
    - `prompt-tuner` - Deploy Prompt Tuner application
 
-2. **Resource Group**: Always use `ingen-test`. Do NOT create or use any other resource group.
+2. **Resource Group**: Use the resource group confirmed by the user.
 
 3. **Resource Tagging**: Apply appropriate tags to all resources:
    - For SoCa: `app=soca`
