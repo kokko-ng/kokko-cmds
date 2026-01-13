@@ -15,6 +15,24 @@ Grok deeply: Thoroughly analyze and understand the topic, code, or problem at ha
 EOF
         ;;
 
+    "assume")
+        cat << 'EOF'
+List all assumptions you are making about this task, code, or problem. What are you taking for granted? What could be wrong? What do you need to verify before proceeding? Be explicit about uncertainties and potential blind spots.
+EOF
+        ;;
+
+    "edge")
+        cat << 'EOF'
+Explore the edge cases. What are the boundary conditions, error states, unusual inputs, race conditions, and failure modes? Think about empty values, nulls, extremes, concurrent access, and unexpected user behavior. Be thorough and paranoid.
+EOF
+        ;;
+
+    "hunt")
+        cat << 'EOF'
+Hunt this down relentlessly. Search everywhere - files, code, logs, configs, dependencies. Try every angle, follow every lead, trace every reference. Do not stop until you find it. If one approach fails, try another. Exhaust all possibilities before concluding it cannot be found.
+EOF
+        ;;
+
     *)
         # No expansion needed, output nothing (prompt passes through unchanged)
         ;;
