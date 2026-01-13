@@ -11,7 +11,7 @@ Pull latest changes from main branch and merge into current branch.
 
 ## Arguments
 
-Usage: `/gitpull [base-branch] [--strategy merge|rebase]`
+Usage: `/git/sync [base-branch] [--strategy merge|rebase]`
 
 - `base-branch` - Branch to pull from (default: main)
 - `--strategy` - Merge strategy (default: merge)
