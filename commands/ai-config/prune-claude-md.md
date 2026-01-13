@@ -68,18 +68,7 @@ wc -l CLAUDE.md
 5. **Link to docs** instead of duplicating
 6. **Use code blocks sparingly** - only for non-obvious commands
 
-### 5. Restructure for Scanning
-
-Organize remaining content:
-```markdown
-# CLAUDE.md
-## Quick Reference (commands, key paths)
-## Constraints (must-follow rules)
-## Patterns (how things are done here)
-## Gotchas (common mistakes to avoid)
-```
-
-### 6. Validate Final Size
+### 5. Validate Final Size. Loop back to Step 2 if still not under 300 lines.
 
 ```bash
 wc -l CLAUDE.md
@@ -87,19 +76,11 @@ wc -l CLAUDE.md
 
 Target: Under 300 lines while retaining critical information.
 
-### 7. Test Effectiveness
+## Guidance on Effectiveness
 
 Ask: "Could an agent complete common tasks with only this CLAUDE.md?"
 - If yes for all critical workflows, pruning is complete
 - If no, add back minimum needed context
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-|-------|-------|------------|
-| Critical info removed | Over-pruning | Test with common tasks, restore needed info |
-| Still too long | Complex project | Focus on most common workflows |
-| Lost important context | Aggressive consolidation | Keep separate items that serve different purposes |
 
 ## Success Criteria
 
