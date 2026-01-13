@@ -10,7 +10,7 @@ Create or improve Dockerfile and .dockerignore for this project, then build and 
 
 ## Arguments
 
-Usage: `/docker-setup [target-dir] [--runtime python|node|go]`
+Usage: `/infra/docker [target-dir] [--runtime python|node|go]`
 
 - `target-dir` - Directory to create Docker files in (default: current directory)
 - `--runtime` - Primary runtime (default: auto-detect)
