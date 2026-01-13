@@ -10,7 +10,7 @@ Generate comprehensive tests for the codebase, including unit tests and end-to-e
 
 ## Arguments
 
-Usage: `/gen-tests [target] [--type unit|e2e|all]`
+Usage: `/quality/tests [target] [--type unit|e2e|all]`
 
 - `target` - Directory or module to generate tests for (default: auto-detect)
 - `--type` - Type of tests to generate (default: all)

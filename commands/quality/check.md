@@ -10,7 +10,7 @@ Run tests and linting iteratively until all checks pass.
 
 ## Arguments
 
-Usage: `/ltest [target]`
+Usage: `/quality/check [target]`
 
 - `target` - Directory or file to check (default: auto-detect project type)
 
