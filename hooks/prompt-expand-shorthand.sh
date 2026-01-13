@@ -50,6 +50,30 @@ If any step fails, stop and report the issue before continuing.
 EOF
         ;;
 
+    "wip")
+        cat << 'EOF'
+Create a work-in-progress commit. Please:
+1. Stage all changed files with git add
+2. Create a commit with message format: "wip: [brief description of current work state]"
+3. Do NOT run tests or any quality checks
+4. Do NOT push to remote
+
+This is just a local checkpoint commit for saving progress.
+EOF
+        ;;
+
+    "revert")
+        cat << 'EOF'
+Safely revert the last commit:
+1. Show the last commit details (hash, message, changed files) using git log -1 and git diff HEAD~1 --stat
+2. Use AskUserQuestion to confirm the user wants to revert this specific commit
+3. If confirmed, run: git revert HEAD --no-edit
+4. Show the result and new HEAD commit
+
+Do NOT use git reset. Always use git revert to preserve history.
+EOF
+        ;;
+
     *)
         # No expansion needed, output nothing (prompt passes through unchanged)
         ;;
