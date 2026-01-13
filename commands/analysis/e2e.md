@@ -11,13 +11,13 @@ Work autonomously to validate the application end-to-end against all user storie
 ## Prerequisites
 
 - `spec.md` must exist with documented user stories
-- If missing, run `/create-spec` first
+- If missing, run `/analysis/spec` first
 - Application must be running and accessible
 - Playwright MCP or browser automation available
 
 ## Arguments
 
-Usage: `/iteratively-verify [spec-file]`
+Usage: `/analysis/e2e [spec-file]`
 
 - `spec-file` - Path to specification file (default: spec.md)
 
@@ -100,7 +100,7 @@ Work is **not complete** until:
 
 | Issue | Cause | Resolution |
 |-------|-------|------------|
-| spec.md not found | Missing file | Run `/create-spec` first |
+| spec.md not found | Missing file | Run `/analysis/spec` first |
 | Application not running | Server down | Start the application |
 | Feature not implemented | Incomplete code | Implement the feature |
 | Flaky test | Timing or state issue | Add proper waits, fix state management |

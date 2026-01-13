@@ -11,7 +11,7 @@ Perform deep manual analysis of the codebase to identify technical debt through 
 
 ## Arguments
 
-Usage: `/tech-debt-analysis [target]`
+Usage: `/analysis/debt [target]`
 
 - `target` - Directory or module to analyze (default: entire project)
 

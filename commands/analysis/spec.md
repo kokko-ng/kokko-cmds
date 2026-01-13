@@ -10,7 +10,7 @@ Generate a comprehensive specification file documenting all testable user storie
 
 ## Arguments
 
-Usage: `/create-spec [target] [--output filename]`
+Usage: `/analysis/spec [target] [--output filename]`
 
 - `target` - Directory or application to analyze (default: current project)
 - `--output` - Output filename (default: spec.md)

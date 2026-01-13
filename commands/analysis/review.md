@@ -10,7 +10,7 @@ Perform a direct, no-nonsense code review without diplomatic softening.
 
 ## Arguments
 
-Usage: `/honest-review [target]`
+Usage: `/analysis/review [target]`
 
 - `target` - File, directory, or commit range to review (default: uncommitted changes)
 
