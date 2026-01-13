@@ -1,113 +1,109 @@
-# Autonomous Web App Validation
+# Master Prompt
 
-Work autonomously to validate the application end-to-end against all user stories in `spec.md`.
+Follow this prompt for the application under test. You must ensure **every User Story in `spec.md` works exactly as expected**. If anything is incomplete or broken, implement fixes until it is correct.
 
-## When to Use
+## Environment
 
-- After implementing features documented in spec.md
-- For comprehensive E2E testing
-- To validate application completeness
+- Run the app locally.
+- Use cloud resources **only for tests**.
+- **Do not** update any `spec.md` with validation results.
+- **Do not** add test outputs, validation notes, pass/fail statuses, screenshots, or any other results to **any** `spec.md`.
 
-## Prerequisites
+---
 
-- `spec.md` must exist with documented user stories
-- If missing, run `/analysis/spec` first
-- Application must be running and accessible
-- Playwright MCP or browser automation available
+## Cloud Constraints (if applicable)
 
-## Arguments
+- Use the platform CLI for all operations (e.g., `az`, `gcloud`, `aws`).
+- Restrict all provisioning/changes to the designated test scope (e.g., a single resource group/project/account).
+- Apply consistent tagging/labels to all test resources.
+- Create resources **only if they do not already exist** in the allowed test scope.
+- Provision the **cheapest viable SKUs/tiers** required to run tests.
+- Do not create or modify resources outside the allowed scope.
 
-Usage: `/analysis/e2e [spec-file]`
+---
 
-- `spec-file` - Path to specification file (default: spec.md)
+## Definitions
 
-If `$ARGUMENTS` is provided, use it as the spec file path.
+| Term | Meaning |
+|---|---|
+| `user_stories` | All User Stories in `spec.md` |
+| `compush_cmd` | `/compush` (or the project’s equivalent deploy/push command) |
 
-## Autonomous Work Expectations
+---
 
-- **Do not stop early** - Work until everything is complete
-- **Do not stop** due to token budget concerns
-- **Complete tasks fully**, even if end of budget is approaching
-- **Never artificially stop** any task early
+## Primary Goal
 
-## Steps
+Validate the application end-to-end against **all User Stories** in `spec.md`. Most implementation is complete—resolve remaining issues until the product is fully functional.
 
-### 1. Load Specification
+> **You must not stop until EVERYTHING in `spec.md` is implemented and validated.**
 
-Read `spec.md` and create a checklist of all user stories to validate.
+---
 
-### 2. Validation Cycle
+## Required Work Cycle (for every feature in `spec.md`)
 
-For **each** user story in the specification:
+For **each** User Story / feature:
 
-1. **Validate** - Test the feature using browser automation
-2. **Debug** - If issues found, identify root cause
-3. **Implement** - Fix the code if needed
-4. **Deploy** - Apply changes (restart server if necessary)
-5. **Re-validate** - Confirm the fix works
-6. **Mark Complete** - Update progress tracking
-7. **Next** - Move to next user story
+1. Validate using the project’s E2E test tooling (e.g., Playwright)
+2. If failing: debug the issue
+3. Implement fixes/features as needed
+4. Run `compush_cmd` after code changes
+5. Re-test end-to-end
+6. Repeat until the feature passes end-to-end
+7. Move to the next feature
 
-### 3. Development Workflow
+---
 
-After any code change:
-1. Save the file
-2. Restart/reload the application if needed
-3. Re-test the functionality
-4. Proceed only after confirming stability
+## Development Workflow
 
-Debug cycle: `Debug -> Fix -> Deploy -> Verify -> Repeat`
+### After ANY code modification (mandatory)
 
-### 4. Validation Requirements
+1. Run `compush_cmd` immediately
+2. Confirm deployment/build succeeds
+3. Re-test affected functionality
+4. Continue only after stability is verified
 
-| Aspect | Details |
-|--------|---------|
-| Source | All user stories in spec.md |
-| Coverage | Functional correctness, data flow, state transitions, error handling |
+### Debugging rule
 
-For each page/feature:
-- All functions must work (no placeholders)
-- All routes accessible via UI
-- Data displays correctly
-- Forms submit and validate properly
-- Error states handled gracefully
+Fail → Debug → Fix → `compush_cmd` → Re-test → Repeat until fully resolved.
 
-### 5. Handling Unclear Specifications
+---
 
-If specifications are ambiguous:
-- Check the actual implementation for intended behavior
-- Document assumptions made
-- Add clarifying notes to spec.md
-- Preserve original intent
+## Validation & Testing
 
-### 6. Execution Priorities
+### Scope
 
-1. Complete **everything** in spec.md
-2. Validate each feature thoroughly
-3. Debug and fix issues immediately
-4. Deploy after each fix
-5. Do not stop until all stories pass
+Validate **ALL** User Stories in `spec.md`, including:
+- Functional correctness
+- Data consistency
+- State transitions
+- Error handling
+- End-to-end flow completion (start → expected result)
 
-## Completion Criteria
+### Page/UI requirements
+
+- No hardcoded placeholders: all functionality must be real and data-driven
+- Manual routes must be reachable via the UI (where applicable)
+- Document new components in the project’s specs/docs area (behavior + state details)
+- Map UI elements to the relevant User Stories
+
+---
+
+## Specification Compliance
+
+- `spec.md` is the single source of truth.
+- If a spec is unclear, rewrite it into a more explicit, structured, agent-friendly form **without changing intent**.
+- **Do not** record validation activity or results in `spec.md` (no checklists, pass/fail notes, logs, screenshots, or summaries).
+
+---
+
+## Completion Criteria (definition of “done”)
 
 Work is **not complete** until:
-- Every user story in spec.md is validated
-- Every feature passes its acceptance criteria
-- Every bug found is fixed and verified
-- The application works end-to-end
+- ✅ Every feature in `spec.md` is implemented
+- ✅ Every feature passes end-to-end validation
+- ✅ All bugs/blockers are fixed
+- ✅ The full app works end-to-end
+- ✅ The system is integrated and stable
 
-## Error Handling
-
-| Issue | Cause | Resolution |
-|-------|-------|------------|
-| spec.md not found | Missing file | Run `/analysis/spec` first |
-| Application not running | Server down | Start the application |
-| Feature not implemented | Incomplete code | Implement the feature |
-| Flaky test | Timing or state issue | Add proper waits, fix state management |
-
-## Success Criteria
-
-- All user stories in spec.md validated
-- All acceptance criteria met
-- No unresolved bugs
-- Application fully functional
+When all completion criteria are met, output exactly:
+`<promise>COMPLETE</promise>`
