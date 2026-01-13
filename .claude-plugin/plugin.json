@@ -1,6 +1,6 @@
 {
   "name": "kokko-cmds",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A comprehensive Claude Code plugin with commands for C4 architecture mapping, code analysis, quality checks, git workflows, infrastructure management, and AI configuration.",
   "author": {
     "name": "kokko-ng"
@@ -24,5 +24,6 @@
     "./commands/infra/",
     "./commands/quality/",
     "./commands/viz/"
-  ]
+  ],
+  "hooks": "./hooks/hooks.json"
 }
