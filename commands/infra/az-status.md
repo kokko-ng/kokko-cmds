@@ -12,10 +12,10 @@ Generate a comprehensive daily summary of Azure subscription activity using Azur
 
 Usage: `/infra/az-status [subscription-id] [--days n]`
 
-- `subscription-id` - Azure subscription to analyze (default: current subscription)
+- `subscription-id` - Azure subscription to analyze
 - `--days` - Number of days to include (default: 1)
 
-If `$ARGUMENTS` is provided, use it as subscription ID or days parameter.
+ALWAYS use AskUserQuestion to confirm subscription and resource group scope before proceeding. Never assume defaults.
 
 ## Prerequisites
 
@@ -24,21 +24,21 @@ If `$ARGUMENTS` is provided, use it as subscription ID or days parameter.
 
 ## Steps
 
-### 1. Verify Azure Authentication
+### 1. Confirm Target Subscription
+
+ALWAYS ask user to confirm subscription before proceeding:
 
 ```bash
-az account show --output table
+# List available subscriptions
+az account list --query "[].{Name:name, Id:id}" -o table
 ```
 
-If not logged in:
-```bash
-az login
-```
+Use AskUserQuestion to confirm which subscription to analyze.
 
-### 2. Set Subscription (if different)
+### 2. Set Subscription
 
 ```bash
-az account set --subscription "<subscription-id>"
+az account set --subscription "<confirmed-subscription-id>"
 ```
 
 ### 3. Gather Resource Information

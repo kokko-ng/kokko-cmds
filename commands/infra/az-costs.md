@@ -8,7 +8,20 @@ Ensure Azure CLI is authenticated: `az account show`
 
 ## Process
 
-### 1. Get Cost Data
+### 1. Confirm Target Subscription
+
+ALWAYS use AskUserQuestion to confirm:
+- Which subscription to analyze
+- Specific resource group to focus on (or all)
+- Time period (default: MonthToDate)
+
+Never assume subscription or resource group. List available options if needed:
+```bash
+az account list --query "[].{Name:name, Id:id}" -o table
+az group list --query "[].name" -o tsv
+```
+
+### 2. Get Cost Data
 
 Fetch cost data for the specified period (default: last 30 days):
 
@@ -23,7 +36,7 @@ az cost query --type ActualCost --dataset-grouping name=ServiceName type=Dimensi
 az cost query --type AmortizedCost --timeframe MonthToDate
 ```
 
-### 2. Resource Group Breakdown
+### 3. Resource Group Breakdown
 
 For each resource group, show:
 - Total cost MTD
@@ -31,7 +44,7 @@ For each resource group, show:
 - Cost trend (increasing/decreasing/stable)
 - Percentage of total spend
 
-### 3. Service Category Analysis
+### 4. Service Category Analysis
 
 Break down by service type:
 - Compute (VMs, Container Apps, Functions)
@@ -40,7 +53,7 @@ Break down by service type:
 - Networking (Bandwidth, Load Balancers)
 - Other
 
-### 4. Anomaly Detection
+### 5. Anomaly Detection
 
 Flag any of these conditions:
 - Daily cost spike > 20% above 7-day average
@@ -48,7 +61,7 @@ Flag any of these conditions:
 - Resources with zero usage but ongoing cost (idle resources)
 - Resources approaching quota limits
 
-### 5. Optimization Suggestions
+### 6. Optimization Suggestions
 
 Based on usage patterns, suggest:
 - Underutilized resources that could be downsized
