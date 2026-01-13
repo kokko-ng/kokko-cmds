@@ -69,30 +69,7 @@ wc -l README.md
 4. **Remove badges** that don't provide useful info
 5. **Collapse optional sections** using details/summary if supported
 
-### 5. Restructure for Scanning
-
-Optimal README structure:
-```markdown
-# Project Name
-One-line description
-
-## Quick Start
-Prerequisites, install, run - all in one place
-
-## Usage
-Most common command or API example
-
-## Configuration
-Table or brief list (optional)
-
-## Documentation
-Links to detailed docs
-
-## License
-One line
-```
-
-### 6. Validate Final Size
+### 5. Validate Final Size. Loop back to Step 2 if still not under target.
 
 ```bash
 wc -l README.md
@@ -100,19 +77,11 @@ wc -l README.md
 
 Target: Under 100 lines (simple), under 200 (complex).
 
-### 7. Test Effectiveness
+## Guidance on Effectiveness
 
 Ask: "Could a new developer go from clone to running in 5 minutes?"
 - If yes, pruning is complete
 - If no, add back minimum needed steps
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-|-------|-------|------------|
-| Missing critical steps | Over-pruning | Test fresh clone, restore needed info |
-| Still confusing | Poor organization | Restructure, use headers |
-| Lost context | Removed too much explanation | Add brief clarifications |
 
 ## Success Criteria
 
