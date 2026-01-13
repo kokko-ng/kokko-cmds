@@ -21,19 +21,26 @@ If `$ARGUMENTS` is provided, use it as bump type or version.
 
 ### 1. Detect Current Version
 
-Find version in:
+Find version in common locations:
 - `pyproject.toml` (version field)
 - `package.json` (version field)
 - `src/__init__.py` or `<package>/__init__.py` (`__version__`)
+- `.claude-plugin/plugin.json` (version field)
+- `.claude-plugin/marketplace.json` (version field)
+- `Cargo.toml` (version field)
+- `version.txt` or `VERSION`
 - Other files with version strings
 
 ```bash
-# Python
-grep -E "^version\s*=" pyproject.toml
+# Search for version patterns
+grep -r '"version"' . --include="*.json" 2>/dev/null | head -20
+grep -E "^version\s*=" pyproject.toml Cargo.toml 2>/dev/null
 grep "__version__" **/__init__.py 2>/dev/null
+```
 
-# JavaScript
-grep '"version"' package.json
+Also check git tags:
+```bash
+git describe --tags --abbrev=0
 ```
 
 ### 2. Calculate New Version
@@ -47,11 +54,16 @@ Example: v0.2.7 -> v0.2.8 (patch)
 
 ### 3. Update All Version References
 
-Replace old version with new in all identified files:
-- pyproject.toml
-- package.json
-- __init__.py files
-- Any other version references
+Replace old version with new in ALL files identified in step 1. Common files include:
+- `pyproject.toml`
+- `package.json`
+- `__init__.py` files
+- `.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
+- `Cargo.toml`
+- Any other files containing version strings
+
+**Important**: Version in files must match the git tag (without 'v' prefix in files, with 'v' prefix in tags).
 
 ### 4. Verify Changes
 
