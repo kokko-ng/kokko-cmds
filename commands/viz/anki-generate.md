@@ -423,14 +423,43 @@ Write the `final_cards` array from Phase 3 to `codemap/<system-id>/anki-cards.js
 ]
 ```
 
-### Step 4B: Verify JSON validity
+### Step 4B: Verify JSON validity and format
 
 ```bash
-# Validate JSON syntax
-python3 -c "import json; json.load(open('codemap/<system-id>/anki-cards.json'))" && echo "Valid JSON"
+# Validate JSON syntax and Anki card structure
+python3 << 'EOF'
+import json
+import sys
 
-# Count cards
-python3 -c "import json; cards=json.load(open('codemap/<system-id>/anki-cards.json')); print(f'Total cards: {len(cards)}')"
+file_path = 'codemap/<system-id>/anki-cards.json'
+cards = json.load(open(file_path))
+
+errors = []
+if not isinstance(cards, list):
+    errors.append("Root must be an array")
+else:
+    for i, card in enumerate(cards):
+        if not isinstance(card, dict):
+            errors.append(f"Card {i}: must be an object")
+            continue
+        if "Front" not in card:
+            errors.append(f"Card {i}: missing 'Front' field")
+        if "Back" not in card:
+            errors.append(f"Card {i}: missing 'Back' field")
+        if "Front" in card and "Back" in card:
+            if card["Back"].lower() in card["Front"].lower():
+                errors.append(f"Card {i}: Front contains the answer '{card['Back']}'")
+
+if errors:
+    print("VALIDATION FAILED:")
+    for e in errors[:10]:
+        print(f"  - {e}")
+    if len(errors) > 10:
+        print(f"  ... and {len(errors) - 10} more errors")
+    sys.exit(1)
+else:
+    print(f"Valid Anki JSON: {len(cards)} cards")
+EOF
 ```
 
 ---
