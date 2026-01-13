@@ -18,7 +18,16 @@ If `$ARGUMENTS` is provided, use it as the review target.
 
 ## Steps
 
-### 1. Identify Review Scope
+### 1. Spawn Opus Subagents for Deep Analysis
+
+Use the Task tool with `model: "opus"` to spawn subagents for thorough review. Opus excels at:
+- Detecting subtle logic errors and edge cases
+- Evaluating architectural decisions
+- Identifying security vulnerabilities
+
+For large changes, spawn parallel Opus agents per file or module for comprehensive coverage.
+
+### 2. Identify Review Scope
 
 ```bash
 # Review uncommitted changes
@@ -34,7 +43,7 @@ git diff <base>..<head>
 git diff <file>
 ```
 
-### 2. Evaluate Against Criteria
+### 3. Evaluate Against Criteria
 
 **Correctness**
 - Does this code actually work?
@@ -64,7 +73,7 @@ git diff <file>
 - Is this adding unnecessary complexity?
 - Does this violate established patterns in the codebase?
 
-### 3. Output Format
+### 4. Output Format
 
 Be direct. No praise sandwiches. No "great job but...". State issues plainly.
 
@@ -82,7 +91,7 @@ VERDICT: APPROVE | NEEDS CHANGES | REJECT
 [One-line summary of the review outcome]
 ```
 
-### 4. Be Accurate, Not Thorough-Looking
+### 5. Be Accurate, Not Thorough-Looking
 
 Do not add false positives to appear thorough. If the code is genuinely good, say so briefly and move on:
 
