@@ -1,13 +1,13 @@
 {
-  "name": "kokko-ng-claude-code-viz",
+  "name": "kokko-ng-kokko-cmds",
   "owner": {
     "name": "kokko-ng"
   },
   "plugins": [
     {
-      "name": "claude-code-viz",
+      "name": "kokko-cmds",
       "source": "./",
-      "description": "C4 architecture mapping and Anki flashcard generation for codebases. Automatically maps your codebase using the C4 model (Context, Containers, Components, Code) and generates study flashcards.",
+      "description": "A comprehensive Claude Code plugin with commands for C4 architecture mapping, code analysis, quality checks, git workflows, infrastructure management, and AI configuration.",
       "version": "1.0.0",
       "author": {
         "name": "kokko-ng"

@@ -1,22 +1,28 @@
 {
-  "name": "claude-code-viz",
+  "name": "kokko-cmds",
   "version": "1.0.0",
-  "description": "C4 architecture mapping and Anki flashcard generation for codebases. Automatically maps your codebase using the C4 model (Context, Containers, Components, Code) and generates study flashcards.",
+  "description": "A comprehensive Claude Code plugin with commands for C4 architecture mapping, code analysis, quality checks, git workflows, infrastructure management, and AI configuration.",
   "author": {
     "name": "kokko-ng"
   },
-  "repository": "https://github.com/kokko-ng/claude-code-viz",
+  "repository": "https://github.com/kokko-ng/kokko-cmds",
   "license": "MIT",
   "keywords": [
     "c4-model",
     "architecture",
     "documentation",
-    "anki",
-    "flashcards",
-    "visualization",
-    "codebase-analysis"
+    "code-analysis",
+    "quality",
+    "git-workflow",
+    "infrastructure",
+    "ai-config"
   ],
   "commands": [
+    "./commands/ai-config/",
+    "./commands/analysis/",
+    "./commands/git/",
+    "./commands/infra/",
+    "./commands/quality/",
     "./commands/viz/"
   ]
 }
