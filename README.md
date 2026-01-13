@@ -23,6 +23,17 @@ My Claude Code plugin for day-to-day work.
 | `/quality/py-quality/` | complexity, deadcode, docs, security, types |
 | `/viz/` | c4-map, c4-verify, c4-checklist, c4-update, c4-templates, anki-generate, anki-verify |
 
+## Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `session-start-context` | Detects project type and git status at session start |
+| `stop-notification` | Plays sounds on task completion |
+| `pre-tool-cloud-ops` | Prompts before destructive cloud operations (terraform destroy, kubectl delete, etc.) |
+| `pre-tool-branch-protection` | Prompts before commits/pushes to protected branches (main, master, prod) |
+| `pre-tool-destructive-git` | Prompts before force push, hard reset, clean -fd, branch -D |
+| `prompt-expand-shorthand` | Expands shortcuts: `gd`, `assume`, `edge`, `hunt` |
+
 ## License
 
 MIT
