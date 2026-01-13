@@ -1,6 +1,6 @@
 #!/bin/bash
 # pre-tool-branch-protection.sh - Protect production branches
-# Hook #21: PreToolUse on Bash - Blocks commits/pushes on main, master, production, prod, release
+# Hook #21: PreToolUse on Bash - Warns on commits/pushes on main, master, production, prod, release
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
@@ -30,11 +30,11 @@ for branch in "${protected_branches[@]}"; do
         play_sound "warning"
         cat << EOF
 {
-  "decision": "block",
-  "reason": "BLOCKED: Force push to protected branch '${branch}' is not allowed. This could overwrite shared history and cause issues for other developers."
+  "decision": "ask",
+  "message": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
 }
 EOF
-        exit 2
+        exit 0
     fi
 
     # Also check: git push origin main --force (flag at end)
@@ -42,11 +42,11 @@ EOF
         play_sound "warning"
         cat << EOF
 {
-  "decision": "block",
-  "reason": "BLOCKED: Force push to protected branch '${branch}' is not allowed. This could overwrite shared history and cause issues for other developers."
+  "decision": "ask",
+  "message": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
 }
 EOF
-        exit 2
+        exit 0
     fi
 done
 
@@ -60,16 +60,16 @@ for branch in "${protected_branches[@]}"; do
 done
 
 if [ "$is_protected" = true ]; then
-    # Block commits, pushes, resets, and rebases on protected branches
+    # Warn about commits, pushes, resets, and rebases on protected branches
     if echo "$command" | grep -qE '^git[[:space:]]+(commit|push|reset|rebase)'; then
         play_sound "warning"
         cat << EOF
 {
-  "decision": "block",
-  "reason": "BLOCKED: You are on protected branch '${current_branch}'. Direct commits, pushes, resets, and rebases are not allowed on production branches. Please create a feature branch first: git checkout -b feature/your-feature-name"
+  "decision": "ask",
+  "message": "You are on protected branch '${current_branch}'. Allow Claude to run this git command directly on this branch?"
 }
 EOF
-        exit 2
+        exit 0
     fi
 fi
 
