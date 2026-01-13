@@ -17,6 +17,25 @@ Usage: `/git/merge [pr-number] [--base-branch name]`
 
 If `$ARGUMENTS` is provided, use it as PR number.
 
+## Pre-Merge Confirmation
+
+ALWAYS use AskUserQuestion to confirm before merging:
+
+1. **PR Selection** - Which PR(s) to merge (list open PRs first)
+2. **Merge Method** - How to merge:
+   - GitHub merge via `gh` CLI (Recommended) - Merges directly using gh pr merge
+   - Manual - Shows commands without executing
+3. **Post-Merge Actions** - Run quality checks after merge?
+
+Example:
+```
+AskUserQuestion:
+- Header: "Merge method"
+- Options:
+  - "GitHub merge via gh CLI (Recommended)" - Merges using gh pr merge --merge
+  - "Manual" - Shows commands without executing
+```
+
 ## Prerequisites
 
 - GitHub CLI installed and authenticated
