@@ -1,6 +1,6 @@
 #!/bin/bash
-# pre-tool-destructive-git.sh - Block destructive git operations
-# Hook #8: PreToolUse on Bash - Blocks force push, hard reset, clean -fd, branch -D, rebase -i
+# pre-tool-destructive-git.sh - Warn on destructive git operations
+# Hook #8: PreToolUse on Bash - Warns on force push, hard reset, clean -fd, branch -D, rebase -i
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
@@ -14,11 +14,11 @@ if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(-
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "block",
-  "reason": "BLOCKED: git push --force can overwrite remote history and cause issues for other developers. If you really need to force push, do it manually in the terminal after careful consideration."
+  "decision": "ask",
+  "message": "git push --force can overwrite remote history. Allow Claude to proceed?"
 }
 EOF
-    exit 2
+    exit 0
 fi
 
 # Hard reset
@@ -26,11 +26,11 @@ if echo "$command" | grep -qE 'git[[:space:]]+reset[[:space:]]+--hard'; then
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "block",
-  "reason": "BLOCKED: git reset --hard permanently discards all uncommitted changes. If you need to reset, consider 'git stash' first or do this manually after confirming you want to lose changes."
+  "decision": "ask",
+  "message": "git reset --hard permanently discards uncommitted changes. Allow Claude to proceed?"
 }
 EOF
-    exit 2
+    exit 0
 fi
 
 # Clean with force and directories
@@ -38,11 +38,11 @@ if echo "$command" | grep -qE 'git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f[a-zA-
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "block",
-  "reason": "BLOCKED: git clean -fd permanently removes untracked files and directories. Run 'git clean -n' first to preview what would be deleted, then do this manually if needed."
+  "decision": "ask",
+  "message": "git clean -fd permanently removes untracked files and directories. Allow Claude to proceed?"
 }
 EOF
-    exit 2
+    exit 0
 fi
 
 # Force delete branch
@@ -50,11 +50,11 @@ if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+-D'; then
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "block",
-  "reason": "BLOCKED: git branch -D force-deletes a branch without checking if it's merged. Use 'git branch -d' for safe deletion, or do this manually after confirming the branch is no longer needed."
+  "decision": "ask",
+  "message": "git branch -D force-deletes a branch without checking if merged. Allow Claude to proceed?"
 }
 EOF
-    exit 2
+    exit 0
 fi
 
 # Interactive rebase (not supported in non-interactive mode)
@@ -62,11 +62,11 @@ if echo "$command" | grep -qE 'git[[:space:]]+rebase[[:space:]]+-i|git[[:space:]
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "block",
-  "reason": "BLOCKED: git rebase -i requires interactive input which is not supported. Please run interactive rebase manually in your terminal."
+  "decision": "ask",
+  "message": "git rebase -i requires interactive input which Claude cannot provide. Allow anyway (will likely fail)?"
 }
 EOF
-    exit 2
+    exit 0
 fi
 
 # Direct push to main/master
@@ -74,11 +74,11 @@ if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(origin|upstream)[
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "block",
-  "reason": "BLOCKED: Direct push to main/master branch detected. Please create a feature branch and use a pull request workflow instead."
+  "decision": "ask",
+  "message": "Direct push to main/master detected. Allow Claude to proceed?"
 }
 EOF
-    exit 2
+    exit 0
 fi
 
 exit 0
