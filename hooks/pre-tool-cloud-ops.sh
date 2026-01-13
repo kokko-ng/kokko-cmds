@@ -1,6 +1,6 @@
 #!/bin/bash
 # pre-tool-cloud-ops.sh - Block dangerous cloud operations
-# Hook #2: PreToolUse on Bash - Blocks destructive cloud commands only
+# PreToolUse on Bash - Blocks destructive cloud commands only
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"

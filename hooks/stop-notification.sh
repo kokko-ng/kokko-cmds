@@ -1,6 +1,6 @@
 #!/bin/bash
 # stop-notification.sh - Play sound on task completion
-# Hook #30: Stop - Plays different sounds based on stop reason
+# Stop - Plays different sounds based on stop reason
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"

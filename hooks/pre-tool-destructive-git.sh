@@ -1,6 +1,6 @@
 #!/bin/bash
 # pre-tool-destructive-git.sh - Warn on destructive git operations
-# Hook #8: PreToolUse on Bash - Warns on force push, hard reset, clean -fd, branch -D, rebase -i
+# PreToolUse on Bash - Warns on force push, hard reset, clean -fd, branch -D, rebase -i
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
