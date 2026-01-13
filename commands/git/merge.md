@@ -10,7 +10,7 @@ List, select, and merge pull requests with quality checks.
 
 ## Arguments
 
-Usage: `/pr-merge [pr-number] [--base-branch name]`
+Usage: `/git/merge [pr-number] [--base-branch name]`
 
 - `pr-number` - Specific PR to merge (default: list all open PRs)
 - `--base-branch` - Target branch (default: main)

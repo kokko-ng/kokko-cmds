@@ -10,7 +10,7 @@ Create a pull request using GitHub CLI with comprehensive change analysis.
 
 ## Arguments
 
-Usage: `/pr-create [base-branch] [--title "title"]`
+Usage: `/git/pr [base-branch] [--title "title"]`
 
 - `base-branch` - Target branch for PR (default: main)
 - `--title` - Optional PR title override
@@ -116,7 +116,7 @@ EOF
 |-------|-------|------------|
 | Branch not pushed | Local only | Run `git push -u origin <branch>` |
 | PR already exists | Duplicate | Update existing PR instead |
-| Base branch behind | Need to update | Run `/gitpull` first |
+| Base branch behind | Need to update | Run `/git/sync` first |
 
 ## Success Criteria
 

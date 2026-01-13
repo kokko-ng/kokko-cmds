@@ -10,7 +10,7 @@ Increment version, create PR, merge, and publish release.
 
 ## Arguments
 
-Usage: `/version-bump [bump-type] [--version x.y.z]`
+Usage: `/git/release [bump-type] [--version x.y.z]`
 
 - `bump-type` - Type of bump: patch, minor, major (default: patch)
 - `--version` - Explicit version to set (overrides bump-type)
