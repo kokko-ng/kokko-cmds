@@ -19,7 +19,16 @@ If `$ARGUMENTS` is provided, use it as the target path.
 
 ## Steps
 
-### 1. Deep Code Reading
+### 1. Spawn Opus Subagents for Deep Analysis
+
+Use the Task tool with `model: "opus"` to spawn subagents for thorough analysis. Opus excels at:
+- Complex reasoning about code architecture
+- Identifying subtle design flaws
+- Understanding nuanced business logic
+
+Spawn parallel Opus agents per module or domain area for comprehensive coverage.
+
+### 2. Deep Code Reading (delegate to Opus)
 
 **Read every source file systematically:**
 - Understand complete codebase structure
@@ -27,7 +36,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Analyze data flow and transformations
 - Map dependency relationships between modules
 
-### 2. Architecture and Design Debt
+### 3. Architecture and Design Debt
 
 **Identify:**
 - Architectural inconsistencies (patterns not followed)
@@ -36,7 +45,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Missing abstractions (repeated patterns not extracted)
 - Layering violations (inappropriate cross-layer dependencies)
 
-### 3. Code Quality Issues
+### 4. Code Quality Issues
 
 **Look for:**
 - Complex functions/methods (hard to understand)
@@ -45,7 +54,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Inconsistent patterns (similar problems solved differently)
 - Magic numbers/strings (hardcoded values needing constants)
 
-### 4. Maintainability Problems
+### 5. Maintainability Problems
 
 **Find:**
 - Commented-out code (dead code in comments)
@@ -54,7 +63,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Over-engineering (unnecessary complexity)
 - Under-engineering (oversimplified, will break under load)
 
-### 5. Business Logic Issues
+### 6. Business Logic Issues
 
 **Identify:**
 - Domain model inconsistencies
@@ -62,7 +71,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Incomplete features (half-implemented functionality)
 - Performance anti-patterns (inefficient algorithms)
 
-### 6. Testing and Documentation Gaps
+### 7. Testing and Documentation Gaps
 
 **Find:**
 - Untestable code (tightly coupled, hard to test)
@@ -70,7 +79,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Undocumented complex logic
 - Inconsistent error messages
 
-### 7. Security and Data Handling
+### 8. Security and Data Handling
 
 **Check for:**
 - Input validation gaps
@@ -78,7 +87,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 - Authentication/authorization inconsistencies
 - Data integrity problems
 
-### 8. Output Format
+### 9. Output Format
 
 ```markdown
 # Technical Debt Analysis Report
@@ -119,7 +128,7 @@ If `$ARGUMENTS` is provided, use it as the target path.
 4. [Low priority - address opportunistically]
 ```
 
-### 9. Review Like a Senior Developer
+### 10. Review Like a Senior Developer
 
 Question every design decision:
 - Why was this done this way?
