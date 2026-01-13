@@ -10,7 +10,7 @@ Use Vulture to detect unused code and safely remove it.
 
 ## Arguments
 
-Usage: `/vulture [target]`
+Usage: `/quality/py-quality/deadcode [target]`
 
 - `target` - Directory or file to analyze (default: current directory)
 

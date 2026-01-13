@@ -10,7 +10,7 @@ Use mypy to detect and fix type errors in Python code.
 
 ## Arguments
 
-Usage: `/mypy [target]`
+Usage: `/quality/py-quality/types [target]`
 
 - `target` - Directory or file to check (default: current directory)
 

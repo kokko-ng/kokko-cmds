@@ -10,7 +10,7 @@ Use Interrogate and Pydocstyle to ensure all functions, classes, and modules hav
 
 ## Arguments
 
-Usage: `/docstrings [target]`
+Usage: `/quality/py-quality/docs [target]`
 
 - `target` - Directory or file to check (default: auto-detect Python source directories)
 

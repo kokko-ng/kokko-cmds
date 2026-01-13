@@ -10,7 +10,7 @@ Use Radon to identify high-complexity and low-maintainability code, then refacto
 
 ## Arguments
 
-Usage: `/radon [target] [--threshold grade]`
+Usage: `/quality/py-quality/complexity [target] [--threshold grade]`
 
 - `target` - Directory or file to analyze (default: current directory)
 - `--threshold` - Minimum complexity grade to report (default: C)

@@ -10,7 +10,7 @@ Use Bandit to detect common Python security issues and refactor code safely.
 
 ## Arguments
 
-Usage: `/bandit [target] [--severity low|medium|high]`
+Usage: `/quality/py-quality/security [target] [--severity low|medium|high]`
 
 - `target` - Directory or file to scan (default: auto-detect Python source directories)
 - `--severity` - Minimum severity level to report (default: medium)
