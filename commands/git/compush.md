@@ -24,14 +24,8 @@ If `$ARGUMENTS` is provided, use it as files to commit or message.
 **Scan for secrets before committing:**
 
 ```bash
-# Option A: detect-secrets (recommended)
+# detect-secrets
 git diff --cached --name-only | xargs detect-secrets scan --list-all-secrets 2>/dev/null
-
-# Option B: gitleaks
-gitleaks detect --staged --verbose 2>/dev/null
-
-# Option C: trufflehog
-git diff --cached | trufflehog filesystem --staged 2>/dev/null
 ```
 
 **If secrets found:**
@@ -39,7 +33,7 @@ git diff --cached | trufflehog filesystem --staged 2>/dev/null
 - Use environment variables or secret management
 - **NEVER commit files containing secrets**
 
-For false positives, add to `.secrets.baseline` or `.gitleaksignore`.
+For false positives, add to `.secrets.baseline`
 
 ### 2. Assess Change Scope
 
