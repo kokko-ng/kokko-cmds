@@ -10,7 +10,7 @@ Generate a comprehensive daily summary of Azure subscription activity using Azur
 
 ## Arguments
 
-Usage: `/az-daily-summary [subscription-id] [--days n]`
+Usage: `/infra/az-status [subscription-id] [--days n]`
 
 - `subscription-id` - Azure subscription to analyze (default: current subscription)
 - `--days` - Number of days to include (default: 1)
