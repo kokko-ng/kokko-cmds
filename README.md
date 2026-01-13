@@ -1,6 +1,6 @@
 # kokko-cmds
 
-Claude Code plugin for C4 architecture mapping, code analysis, quality checks, git workflows, and infrastructure management.
+My Claude Code plugin for day-to-day work.
 
 ## Installation
 
