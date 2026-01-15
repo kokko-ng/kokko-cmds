@@ -15,6 +15,7 @@ if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(-
     cat << 'EOF'
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "git push --force can overwrite remote history. Allow Claude to proceed?"
@@ -29,6 +30,7 @@ if echo "$command" | grep -qE 'git[[:space:]]+reset[[:space:]]+--hard'; then
     cat << 'EOF'
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "git reset --hard permanently discards uncommitted changes. Allow Claude to proceed?"
@@ -43,6 +45,7 @@ if echo "$command" | grep -qE 'git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f[a-zA-
     cat << 'EOF'
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "git clean -fd permanently removes untracked files and directories. Allow Claude to proceed?"
@@ -57,6 +60,7 @@ if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+-D'; then
     cat << 'EOF'
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "git branch -D force-deletes a branch without checking if merged. Allow Claude to proceed?"
@@ -71,6 +75,7 @@ if echo "$command" | grep -qE 'git[[:space:]]+rebase[[:space:]]+-i|git[[:space:]
     cat << 'EOF'
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "git rebase -i requires interactive input which Claude cannot provide. Allow anyway (will likely fail)?"
@@ -85,6 +90,7 @@ if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(origin|upstream)[
     cat << 'EOF'
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "Direct push to main/master detected. Allow Claude to proceed?"

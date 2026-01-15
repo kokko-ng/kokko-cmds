@@ -31,6 +31,7 @@ for branch in "${protected_branches[@]}"; do
         cat << EOF
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
@@ -45,6 +46,7 @@ EOF
         cat << EOF
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
@@ -70,6 +72,7 @@ if [ "$is_protected" = true ]; then
         cat << EOF
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "You are on protected branch '${current_branch}'. Allow Claude to run this git command directly on this branch?"
