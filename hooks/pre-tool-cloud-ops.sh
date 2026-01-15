@@ -51,6 +51,7 @@ for pattern in "${dangerous_patterns[@]}"; do
         cat << EOF
 {
   "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
   "systemMessage": "Destructive cloud operation detected. This command can delete or stop resources. Allow Claude to proceed?"
