@@ -14,8 +14,10 @@ if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(-
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "ask",
-  "message": "git push --force can overwrite remote history. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "git push --force can overwrite remote history. Allow Claude to proceed?"
 }
 EOF
     exit 0
@@ -26,8 +28,10 @@ if echo "$command" | grep -qE 'git[[:space:]]+reset[[:space:]]+--hard'; then
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "ask",
-  "message": "git reset --hard permanently discards uncommitted changes. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "git reset --hard permanently discards uncommitted changes. Allow Claude to proceed?"
 }
 EOF
     exit 0
@@ -38,8 +42,10 @@ if echo "$command" | grep -qE 'git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f[a-zA-
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "ask",
-  "message": "git clean -fd permanently removes untracked files and directories. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "git clean -fd permanently removes untracked files and directories. Allow Claude to proceed?"
 }
 EOF
     exit 0
@@ -50,8 +56,10 @@ if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+-D'; then
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "ask",
-  "message": "git branch -D force-deletes a branch without checking if merged. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "git branch -D force-deletes a branch without checking if merged. Allow Claude to proceed?"
 }
 EOF
     exit 0
@@ -62,8 +70,10 @@ if echo "$command" | grep -qE 'git[[:space:]]+rebase[[:space:]]+-i|git[[:space:]
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "ask",
-  "message": "git rebase -i requires interactive input which Claude cannot provide. Allow anyway (will likely fail)?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "git rebase -i requires interactive input which Claude cannot provide. Allow anyway (will likely fail)?"
 }
 EOF
     exit 0
@@ -74,8 +84,10 @@ if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(origin|upstream)[
     play_sound "warning"
     cat << 'EOF'
 {
-  "decision": "ask",
-  "message": "Direct push to main/master detected. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "Direct push to main/master detected. Allow Claude to proceed?"
 }
 EOF
     exit 0

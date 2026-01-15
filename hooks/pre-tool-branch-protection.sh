@@ -30,8 +30,10 @@ for branch in "${protected_branches[@]}"; do
         play_sound "warning"
         cat << EOF
 {
-  "decision": "ask",
-  "message": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
 }
 EOF
         exit 0
@@ -42,8 +44,10 @@ EOF
         play_sound "warning"
         cat << EOF
 {
-  "decision": "ask",
-  "message": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "Force push to protected branch '${branch}' detected. This could overwrite shared history. Allow Claude to proceed?"
 }
 EOF
         exit 0
@@ -65,8 +69,10 @@ if [ "$is_protected" = true ]; then
         play_sound "warning"
         cat << EOF
 {
-  "decision": "ask",
-  "message": "You are on protected branch '${current_branch}'. Allow Claude to run this git command directly on this branch?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "You are on protected branch '${current_branch}'. Allow Claude to run this git command directly on this branch?"
 }
 EOF
         exit 0

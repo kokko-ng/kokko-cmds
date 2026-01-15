@@ -50,8 +50,10 @@ for pattern in "${dangerous_patterns[@]}"; do
 
         cat << EOF
 {
-  "decision": "ask",
-  "message": "Destructive cloud operation detected. This command can delete or stop resources. Allow Claude to proceed?"
+  "hookSpecificOutput": {
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "Destructive cloud operation detected. This command can delete or stop resources. Allow Claude to proceed?"
 }
 EOF
         exit 0
