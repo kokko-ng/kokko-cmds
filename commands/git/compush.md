@@ -37,7 +37,13 @@ git status
 git diff --stat
 ```
 
-If extensive changes exist, break into logical groups. Each commit should be cohesive. Group by: feature, bug fix, refactoring, docs, tests.
+**Atomic commits are mandatory.** If changes span multiple concerns, create multiple separate commits in sequence:
+- One feature = one commit
+- One bug fix = one commit
+- Refactoring separate from feature work
+- Tests can be with their feature or separate
+
+If you cannot describe the change in ~50 characters, split into multiple commits. Stage and commit each logical change separately before moving to the next.
 
 ### 3. Stage Changes
 
@@ -78,7 +84,7 @@ Use **Conventional Commits** format (commitizen compatible):
 | `chore` | Other changes that don't modify src or test files |
 | `revert` | Reverts a previous commit |
 
-**Scope:** Name of the component affected (e.g., `auth`, `api`, `db`, `parser`).
+**Scope:** Component affected (e.g., `auth`, `api`, `db`, `parser`).
 
 **Subject rules:**
 - Imperative, present tense: "add" not "added" nor "adds"
