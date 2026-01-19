@@ -21,99 +21,134 @@ If `$ARGUMENTS` is provided, use it as files to commit or message.
 
 ### 1. Security Check
 
-**Scan for secrets before committing:**
+Scan for secrets before committing:
 
 ```bash
-# detect-secrets
 git diff --cached --name-only | xargs detect-secrets scan --list-all-secrets 2>/dev/null
 ```
 
-**If secrets found:**
-- Remove them immediately
-- Use environment variables or secret management
-- **NEVER commit files containing secrets**
-
-For false positives, add to `.secrets.baseline`
+If secrets are found, remove them immediately. Use environment variables or secret management. **NEVER commit files containing secrets.**
 
 ### 2. Assess Change Scope
 
 Review the changes:
 ```bash
 git status
-git diff --cached --stat
+git diff --stat
 ```
 
-If extensive changes exist:
-- Break into logical groups
-- Each commit should be cohesive
-- Group by: feature, bug fix, refactoring, docs, tests
+If extensive changes exist, break into logical groups. Each commit should be cohesive. Group by: feature, bug fix, refactoring, docs, tests.
 
-### 3. Write Commit Message
+### 3. Stage Changes
 
-Use **Conventional Commits** format: `<type>(<scope>): <description>`
-
-**Types:**
-| Type | Use For |
-|------|---------|
-| `feat` | New feature or functionality |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting, whitespace |
-| `refactor` | Code change without behavior change |
-| `perf` | Performance improvement |
-| `test` | Adding or modifying tests |
-| `chore` | Build, dependencies, tooling |
-| `security` | Security-related changes |
-| `ci` | CI/CD configuration |
-
-**Rules:**
-- Scope (optional): Component affected (e.g., `auth`, `api`, `db`)
-- Description: Imperative mood, under 50 characters
-- Full first line under 72 characters
-- No emojis
-- No attribution footers
-
-**Examples:**
-```
-feat(auth): add JWT token refresh endpoint
-fix(db): resolve connection pool exhaustion
-refactor(api): simplify request validation logic
-docs: update API endpoint documentation
-chore(deps): upgrade FastAPI to 0.110.0
-```
-
-### 4. Commit Changes
-
-**Single commit (small changes):**
+Stage files for commit:
 ```bash
 git add .
-git commit -m "<type>(<scope>): <description>"
 ```
 
-**Multiple commits (extensive changes):**
+For specific files:
 ```bash
-# Core functionality
-git add src/feature/
-git commit -m "feat(feature): add core implementation"
-
-# Tests
-git add tests/
-git commit -m "test(feature): add unit tests"
-
-# Documentation
-git add docs/
-git commit -m "docs(feature): add usage documentation"
+git add <file1> <file2>
 ```
 
-### 5. Push to Remote
+### 4. Write Commit Message
 
+Use **Conventional Commits** format (commitizen compatible):
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+| Type | Description |
+|------|-------------|
+| `feat` | A new feature |
+| `fix` | A bug fix |
+| `docs` | Documentation only changes |
+| `style` | Formatting, whitespace, missing semi-colons |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `perf` | Code change that improves performance |
+| `test` | Adding or correcting tests |
+| `build` | Changes to build system or external dependencies |
+| `ci` | Changes to CI configuration files and scripts |
+| `chore` | Other changes that don't modify src or test files |
+| `revert` | Reverts a previous commit |
+
+**Scope:** Name of the component affected (e.g., `auth`, `api`, `db`, `parser`).
+
+**Subject rules:**
+- Imperative, present tense: "add" not "added" nor "adds"
+- Lowercase first letter
+- No period at the end
+- Maximum 50 characters
+
+**Body:** Motivation for the change. Wrap at 72 characters.
+
+**Footer:** Reference issues with `Closes #123` or `Fixes #456`. Breaking changes start with `BREAKING CHANGE:`.
+
+### 5. Commit
+
+Commit with the formatted message:
+```bash
+git commit -m "<type>(<scope>): <subject>"
+```
+
+For commits with body/footer, use HEREDOC:
+```bash
+git commit -m "$(cat <<'EOF'
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+EOF
+)"
+```
+
+**Examples:**
+
+Simple commit:
+```bash
+git commit -m "feat(auth): add JWT token refresh endpoint"
+```
+
+Commit with body:
+```bash
+git commit -m "$(cat <<'EOF'
+fix(db): resolve connection pool exhaustion
+
+The pool was not releasing connections after query timeout.
+Added explicit connection release in finally block.
+
+Fixes #567
+EOF
+)"
+```
+
+Breaking change:
+```bash
+git commit -m "$(cat <<'EOF'
+chore(deps): upgrade FastAPI to 0.110.0
+
+BREAKING CHANGE: minimum Python version is now 3.9
+EOF
+)"
+```
+
+### 6. Push to Remote
+
+Push to the remote repository:
 ```bash
 git push
 ```
 
-If branch is new:
+If the branch is new:
 ```bash
-git push -u origin <branch-name>
+git push -u origin $(git branch --show-current)
 ```
 
 ## Error Handling
@@ -121,12 +156,12 @@ git push -u origin <branch-name>
 | Issue | Cause | Resolution |
 |-------|-------|------------|
 | Pre-commit hook fails | Code style issues | Fix issues, re-stage, commit again |
-| Push rejected | Remote has new commits | Pull first, resolve conflicts, push |
+| Push rejected | Remote has new commits | Run `git pull --rebase` then push |
 | Secrets detected | Sensitive data in commit | Remove secrets, use env vars |
 
 ## Success Criteria
 
 - Security scan passes (no secrets)
-- Commit message follows Conventional Commits
+- Commit message follows Conventional Commits format
 - Changes logically grouped
 - Push successful
