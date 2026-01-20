@@ -23,11 +23,7 @@ codemap/
                 └── <component-id>/
                     ├── component.puml
                     ├── component.png
-                    ├── component.md
-                    └── code/
-                        ├── classes.puml
-                        ├── classes.png
-                        └── classes.md
+                    └── component.md
 ```
 
 ---
@@ -124,45 +120,6 @@ codemap/
 
 - Internal: [Same container dependencies]
 - Cross-Container: [Other container dependencies]
-
-## Drill Down - Code
-
-| Class | Purpose | Details |
-|-------|---------|---------|
-| [Name] | [Desc] | [View](./code/classes.md) |
-```
-
-### classes.md
-
-```markdown
-# Code: [Component Name] Classes
-
-<!-- Last updated: YYYY-MM-DD -->
-
-**Parent:** [Component Name](../component.md)
-**Container:** [Container Name](../../../container.md)
-**System:** [System Context](../../../../../context.md)
-
-## Class Diagram
-
-![Classes](./classes.png)
-
-## Classes
-
-| Class | File | Purpose | Pattern |
-|-------|------|---------|---------|
-| [Name] | [path:line] | [Desc] | [Pattern] |
-
-## Design Patterns
-
-| Pattern | Implementation | Description |
-|---------|----------------|-------------|
-| [Pattern] | [Class] | [Desc] |
-
-## Key Methods
-
-### [ClassName]
-- `method_name(args)` - Description
 ```
 
 ---
@@ -176,7 +133,6 @@ codemap/
 | Context | `!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml` |
 | Container | `!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml` |
 | Component | `!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml` |
-| Code | Standard PlantUML (no C4 include) |
 
 ### Valid Macros by Level
 
@@ -185,7 +141,6 @@ codemap/
 | Context | `Person()`, `System()`, `System_Ext()`, `Rel()` |
 | Container | `Container()`, `ContainerDb()`, `ContainerQueue()`, `Rel()` |
 | Component | `Component()`, `Rel()` |
-| Code | `class`, `interface`, `abstract`, arrows |
 
 ---
 
@@ -249,40 +204,9 @@ codemap/
         "source_path": "path/",
         "responsibility": "string",
         "internal_deps": ["component-id"],
-        "cross_container_deps": [],
-        "KEY_CLASSES": [
-          {"name": "ClassName", "file": "path:line", "importance": "core|supporting"}
-        ]
+        "cross_container_deps": []
       }
     ]
-  }
-}
-```
-
-### Code Phase Output
-
-```json
-{
-  "SYSTEM_ID": "from-context",
-  "CODE_BY_COMPONENT": {
-    "container-id": {
-      "component-id": {
-        "classes": [
-          {
-            "name": "ClassName",
-            "file": "path:line",
-            "purpose": "string",
-            "methods": ["method1", "method2"],
-            "inherits": "ParentClass|null",
-            "pattern": "Factory|Repository|null"
-          }
-        ],
-        "patterns_found": ["Pattern1"],
-        "class_relationships": [
-          {"from": "ClassA", "to": "ClassB", "type": "uses|inherits"}
-        ]
-      }
-    }
   }
 }
 ```
@@ -306,7 +230,7 @@ codemap/
 {
   "id": "change-001",
   "type": "ADDITION|DELETION|MODIFICATION|RENAME",
-  "level": "CONTEXT|CONTAINER|COMPONENT|CODE",
+  "level": "CONTEXT|CONTAINER|COMPONENT",
   "affected_element": {"id": "string", "current_path": "string", "source_path": "string"},
   "description": "string",
   "cascade_up": true,
@@ -343,13 +267,6 @@ Grep: "class \w+", "def \w+", "export"
 Check: Package/module structure under each container
 ```
 
-### Code/Class Detection
-
-```
-Grep: "class \w+\(", "class \w+:", "interface \w+"
-Check: Inheritance patterns, design pattern implementations
-```
-
 ---
 
 ## Navigation Link Patterns
@@ -358,7 +275,6 @@ Check: Inheritance patterns, design pattern implementations
 |------------|-------------|---------|
 | Container | `../../context.md` | Go to system context |
 | Component | `../../container.md` | Go to parent container |
-| Code | `../component.md` | Go to parent component |
 
 ### Drill-Down Table Format
 

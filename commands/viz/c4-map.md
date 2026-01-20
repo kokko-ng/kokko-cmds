@@ -1,6 +1,6 @@
 # C4 Architecture Mapping
 
-Map the codebase architecture using a hierarchical C4 model (Context -> Containers -> Components -> Code).
+Map the codebase architecture using a hierarchical C4 model (Context -> Containers -> Components).
 
 ## Arguments
 
@@ -17,7 +17,7 @@ A codebase to analyze. No existing C4 model required - this command generates th
 ## Orchestration
 
 ```
-Phase 1: Context ──> Phase 2: Containers ──> Phase 3: Components ──> Phase 4: Code ──> Phase 5: Synthesis ──> Phase 6: Files
+Phase 1: Context ──> Phase 2: Containers ──> Phase 3: Components ──> Phase 4: Synthesis ──> Phase 5: Files
 ```
 
 Each level depends on outputs from the previous level. Execute sequentially, passing outputs forward.
@@ -115,8 +115,7 @@ Parameters:
     1. Validate coherent module with clear responsibility
     2. Identify internal dependencies (same container)
     3. Identify cross-container dependencies
-    4. List KEY_CLASSES deserving Level 4 docs (core logic only)
-    5. Map component interfaces/contracts
+    4. Map component interfaces/contracts
 
     SEARCH:
     - Read __init__.py or index.ts for exports
@@ -129,45 +128,11 @@ Parameters:
 
 **WAIT for Phase 3 to complete.**
 
-Store: `COMPONENTS_BY_CONTAINER` with `KEY_CLASSES`
+Store: `COMPONENTS_BY_CONTAINER`
 
 ---
 
-## Phase 4: Code
-
-```
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Map C4 code structure"
-  prompt: |
-    Map CODE level (C4 Level 4).
-
-    CONTEXT FROM PHASE 3:
-    - SYSTEM_ID: <insert>
-    - COMPONENTS_BY_CONTAINER: <insert>
-
-    GOALS:
-    For each KEY_CLASS (only those marked, not all classes):
-    1. Read actual class implementation
-    2. Document public methods, key attributes
-    3. Identify design patterns (Repository, Factory, etc.)
-    4. Map class relationships (inheritance, composition)
-
-    SEARCH:
-    - Read files at KEY_CLASSES paths
-    - Grep for method definitions
-    - Analyze inheritance patterns
-
-    OUTPUT: JSON per c4-templates.md#code-phase-output
-    Include PlantUML class diagrams per component
-```
-
-**WAIT for Phase 4 to complete.**
-
----
-
-## Phase 5: Synthesis
+## Phase 4: Synthesis
 
 ```
 Tool: Task
@@ -181,7 +146,6 @@ Parameters:
     - Phase 1 (Context): <insert>
     - Phase 2 (Containers): <insert>
     - Phase 3 (Components): <insert>
-    - Phase 4 (Code): <insert>
 
     VALIDATION CHECKS:
     1. ID Consistency: Every element traces to parent level
@@ -202,9 +166,9 @@ Parameters:
 
 ---
 
-## Phase 6: File Generation
+## Phase 5: File Generation
 
-Using `FINAL_STRUCTURE` from Phase 5:
+Using `FINAL_STRUCTURE` from Phase 4:
 
 ### Step 1: Create Folders
 
@@ -215,11 +179,7 @@ mkdir -p codemap/$SYSTEM_ID/containers
 for CONTAINER_ID in <containers>; do
   mkdir -p codemap/$SYSTEM_ID/containers/$CONTAINER_ID/components
   for COMPONENT_ID in <components>; do
-    if <has KEY_CLASSES>; then
-      mkdir -p codemap/$SYSTEM_ID/containers/$CONTAINER_ID/components/$COMPONENT_ID/code
-    else
-      mkdir -p codemap/$SYSTEM_ID/containers/$CONTAINER_ID/components/$COMPONENT_ID
-    fi
+    mkdir -p codemap/$SYSTEM_ID/containers/$CONTAINER_ID/components/$COMPONENT_ID
   done
 done
 ```
@@ -233,7 +193,6 @@ Use templates from [c4-templates.md](./c4-templates.md#markdown-templates):
 | System | `context.puml`, `context.md` |
 | Container | `container.puml`, `container.md` |
 | Component | `component.puml`, `component.md` |
-| Code | `classes.puml`, `classes.md` |
 
 Each markdown file must include:
 - Parent navigation link
@@ -269,7 +228,6 @@ find codemap -type f | sort
 - Context level: 1 diagram
 - Containers: X containers
 - Components: Y components
-- Code: Z class diagrams
 
 ## Files Created
 - Total files: N
@@ -292,4 +250,4 @@ find codemap -type f | sort
 See [c4-templates.md](./c4-templates.md#error-handling)
 
 - If any phase fails: Report failure, do not proceed to dependent phases
-- If Phase 5 validation fails: List errors, ask user to proceed or fix
+- If Phase 4 validation fails: List errors, ask user to proceed or fix
