@@ -12,7 +12,8 @@ command=$(echo "$input" | jq -r '.tool_input.command // ""')
 protected_branches=("main" "master" "production" "prod" "release")
 
 # Check if this is a git command we care about
-if ! echo "$command" | grep -qE '^git[[:space:]]+(commit|push|reset|rebase)'; then
+# Note: no ^ anchor so we catch git commands anywhere in the string (e.g., "cd /path && git push")
+if ! echo "$command" | grep -qE 'git[[:space:]]+(commit|push|reset|rebase)'; then
     exit 0
 fi
 
@@ -67,7 +68,7 @@ done
 
 if [ "$is_protected" = true ]; then
     # Warn about commits, pushes, resets, and rebases on protected branches
-    if echo "$command" | grep -qE '^git[[:space:]]+(commit|push|reset|rebase)'; then
+    if echo "$command" | grep -qE 'git[[:space:]]+(commit|push|reset|rebase)'; then
         play_sound "warning"
         cat << EOF
 {
