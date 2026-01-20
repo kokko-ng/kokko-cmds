@@ -21,8 +21,8 @@ Phase 1: Detect Changes ──> Phase 2: Plan Updates ──> Phase 3: Apply ─
 ```
 
 **Update order:**
-- Deletions: Code -> Component -> Container -> Context (bottom-up)
-- Additions: Context -> Container -> Component -> Code (top-down)
+- Deletions: Component -> Container -> Context (bottom-up)
+- Additions: Context -> Container -> Component (top-down)
 - Modifications: Affected level + adjacent levels
 
 ---
@@ -59,7 +59,7 @@ Parameters:
 
     GOALS:
     For each changed file:
-    1. Determine C4 LEVEL: CONTEXT|CONTAINER|COMPONENT|CODE
+    1. Determine C4 LEVEL: CONTEXT|CONTAINER|COMPONENT
     2. Determine CHANGE TYPE: ADDITION|DELETION|MODIFICATION|RENAME
     3. Identify CASCADE effects (parent/child impacts)
 
@@ -94,9 +94,9 @@ Parameters:
     PHASE 1 OUTPUT: <insert>
 
     PLANNING RULES:
-    1. DELETIONS (bottom-up): code -> component -> container -> context
+    1. DELETIONS (bottom-up): component -> container -> context
     2. MODIFICATIONS: affected level + adjacent levels
-    3. ADDITIONS (top-down): context -> container -> component -> code
+    3. ADDITIONS (top-down): context -> container -> component
     4. PARALLEL: Same-level operations can run in parallel
 
     OUTPUT:
@@ -115,7 +115,7 @@ Parameters:
 ### Step 3A: Deletions (Bottom-Up)
 
 ```bash
-# Remove folders in order: code -> component -> container
+# Remove folders in order: component -> container
 rm -rf <paths from execution plan>
 ```
 
@@ -159,7 +159,7 @@ For new elements:
 mkdir -p codemap/$SYSTEM_ID/containers/<new-id>/components
 
 # Create new component
-mkdir -p codemap/$SYSTEM_ID/containers/<container>/components/<new-id>/code
+mkdir -p codemap/$SYSTEM_ID/containers/<container>/components/<new-id>
 ```
 
 ---
@@ -179,9 +179,8 @@ Parameters:
     CHECKS:
     1. Container-Context: Folders match context.md table entries
     2. Component-Container: Folders match container.md table entries
-    3. Code-Component: Code folders match component.md entries
-    4. Navigation: All links resolve to existing files
-    5. IDs: No duplicates, valid folder names
+    3. Navigation: All links resolve to existing files
+    4. IDs: No duplicates, valid folder names
 
     OUTPUT:
     {

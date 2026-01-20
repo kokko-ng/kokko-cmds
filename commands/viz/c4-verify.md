@@ -56,8 +56,7 @@ Parameters:
     CHECKS:
     1. Container Completeness: All deployable units have folders
     2. Component Completeness: All major modules documented
-    3. Code Completeness: Key classes documented (not all, just important ones)
-    4. External System Completeness: All integrations in context.puml
+    3. External System Completeness: All integrations in context.puml
 
     SEARCH:
     - Glob: **/Dockerfile, **/docker-compose.yml (containers)
@@ -66,8 +65,8 @@ Parameters:
     OUTPUT:
     {
       "check_type": "completeness",
-      "score": "X/4",
-      "findings": {containers, components, code, external_systems},
+      "score": "X/3",
+      "findings": {containers, components, external_systems},
       "issues": [<per c4-templates.md#validation-issue-schema>]
     }
 ```
@@ -187,7 +186,6 @@ Parameters:
     - context.md -> context.png
     - container.md -> container.png
     - component.md -> component.png
-    - classes.md -> classes.png
 
     FRESHNESS CHECK:
     ```bash
