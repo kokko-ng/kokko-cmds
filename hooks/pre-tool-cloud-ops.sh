@@ -272,6 +272,12 @@ dangerous_patterns=(
     # Auth operations (potentially dangerous)
     'gh[[:space:]]+auth[[:space:]]+logout'
 
+    # Admin operations (bypass protections / repository settings)
+    'gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+.*--admin'
+    'gh[[:space:]]+repo[[:space:]]+edit[[:space:]]+.*--admin'
+    'gh[[:space:]]+api[[:space:]]+.*--admin'
+    'gh[[:space:]]+.*--admin'
+
     # API DELETE operations
     'gh[[:space:]]+api[[:space:]]+.*[[:space:]]+-X[[:space:]]+DELETE'
     'gh[[:space:]]+api[[:space:]]+.*[[:space:]]+--method[[:space:]]+DELETE'
