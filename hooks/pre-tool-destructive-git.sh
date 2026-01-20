@@ -54,8 +54,8 @@ EOF
     exit 0
 fi
 
-# Force delete branch
-if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+-D'; then
+# Delete branch (any variant: -d, -D, --delete)
+if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+(-[dD]|--delete)'; then
     play_sound "warning"
     cat << 'EOF'
 {
@@ -63,7 +63,22 @@ if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+-D'; then
     "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
-  "systemMessage": "git branch -D force-deletes a branch without checking if merged. Allow Claude to proceed?"
+  "systemMessage": "git branch delete detected. Allow Claude to proceed?"
+}
+EOF
+    exit 0
+fi
+
+# Delete remote branch (git push origin --delete branch OR git push origin :branch)
+if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(.*[[:space:]])?--delete|git[[:space:]]+push[[:space:]]+[^[:space:]]+[[:space:]]+:[^[:space:]]'; then
+    play_sound "warning"
+    cat << 'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "ask"
+  },
+  "systemMessage": "Remote branch deletion detected. Allow Claude to proceed?"
 }
 EOF
     exit 0
