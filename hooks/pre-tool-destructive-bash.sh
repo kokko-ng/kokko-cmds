@@ -102,6 +102,28 @@ dangerous_patterns=(
     '\brm[[:space:]]+.*\.bash_history'
     '\brm[[:space:]]+.*\.zsh_history'
 
+    # System/power commands
+    'shutdown[[:space:]]+'
+    'reboot([[:space:]]|$)'
+    'halt([[:space:]]|$)'
+    'poweroff([[:space:]]|$)'
+    'init[[:space:]]+[06]'
+    'systemctl[[:space:]]+reboot'
+    'systemctl[[:space:]]+poweroff'
+    'systemctl[[:space:]]+halt'
+
+    # Dangerous piping (remote code execution)
+    'curl[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)'
+    'wget[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)'
+    'curl[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)'
+    'wget[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)'
+
+    # Privilege escalation
+    'sudo[[:space:]]+'
+    '\bsu[[:space:]]+-'
+    '\bsu[[:space:]]+root'
+    'doas[[:space:]]+'
+
     # Docker destructive
     'docker[[:space:]]+system[[:space:]]+prune'
     'docker[[:space:]]+volume[[:space:]]+prune'
