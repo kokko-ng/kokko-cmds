@@ -170,6 +170,20 @@ Parameters:
 
 Using `FINAL_STRUCTURE` from Phase 4:
 
+### Step 0: Download C4-PlantUML Library
+
+Download the C4-PlantUML library files if not already present:
+
+```bash
+mkdir -p codemap/.c4-plantuml
+
+# Download only if files don't exist
+[ -f codemap/.c4-plantuml/C4.puml ] || curl -sL -o codemap/.c4-plantuml/C4.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml
+[ -f codemap/.c4-plantuml/C4_Context.puml ] || curl -sL -o codemap/.c4-plantuml/C4_Context.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+[ -f codemap/.c4-plantuml/C4_Container.puml ] || curl -sL -o codemap/.c4-plantuml/C4_Container.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+[ -f codemap/.c4-plantuml/C4_Component.puml ] || curl -sL -o codemap/.c4-plantuml/C4_Component.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+```
+
 ### Step 1: Create Folders
 
 ```bash
@@ -202,7 +216,7 @@ Each markdown file must include:
 ### Step 3: Generate PNGs
 
 ```bash
-find codemap -name "*.puml" -exec plantuml -tpng {} \;
+find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 ```
 
 ### Step 4: Write README
