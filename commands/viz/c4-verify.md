@@ -305,9 +305,9 @@ Fix broken links, update drill-down tables.
 ### Step 4E: Image Fixes
 
 ```bash
-# Regenerate stale/missing PNGs
+# Regenerate stale/missing PNGs (with local C4-PlantUML library)
 for puml in <stale_pngs sources>; do
-  plantuml -tpng $puml
+  plantuml -DRELATIVE_INCLUDE="." -tpng $puml
 done
 ```
 
@@ -348,7 +348,7 @@ Parameters:
 ### Step 6A: Regenerate All PNGs
 
 ```bash
-find codemap -name "*.puml" -exec plantuml -tpng {} \;
+find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 ```
 
 ### Step 6B: Write Verification Report

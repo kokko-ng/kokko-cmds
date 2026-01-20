@@ -126,13 +126,38 @@ codemap/
 
 ## PlantUML Reference
 
+### C4-PlantUML Library Setup
+
+The C4-PlantUML library files must be stored locally in `codemap/.c4-plantuml/`:
+
+```
+codemap/.c4-plantuml/
+├── C4.puml
+├── C4_Context.puml
+├── C4_Container.puml
+└── C4_Component.puml
+```
+
+**Download URLs** (fetch if not already present):
+- `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml`
+- `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml`
+- `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml`
+- `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml`
+
 ### Include Statements by Level
 
-| Level | Include Statement |
-|-------|-------------------|
-| Context | `!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml` |
-| Container | `!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml` |
-| Component | `!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml` |
+All `.puml` diagrams must set `!RELATIVE_INCLUDE` and use relative paths to the local library:
+
+| Level | Include Statement (relative from diagram location) |
+|-------|---------------------------------------------------|
+| Context | `!define RELATIVE_INCLUDE .`<br>`!include ../.c4-plantuml/C4_Context.puml` |
+| Container | `!define RELATIVE_INCLUDE .`<br>`!include ../../../.c4-plantuml/C4_Container.puml` |
+| Component | `!define RELATIVE_INCLUDE .`<br>`!include ../../../../../.c4-plantuml/C4_Component.puml` |
+
+**Path calculation:** Count directory levels from diagram to `codemap/.c4-plantuml/`:
+- `codemap/<system>/context.puml` -> `../.c4-plantuml/`
+- `codemap/<system>/containers/<container>/container.puml` -> `../../../.c4-plantuml/`
+- `codemap/<system>/containers/<container>/components/<component>/component.puml` -> `../../../../../.c4-plantuml/`
 
 ### Valid Macros by Level
 
@@ -289,12 +314,14 @@ Check: Package/module structure under each container
 ## PNG Generation
 
 ```bash
-# Generate all PNGs
-find codemap -name "*.puml" -exec plantuml -tpng {} \;
+# Generate all PNGs (with local C4-PlantUML library)
+find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 
 # Generate single PNG
-plantuml -tpng codemap/<system-id>/context.puml
+plantuml -DRELATIVE_INCLUDE="." -tpng codemap/<system-id>/context.puml
 ```
+
+**Note:** The `-DRELATIVE_INCLUDE="."` flag enables local file resolution for C4-PlantUML includes. Exclude `.c4-plantuml/` directory from PNG generation.
 
 ---
 

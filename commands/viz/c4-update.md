@@ -207,9 +207,9 @@ Update `<!-- Last updated: YYYY-MM-DD -->` in modified files.
 ### Step 5C: Regenerate PNGs
 
 ```bash
-# Regenerate modified diagrams
-plantuml -tpng codemap/$SYSTEM_ID/context.puml
-plantuml -tpng codemap/$SYSTEM_ID/containers/<id>/container.puml
+# Regenerate modified diagrams (with local C4-PlantUML library)
+plantuml -DRELATIVE_INCLUDE="." -tpng codemap/$SYSTEM_ID/context.puml
+plantuml -DRELATIVE_INCLUDE="." -tpng codemap/$SYSTEM_ID/containers/<id>/container.puml
 # etc.
 ```
 
