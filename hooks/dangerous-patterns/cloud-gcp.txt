@@ -1,0 +1,117 @@
+# cloud-gcp.txt - Google Cloud Platform CLI destructive operations
+
+# Compute Engine destructive
+gcloud[[:space:]]+compute[[:space:]]+instances[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+instances[[:space:]]+stop
+gcloud[[:space:]]+compute[[:space:]]+instances[[:space:]]+reset
+gcloud[[:space:]]+compute[[:space:]]+disks[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+snapshots[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+images[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+networks[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+networks[[:space:]]+subnets[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+firewall-rules[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+addresses[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+routers[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+vpn-tunnels[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+instance-templates[[:space:]]+delete
+gcloud[[:space:]]+compute[[:space:]]+instance-groups[[:space:]]+delete
+
+# Cloud SQL destructive
+gcloud[[:space:]]+sql[[:space:]]+instances[[:space:]]+delete
+gcloud[[:space:]]+sql[[:space:]]+databases[[:space:]]+delete
+gcloud[[:space:]]+sql[[:space:]]+backups[[:space:]]+delete
+gcloud[[:space:]]+sql[[:space:]]+users[[:space:]]+delete
+
+# Cloud Storage destructive
+gsutil[[:space:]]+rm
+gsutil[[:space:]]+rb
+gcloud[[:space:]]+storage[[:space:]]+rm
+gcloud[[:space:]]+storage[[:space:]]+buckets[[:space:]]+delete
+
+# Cloud Functions destructive
+gcloud[[:space:]]+functions[[:space:]]+delete
+
+# Cloud Run destructive
+gcloud[[:space:]]+run[[:space:]]+services[[:space:]]+delete
+gcloud[[:space:]]+run[[:space:]]+jobs[[:space:]]+delete
+
+# GKE destructive
+gcloud[[:space:]]+container[[:space:]]+clusters[[:space:]]+delete
+gcloud[[:space:]]+container[[:space:]]+node-pools[[:space:]]+delete
+
+# App Engine destructive
+gcloud[[:space:]]+app[[:space:]]+services[[:space:]]+delete
+gcloud[[:space:]]+app[[:space:]]+versions[[:space:]]+delete
+gcloud[[:space:]]+app[[:space:]]+firewall-rules[[:space:]]+delete
+
+# Pub/Sub destructive
+gcloud[[:space:]]+pubsub[[:space:]]+topics[[:space:]]+delete
+gcloud[[:space:]]+pubsub[[:space:]]+subscriptions[[:space:]]+delete
+gcloud[[:space:]]+pubsub[[:space:]]+snapshots[[:space:]]+delete
+
+# BigQuery destructive
+bq[[:space:]]+rm
+gcloud[[:space:]]+bq[[:space:]]+.*delete
+
+# Datastore/Firestore destructive
+gcloud[[:space:]]+firestore[[:space:]]+indexes[[:space:]]+delete
+gcloud[[:space:]]+datastore[[:space:]]+indexes[[:space:]]+cleanup
+
+# IAM destructive
+gcloud[[:space:]]+iam[[:space:]]+service-accounts[[:space:]]+delete
+gcloud[[:space:]]+iam[[:space:]]+service-accounts[[:space:]]+keys[[:space:]]+delete
+gcloud[[:space:]]+projects[[:space:]]+remove-iam-policy-binding
+gcloud[[:space:]]+organizations[[:space:]]+remove-iam-policy-binding
+
+# Project destructive
+gcloud[[:space:]]+projects[[:space:]]+delete
+
+# DNS destructive
+gcloud[[:space:]]+dns[[:space:]]+managed-zones[[:space:]]+delete
+gcloud[[:space:]]+dns[[:space:]]+record-sets[[:space:]]+delete
+
+# Secret Manager destructive
+gcloud[[:space:]]+secrets[[:space:]]+delete
+gcloud[[:space:]]+secrets[[:space:]]+versions[[:space:]]+destroy
+
+# Cloud KMS destructive
+gcloud[[:space:]]+kms[[:space:]]+keys[[:space:]]+versions[[:space:]]+destroy
+gcloud[[:space:]]+kms[[:space:]]+keyrings[[:space:]]+delete
+
+# Artifact Registry destructive
+gcloud[[:space:]]+artifacts[[:space:]]+repositories[[:space:]]+delete
+gcloud[[:space:]]+artifacts[[:space:]]+packages[[:space:]]+delete
+gcloud[[:space:]]+artifacts[[:space:]]+versions[[:space:]]+delete
+
+# Container Registry destructive
+gcloud[[:space:]]+container[[:space:]]+images[[:space:]]+delete
+
+# Cloud Scheduler destructive
+gcloud[[:space:]]+scheduler[[:space:]]+jobs[[:space:]]+delete
+
+# Cloud Tasks destructive
+gcloud[[:space:]]+tasks[[:space:]]+queues[[:space:]]+delete
+
+# Memorystore destructive
+gcloud[[:space:]]+redis[[:space:]]+instances[[:space:]]+delete
+gcloud[[:space:]]+memcache[[:space:]]+instances[[:space:]]+delete
+
+# Spanner destructive
+gcloud[[:space:]]+spanner[[:space:]]+instances[[:space:]]+delete
+gcloud[[:space:]]+spanner[[:space:]]+databases[[:space:]]+delete
+
+# Dataflow destructive
+gcloud[[:space:]]+dataflow[[:space:]]+jobs[[:space:]]+cancel
+gcloud[[:space:]]+dataflow[[:space:]]+jobs[[:space:]]+drain
+
+# Dataproc destructive
+gcloud[[:space:]]+dataproc[[:space:]]+clusters[[:space:]]+delete
+gcloud[[:space:]]+dataproc[[:space:]]+jobs[[:space:]]+kill
+
+# Composer destructive
+gcloud[[:space:]]+composer[[:space:]]+environments[[:space:]]+delete
+
+# AI Platform destructive
+gcloud[[:space:]]+ai[[:space:]]+models[[:space:]]+delete
+gcloud[[:space:]]+ai[[:space:]]+endpoints[[:space:]]+delete
+gcloud[[:space:]]+ml[[:space:]]+models[[:space:]]+delete

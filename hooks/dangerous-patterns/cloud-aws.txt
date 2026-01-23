@@ -1,0 +1,134 @@
+# cloud-aws.txt - AWS CLI destructive operations
+
+# S3 destructive
+aws[[:space:]]+s3[[:space:]]+rm
+aws[[:space:]]+s3[[:space:]]+rb
+aws[[:space:]]+s3api[[:space:]]+delete-bucket
+aws[[:space:]]+s3api[[:space:]]+delete-object
+aws[[:space:]]+s3api[[:space:]]+delete-objects
+
+# EC2 destructive
+aws[[:space:]]+ec2[[:space:]]+terminate-instances
+aws[[:space:]]+ec2[[:space:]]+delete-volume
+aws[[:space:]]+ec2[[:space:]]+delete-snapshot
+aws[[:space:]]+ec2[[:space:]]+delete-key-pair
+aws[[:space:]]+ec2[[:space:]]+delete-security-group
+aws[[:space:]]+ec2[[:space:]]+delete-vpc
+aws[[:space:]]+ec2[[:space:]]+delete-subnet
+aws[[:space:]]+ec2[[:space:]]+delete-internet-gateway
+aws[[:space:]]+ec2[[:space:]]+delete-nat-gateway
+aws[[:space:]]+ec2[[:space:]]+delete-route-table
+aws[[:space:]]+ec2[[:space:]]+delete-network-interface
+aws[[:space:]]+ec2[[:space:]]+release-address
+aws[[:space:]]+ec2[[:space:]]+stop-instances
+aws[[:space:]]+ec2[[:space:]]+reboot-instances
+
+# RDS destructive
+aws[[:space:]]+rds[[:space:]]+delete-db-instance
+aws[[:space:]]+rds[[:space:]]+delete-db-cluster
+aws[[:space:]]+rds[[:space:]]+delete-db-snapshot
+aws[[:space:]]+rds[[:space:]]+delete-db-cluster-snapshot
+aws[[:space:]]+rds[[:space:]]+stop-db-instance
+aws[[:space:]]+rds[[:space:]]+stop-db-cluster
+aws[[:space:]]+rds[[:space:]]+reboot-db-instance
+
+# Lambda destructive
+aws[[:space:]]+lambda[[:space:]]+delete-function
+aws[[:space:]]+lambda[[:space:]]+delete-layer-version
+aws[[:space:]]+lambda[[:space:]]+delete-event-source-mapping
+
+# IAM destructive
+aws[[:space:]]+iam[[:space:]]+delete-user
+aws[[:space:]]+iam[[:space:]]+delete-group
+aws[[:space:]]+iam[[:space:]]+delete-role
+aws[[:space:]]+iam[[:space:]]+delete-policy
+aws[[:space:]]+iam[[:space:]]+delete-access-key
+aws[[:space:]]+iam[[:space:]]+remove-user-from-group
+aws[[:space:]]+iam[[:space:]]+detach-user-policy
+aws[[:space:]]+iam[[:space:]]+detach-role-policy
+aws[[:space:]]+iam[[:space:]]+detach-group-policy
+aws[[:space:]]+iam[[:space:]]+delete-instance-profile
+aws[[:space:]]+iam[[:space:]]+delete-service-linked-role
+
+# DynamoDB destructive
+aws[[:space:]]+dynamodb[[:space:]]+delete-table
+aws[[:space:]]+dynamodb[[:space:]]+delete-backup
+
+# ECS destructive
+aws[[:space:]]+ecs[[:space:]]+delete-cluster
+aws[[:space:]]+ecs[[:space:]]+delete-service
+aws[[:space:]]+ecs[[:space:]]+deregister-task-definition
+aws[[:space:]]+ecs[[:space:]]+stop-task
+aws[[:space:]]+ecs[[:space:]]+delete-capacity-provider
+
+# EKS destructive
+aws[[:space:]]+eks[[:space:]]+delete-cluster
+aws[[:space:]]+eks[[:space:]]+delete-nodegroup
+aws[[:space:]]+eks[[:space:]]+delete-fargate-profile
+aws[[:space:]]+eks[[:space:]]+delete-addon
+
+# Route53 destructive
+aws[[:space:]]+route53[[:space:]]+delete-hosted-zone
+aws[[:space:]]+route53[[:space:]]+change-resource-record-sets.*DELETE
+
+# CloudWatch destructive
+aws[[:space:]]+logs[[:space:]]+delete-log-group
+aws[[:space:]]+logs[[:space:]]+delete-log-stream
+aws[[:space:]]+cloudwatch[[:space:]]+delete-alarms
+aws[[:space:]]+cloudwatch[[:space:]]+delete-dashboards
+
+# SNS/SQS destructive
+aws[[:space:]]+sns[[:space:]]+delete-topic
+aws[[:space:]]+sqs[[:space:]]+delete-queue
+aws[[:space:]]+sqs[[:space:]]+purge-queue
+
+# Secrets Manager destructive
+aws[[:space:]]+secretsmanager[[:space:]]+delete-secret
+
+# KMS destructive
+aws[[:space:]]+kms[[:space:]]+schedule-key-deletion
+aws[[:space:]]+kms[[:space:]]+disable-key
+aws[[:space:]]+kms[[:space:]]+delete-alias
+
+# ElastiCache destructive
+aws[[:space:]]+elasticache[[:space:]]+delete-cache-cluster
+aws[[:space:]]+elasticache[[:space:]]+delete-replication-group
+
+# Elasticsearch/OpenSearch destructive
+aws[[:space:]]+es[[:space:]]+delete-elasticsearch-domain
+aws[[:space:]]+opensearch[[:space:]]+delete-domain
+
+# API Gateway destructive
+aws[[:space:]]+apigateway[[:space:]]+delete-rest-api
+aws[[:space:]]+apigatewayv2[[:space:]]+delete-api
+
+# Cognito destructive
+aws[[:space:]]+cognito-idp[[:space:]]+delete-user-pool
+aws[[:space:]]+cognito-identity[[:space:]]+delete-identity-pool
+
+# Kinesis destructive
+aws[[:space:]]+kinesis[[:space:]]+delete-stream
+aws[[:space:]]+firehose[[:space:]]+delete-delivery-stream
+
+# Step Functions destructive
+aws[[:space:]]+stepfunctions[[:space:]]+delete-state-machine
+aws[[:space:]]+stepfunctions[[:space:]]+stop-execution
+
+# ECR destructive
+aws[[:space:]]+ecr[[:space:]]+delete-repository
+aws[[:space:]]+ecr[[:space:]]+batch-delete-image
+
+# Elastic Beanstalk destructive
+aws[[:space:]]+elasticbeanstalk[[:space:]]+terminate-environment
+aws[[:space:]]+elasticbeanstalk[[:space:]]+delete-application
+
+# CloudFront destructive
+aws[[:space:]]+cloudfront[[:space:]]+delete-distribution
+
+# ACM destructive
+aws[[:space:]]+acm[[:space:]]+delete-certificate
+
+# Organizations destructive
+aws[[:space:]]+organizations[[:space:]]+delete-organization
+aws[[:space:]]+organizations[[:space:]]+remove-account-from-organization
+aws[[:space:]]+organizations[[:space:]]+delete-organizational-unit

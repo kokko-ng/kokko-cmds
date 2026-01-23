@@ -1,0 +1,156 @@
+# cloud-azure.txt - Azure CLI destructive operations
+
+# Generic delete patterns
+az[[:space:]]+[a-z-]+[[:space:]]+delete
+az[[:space:]]+[a-z-]+[[:space:]]+[a-z-]+[[:space:]]+delete
+
+# Resource groups
+az[[:space:]]+group[[:space:]]+delete
+az[[:space:]]+group[[:space:]]+deployment[[:space:]]+delete
+
+# Virtual machines
+az[[:space:]]+vm[[:space:]]+delete
+az[[:space:]]+vm[[:space:]]+deallocate
+az[[:space:]]+vm[[:space:]]+stop
+az[[:space:]]+vm[[:space:]]+restart
+az[[:space:]]+vm[[:space:]]+redeploy
+az[[:space:]]+vm[[:space:]]+reimage
+az[[:space:]]+vm[[:space:]]+generalize
+az[[:space:]]+vmss[[:space:]]+delete
+az[[:space:]]+vmss[[:space:]]+deallocate
+az[[:space:]]+vmss[[:space:]]+stop
+az[[:space:]]+vmss[[:space:]]+restart
+az[[:space:]]+vmss[[:space:]]+reimage
+az[[:space:]]+vmss[[:space:]]+scale
+
+# Storage
+az[[:space:]]+storage[[:space:]]+account[[:space:]]+delete
+az[[:space:]]+storage[[:space:]]+container[[:space:]]+delete
+az[[:space:]]+storage[[:space:]]+blob[[:space:]]+delete
+az[[:space:]]+storage[[:space:]]+blob[[:space:]]+delete-batch
+az[[:space:]]+storage[[:space:]]+share[[:space:]]+delete
+az[[:space:]]+storage[[:space:]]+table[[:space:]]+delete
+az[[:space:]]+storage[[:space:]]+queue[[:space:]]+delete
+
+# Networking
+az[[:space:]]+network[[:space:]]+vnet[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+nsg[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+nsg[[:space:]]+rule[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+nic[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+public-ip[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+lb[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+application-gateway[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+dns[[:space:]]+zone[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+dns[[:space:]]+record-set[[:space:]]+.*[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+private-endpoint[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+private-dns[[:space:]]+zone[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+firewall[[:space:]]+delete
+az[[:space:]]+network[[:space:]]+bastion[[:space:]]+delete
+
+# Databases
+az[[:space:]]+sql[[:space:]]+server[[:space:]]+delete
+az[[:space:]]+sql[[:space:]]+db[[:space:]]+delete
+az[[:space:]]+sql[[:space:]]+mi[[:space:]]+delete
+az[[:space:]]+mysql[[:space:]]+server[[:space:]]+delete
+az[[:space:]]+mysql[[:space:]]+flexible-server[[:space:]]+delete
+az[[:space:]]+postgres[[:space:]]+server[[:space:]]+delete
+az[[:space:]]+postgres[[:space:]]+flexible-server[[:space:]]+delete
+az[[:space:]]+cosmosdb[[:space:]]+delete
+az[[:space:]]+cosmosdb[[:space:]]+sql[[:space:]]+database[[:space:]]+delete
+az[[:space:]]+cosmosdb[[:space:]]+sql[[:space:]]+container[[:space:]]+delete
+az[[:space:]]+redis[[:space:]]+delete
+az[[:space:]]+mariadb[[:space:]]+server[[:space:]]+delete
+
+# App Services
+az[[:space:]]+webapp[[:space:]]+delete
+az[[:space:]]+webapp[[:space:]]+stop
+az[[:space:]]+webapp[[:space:]]+restart
+az[[:space:]]+webapp[[:space:]]+deployment[[:space:]]+slot[[:space:]]+delete
+az[[:space:]]+functionapp[[:space:]]+delete
+az[[:space:]]+functionapp[[:space:]]+stop
+az[[:space:]]+functionapp[[:space:]]+restart
+az[[:space:]]+staticwebapp[[:space:]]+delete
+az[[:space:]]+appservice[[:space:]]+plan[[:space:]]+delete
+
+# Container services
+az[[:space:]]+aks[[:space:]]+delete
+az[[:space:]]+aks[[:space:]]+stop
+az[[:space:]]+aks[[:space:]]+nodepool[[:space:]]+delete
+az[[:space:]]+aks[[:space:]]+nodepool[[:space:]]+scale
+az[[:space:]]+acr[[:space:]]+delete
+az[[:space:]]+acr[[:space:]]+repository[[:space:]]+delete
+az[[:space:]]+container[[:space:]]+delete
+az[[:space:]]+containerapp[[:space:]]+delete
+az[[:space:]]+containerapp[[:space:]]+revision[[:space:]]+deactivate
+
+# Identity and access
+az[[:space:]]+ad[[:space:]]+user[[:space:]]+delete
+az[[:space:]]+ad[[:space:]]+group[[:space:]]+delete
+az[[:space:]]+ad[[:space:]]+app[[:space:]]+delete
+az[[:space:]]+ad[[:space:]]+sp[[:space:]]+delete
+az[[:space:]]+role[[:space:]]+assignment[[:space:]]+delete
+az[[:space:]]+role[[:space:]]+definition[[:space:]]+delete
+az[[:space:]]+keyvault[[:space:]]+delete
+az[[:space:]]+keyvault[[:space:]]+secret[[:space:]]+delete
+az[[:space:]]+keyvault[[:space:]]+key[[:space:]]+delete
+az[[:space:]]+keyvault[[:space:]]+certificate[[:space:]]+delete
+az[[:space:]]+keyvault[[:space:]]+purge
+az[[:space:]]+identity[[:space:]]+delete
+
+# Deployments
+az[[:space:]]+deployment[[:space:]]+group[[:space:]]+delete
+az[[:space:]]+deployment[[:space:]]+sub[[:space:]]+delete
+az[[:space:]]+deployment[[:space:]]+mg[[:space:]]+delete
+az[[:space:]]+deployment[[:space:]]+tenant[[:space:]]+delete
+az[[:space:]]+deployment[[:space:]]+.*[[:space:]]+cancel
+az[[:space:]]+stack[[:space:]]+group[[:space:]]+delete
+az[[:space:]]+stack[[:space:]]+sub[[:space:]]+delete
+az[[:space:]]+stack[[:space:]]+mg[[:space:]]+delete
+
+# Messaging and eventing
+az[[:space:]]+servicebus[[:space:]]+namespace[[:space:]]+delete
+az[[:space:]]+servicebus[[:space:]]+queue[[:space:]]+delete
+az[[:space:]]+servicebus[[:space:]]+topic[[:space:]]+delete
+az[[:space:]]+eventhubs[[:space:]]+namespace[[:space:]]+delete
+az[[:space:]]+eventhubs[[:space:]]+eventhub[[:space:]]+delete
+az[[:space:]]+eventgrid[[:space:]]+topic[[:space:]]+delete
+az[[:space:]]+eventgrid[[:space:]]+domain[[:space:]]+delete
+
+# Monitoring and logging
+az[[:space:]]+monitor[[:space:]]+log-analytics[[:space:]]+workspace[[:space:]]+delete
+az[[:space:]]+monitor[[:space:]]+app-insights[[:space:]]+component[[:space:]]+delete
+az[[:space:]]+monitor[[:space:]]+diagnostic-settings[[:space:]]+delete
+az[[:space:]]+monitor[[:space:]]+action-group[[:space:]]+delete
+az[[:space:]]+monitor[[:space:]]+metrics-alert[[:space:]]+delete
+
+# Cognitive services and AI
+az[[:space:]]+cognitiveservices[[:space:]]+account[[:space:]]+delete
+az[[:space:]]+openai[[:space:]]+delete
+az[[:space:]]+ml[[:space:]]+workspace[[:space:]]+delete
+az[[:space:]]+ml[[:space:]]+compute[[:space:]]+delete
+az[[:space:]]+ml[[:space:]]+online-endpoint[[:space:]]+delete
+az[[:space:]]+ml[[:space:]]+online-deployment[[:space:]]+delete
+
+# DevOps and source control
+az[[:space:]]+devops[[:space:]]+project[[:space:]]+delete
+az[[:space:]]+repos[[:space:]]+delete
+az[[:space:]]+pipelines[[:space:]]+delete
+az[[:space:]]+boards[[:space:]]+work-item[[:space:]]+delete
+az[[:space:]]+artifacts[[:space:]]+.*[[:space:]]+delete
+
+# Other Azure services
+az[[:space:]]+apim[[:space:]]+delete
+az[[:space:]]+cdn[[:space:]]+endpoint[[:space:]]+delete
+az[[:space:]]+cdn[[:space:]]+profile[[:space:]]+delete
+az[[:space:]]+signalr[[:space:]]+delete
+az[[:space:]]+batch[[:space:]]+account[[:space:]]+delete
+az[[:space:]]+logic[[:space:]]+workflow[[:space:]]+delete
+az[[:space:]]+backup[[:space:]]+protection[[:space:]]+disable
+az[[:space:]]+backup[[:space:]]+vault[[:space:]]+delete
+az[[:space:]]+policy[[:space:]]+assignment[[:space:]]+delete
+az[[:space:]]+blueprint[[:space:]]+delete
+az[[:space:]]+lock[[:space:]]+delete
+az[[:space:]]+tag[[:space:]]+delete
+
+# Subscription and management group operations
+az[[:space:]]+account[[:space:]]+management-group[[:space:]]+delete

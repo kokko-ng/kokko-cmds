@@ -1,0 +1,122 @@
+# disk-storage.txt - Disk, partition, and filesystem operations
+
+# Filesystem formatting
+mkfs[[:space:]]+
+mkfs\.[a-z]+
+mke2fs[[:space:]]+
+mkswap[[:space:]]+
+mkntfs[[:space:]]+
+mkexfatfs[[:space:]]+
+newfs[[:space:]]+
+newfs_[a-z]+
+
+# Partition manipulation
+fdisk[[:space:]]+
+gdisk[[:space:]]+
+parted[[:space:]]+
+cfdisk[[:space:]]+
+sfdisk[[:space:]]+
+partprobe[[:space:]]+
+
+# Disk destruction with dd
+dd[[:space:]]+if=/dev/zero
+dd[[:space:]]+if=/dev/urandom
+dd[[:space:]]+if=/dev/random
+dd[[:space:]]+of=/dev/[sh]d
+dd[[:space:]]+of=/dev/nvme
+dd[[:space:]]+of=/dev/mmcblk
+dd[[:space:]]+of=/dev/disk
+dd[[:space:]]+if=.*[[:space:]]+of=/dev/
+
+# LVM operations
+lvremove[[:space:]]+
+vgremove[[:space:]]+
+pvremove[[:space:]]+
+lvchange[[:space:]]+-an
+vgchange[[:space:]]+-an
+lvreduce[[:space:]]+
+vgreduce[[:space:]]+
+
+# RAID operations
+mdadm[[:space:]]+--stop
+mdadm[[:space:]]+--remove
+mdadm[[:space:]]+-S
+mdadm[[:space:]]+--zero-superblock
+mdadm[[:space:]]+--fail
+mdadm[[:space:]]+-f
+
+# ZFS destructive
+zfs[[:space:]]+destroy
+zpool[[:space:]]+destroy
+zpool[[:space:]]+remove
+zpool[[:space:]]+offline
+zpool[[:space:]]+detach
+zpool[[:space:]]+labelclear
+
+# Btrfs destructive
+btrfs[[:space:]]+subvolume[[:space:]]+delete
+btrfs[[:space:]]+filesystem[[:space:]]+resize[[:space:]]+.*:[[:space:]]*-
+btrfs[[:space:]]+device[[:space:]]+remove
+btrfs[[:space:]]+device[[:space:]]+delete
+
+# Mount operations
+umount[[:space:]]+
+umount[[:space:]]+-f
+umount[[:space:]]+-l
+fusermount[[:space:]]+-u
+
+# Loop device removal
+losetup[[:space:]]+-d
+losetup[[:space:]]+--detach
+
+# Device mapper
+dmsetup[[:space:]]+remove
+dmsetup[[:space:]]+wipe_table
+cryptsetup[[:space:]]+close
+cryptsetup[[:space:]]+remove
+cryptsetup[[:space:]]+erase
+cryptsetup[[:space:]]+luksErase
+
+# iSCSI
+iscsiadm[[:space:]]+.*--logout
+iscsiadm[[:space:]]+.*-u
+targetcli[[:space:]]+.*delete
+
+# Disk wiping utilities
+wipefs[[:space:]]+
+blkdiscard[[:space:]]+
+hdparm[[:space:]]+--security-erase
+hdparm[[:space:]]+--user-master
+nvme[[:space:]]+format
+nvme[[:space:]]+sanitize
+
+# Filesystem check that can modify
+fsck[[:space:]]+-y
+fsck[[:space:]]+-a
+e2fsck[[:space:]]+-y
+e2fsck[[:space:]]+-p
+xfs_repair[[:space:]]+
+
+# Resize operations (can lose data if shrinking)
+resize2fs[[:space:]]+
+xfs_growfs[[:space:]]+
+btrfs[[:space:]]+filesystem[[:space:]]+resize
+
+# Quota operations
+quotaoff[[:space:]]+
+quotacheck[[:space:]]+-c
+
+# Swap operations
+swapoff[[:space:]]+
+
+# macOS disk utilities
+diskutil[[:space:]]+eraseDisk
+diskutil[[:space:]]+eraseVolume
+diskutil[[:space:]]+partitionDisk
+diskutil[[:space:]]+secureErase
+diskutil[[:space:]]+unmount
+diskutil[[:space:]]+unmountDisk
+diskutil[[:space:]]+apfs[[:space:]]+deleteVolume
+diskutil[[:space:]]+apfs[[:space:]]+deleteContainer
+diskutil[[:space:]]+cs[[:space:]]+delete
+hdiutil[[:space:]]+detach

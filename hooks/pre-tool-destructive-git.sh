@@ -1,114 +1,30 @@
 #!/bin/bash
 # pre-tool-destructive-git.sh - Warn on destructive git operations
 # PreToolUse on Bash - Warns on force push, hard reset, clean -fd, branch -D, rebase -i
+#
+# This hook loads patterns from:
+#   hooks/dangerous-patterns/git.txt
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
+source "$SCRIPT_DIR/utils/load-patterns.sh"
 
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command // ""')
 
-# Check for destructive git patterns
-# Force push variants
-if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(--force|-f)([[:space:]]|$)'; then
-    play_sound "warning"
-    cat << 'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "git push --force can overwrite remote history. Allow Claude to proceed?"
-}
-EOF
-    exit 0
-fi
+# Load git-specific patterns
+load_patterns "git"
 
-# Hard reset
-if echo "$command" | grep -qE 'git[[:space:]]+reset[[:space:]]+--hard'; then
+if check_dangerous_pattern "$command"; then
     play_sound "warning"
-    cat << 'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "git reset --hard permanently discards uncommitted changes. Allow Claude to proceed?"
-}
-EOF
-    exit 0
-fi
 
-# Clean with force and directories
-if echo "$command" | grep -qE 'git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*d|git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*d[a-zA-Z]*f'; then
-    play_sound "warning"
-    cat << 'EOF'
+    cat << EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
     "permissionDecision": "ask"
   },
-  "systemMessage": "git clean -fd permanently removes untracked files and directories. Allow Claude to proceed?"
-}
-EOF
-    exit 0
-fi
-
-# Delete branch (any variant: -d, -D, --delete)
-if echo "$command" | grep -qE 'git[[:space:]]+branch[[:space:]]+(-[dD]|--delete)'; then
-    play_sound "warning"
-    cat << 'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "git branch delete detected. Allow Claude to proceed?"
-}
-EOF
-    exit 0
-fi
-
-# Delete remote branch (git push origin --delete branch OR git push origin :branch)
-if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(.*[[:space:]])?--delete|git[[:space:]]+push[[:space:]]+[^[:space:]]+[[:space:]]+:[^[:space:]]'; then
-    play_sound "warning"
-    cat << 'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "Remote branch deletion detected. Allow Claude to proceed?"
-}
-EOF
-    exit 0
-fi
-
-# Interactive rebase (not supported in non-interactive mode)
-if echo "$command" | grep -qE 'git[[:space:]]+rebase[[:space:]]+-i|git[[:space:]]+rebase[[:space:]]+--interactive'; then
-    play_sound "warning"
-    cat << 'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "git rebase -i requires interactive input which Claude cannot provide. Allow anyway (will likely fail)?"
-}
-EOF
-    exit 0
-fi
-
-# Direct push to main/master
-if echo "$command" | grep -qE 'git[[:space:]]+push[[:space:]]+(origin|upstream)[[:space:]]+(main|master)([[:space:]]|$)'; then
-    play_sound "warning"
-    cat << 'EOF'
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "Direct push to main/master detected. Allow Claude to proceed?"
+  "systemMessage": "Destructive git operation detected. This could rewrite history, delete branches, or discard changes. Allow Claude to proceed?"
 }
 EOF
     exit 0

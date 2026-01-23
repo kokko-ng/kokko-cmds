@@ -1,0 +1,84 @@
+# permissions.txt - File permission and ownership operations
+
+# World-writable permissions (security risk)
+chmod[[:space:]]+777
+chmod[[:space:]]+-R[[:space:]]+777
+chmod[[:space:]]+a\+w
+chmod[[:space:]]+-R[[:space:]]+a\+w
+chmod[[:space:]]+o\+w
+chmod[[:space:]]+-R[[:space:]]+o\+w
+
+# Remove all permissions
+chmod[[:space:]]+000
+chmod[[:space:]]+-R[[:space:]]+000
+
+# Recursive chmod (can break systems)
+chmod[[:space:]]+-R[[:space:]]+
+chmod[[:space:]]+--recursive[[:space:]]+
+
+# SUID/SGID manipulation (security sensitive)
+chmod[[:space:]]+[ug]\+s
+chmod[[:space:]]+[0-7]?[4-7][0-7][0-7][0-7]
+chmod[[:space:]]+4[0-7][0-7][0-7]
+chmod[[:space:]]+2[0-7][0-7][0-7]
+chmod[[:space:]]+6[0-7][0-7][0-7]
+
+# Sticky bit removal
+chmod[[:space:]]+-t
+chmod[[:space:]]+0[0-7][0-7][0-7]
+
+# Recursive ownership change
+chown[[:space:]]+-R
+chown[[:space:]]+--recursive
+chgrp[[:space:]]+-R
+chgrp[[:space:]]+--recursive
+
+# Change ownership to root
+chown[[:space:]]+root
+chown[[:space:]]+0:
+
+# Change ownership on system directories
+chown[[:space:]]+.*[[:space:]]+/etc
+chown[[:space:]]+.*[[:space:]]+/usr
+chown[[:space:]]+.*[[:space:]]+/var
+chown[[:space:]]+.*[[:space:]]+/bin
+chown[[:space:]]+.*[[:space:]]+/sbin
+chown[[:space:]]+.*[[:space:]]+/lib
+chmod[[:space:]]+.*[[:space:]]+/etc
+chmod[[:space:]]+.*[[:space:]]+/usr
+chmod[[:space:]]+.*[[:space:]]+/var
+chmod[[:space:]]+.*[[:space:]]+/bin
+chmod[[:space:]]+.*[[:space:]]+/sbin
+chmod[[:space:]]+.*[[:space:]]+/lib
+
+# ACL manipulation
+setfacl[[:space:]]+-b
+setfacl[[:space:]]+--remove-all
+setfacl[[:space:]]+-x
+setfacl[[:space:]]+--remove
+
+# Extended attributes
+setattr[[:space:]]+-i
+chattr[[:space:]]+-i
+chattr[[:space:]]+\+i[[:space:]]+/
+
+# macOS specific
+xattr[[:space:]]+-d
+xattr[[:space:]]+-c
+xattr[[:space:]]+--clear
+
+# SELinux
+setenforce[[:space:]]+0
+chcon[[:space:]]+-R
+restorecon[[:space:]]+-R
+semanage[[:space:]]+.*[[:space:]]+--delete
+setsebool[[:space:]]
+
+# AppArmor
+aa-disable
+aa-teardown
+apparmor_parser[[:space:]]+-R
+
+# Capabilities
+setcap[[:space:]]+-r
+setcap[[:space:]]+cap_.*=

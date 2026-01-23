@@ -1,0 +1,78 @@
+# docker.txt - Docker and container destructive operations
+
+# Docker prune operations
+docker[[:space:]]+system[[:space:]]+prune
+docker[[:space:]]+volume[[:space:]]+prune
+docker[[:space:]]+container[[:space:]]+prune
+docker[[:space:]]+image[[:space:]]+prune
+docker[[:space:]]+network[[:space:]]+prune
+docker[[:space:]]+builder[[:space:]]+prune
+
+# Force remove containers/images
+docker[[:space:]]+rm[[:space:]]+-f
+docker[[:space:]]+rm[[:space:]]+--force
+docker[[:space:]]+rmi[[:space:]]+-f
+docker[[:space:]]+rmi[[:space:]]+--force
+
+# Stop and kill containers
+docker[[:space:]]+stop
+docker[[:space:]]+kill
+
+# Remove volumes
+docker[[:space:]]+volume[[:space:]]+rm
+docker[[:space:]]+volume[[:space:]]+remove
+
+# Remove networks
+docker[[:space:]]+network[[:space:]]+rm
+docker[[:space:]]+network[[:space:]]+remove
+
+# Docker Compose destructive
+docker-compose[[:space:]]+down
+docker-compose[[:space:]]+rm
+docker-compose[[:space:]]+kill
+docker-compose[[:space:]]+stop
+docker[[:space:]]+compose[[:space:]]+down
+docker[[:space:]]+compose[[:space:]]+rm
+docker[[:space:]]+compose[[:space:]]+kill
+docker[[:space:]]+compose[[:space:]]+stop
+
+# Docker Compose with volumes (data loss)
+docker-compose[[:space:]]+down[[:space:]]+-v
+docker-compose[[:space:]]+down[[:space:]]+--volumes
+docker[[:space:]]+compose[[:space:]]+down[[:space:]]+-v
+docker[[:space:]]+compose[[:space:]]+down[[:space:]]+--volumes
+
+# Docker Swarm destructive
+docker[[:space:]]+swarm[[:space:]]+leave
+docker[[:space:]]+node[[:space:]]+rm
+docker[[:space:]]+service[[:space:]]+rm
+docker[[:space:]]+service[[:space:]]+remove
+docker[[:space:]]+stack[[:space:]]+rm
+docker[[:space:]]+stack[[:space:]]+remove
+docker[[:space:]]+secret[[:space:]]+rm
+docker[[:space:]]+config[[:space:]]+rm
+
+# Docker context manipulation
+docker[[:space:]]+context[[:space:]]+rm
+docker[[:space:]]+context[[:space:]]+remove
+
+# Podman equivalents
+podman[[:space:]]+system[[:space:]]+prune
+podman[[:space:]]+rm[[:space:]]+-f
+podman[[:space:]]+rmi[[:space:]]+-f
+podman[[:space:]]+stop
+podman[[:space:]]+kill
+podman[[:space:]]+volume[[:space:]]+rm
+podman[[:space:]]+pod[[:space:]]+rm
+podman[[:space:]]+pod[[:space:]]+stop
+
+# Container runtime (containerd/nerdctl)
+nerdctl[[:space:]]+rm[[:space:]]+-f
+nerdctl[[:space:]]+rmi[[:space:]]+-f
+nerdctl[[:space:]]+stop
+nerdctl[[:space:]]+kill
+ctr[[:space:]]+containers[[:space:]]+rm
+ctr[[:space:]]+images[[:space:]]+rm
+crictl[[:space:]]+rm
+crictl[[:space:]]+rmi
+crictl[[:space:]]+stop

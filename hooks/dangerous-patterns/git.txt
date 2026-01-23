@@ -1,0 +1,74 @@
+# git.txt - Git destructive operations
+
+# Force push variants
+git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(--force|-f)([[:space:]]|$)
+git[[:space:]]+push[[:space:]]+--force-with-lease
+
+# Hard reset
+git[[:space:]]+reset[[:space:]]+--hard
+git[[:space:]]+reset[[:space:]]+--merge
+git[[:space:]]+reset[[:space:]]+--keep
+
+# Clean with force and directories
+git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f
+git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*d
+git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*x
+
+# Delete branch (any variant)
+git[[:space:]]+branch[[:space:]]+(-[dD]|--delete)
+
+# Delete remote branch
+git[[:space:]]+push[[:space:]]+(.*[[:space:]])?--delete
+git[[:space:]]+push[[:space:]]+[^[:space:]]+[[:space:]]+:[^[:space:]]
+
+# Interactive rebase (requires interaction)
+git[[:space:]]+rebase[[:space:]]+-i
+git[[:space:]]+rebase[[:space:]]+--interactive
+
+# Direct push to main/master
+git[[:space:]]+push[[:space:]]+(origin|upstream)[[:space:]]+(main|master)([[:space:]]|$)
+
+# Checkout/restore that discards changes
+git[[:space:]]+checkout[[:space:]]+--[[:space:]]+\.
+git[[:space:]]+checkout[[:space:]]+\.
+git[[:space:]]+restore[[:space:]]+--staged[[:space:]]+\.
+git[[:space:]]+restore[[:space:]]+\.
+
+# Stash destructive operations
+git[[:space:]]+stash[[:space:]]+drop
+git[[:space:]]+stash[[:space:]]+clear
+git[[:space:]]+stash[[:space:]]+pop[[:space:]]+--index
+
+# History rewriting
+git[[:space:]]+filter-branch
+git[[:space:]]+filter-repo
+git[[:space:]]+rebase[[:space:]]+-[^i]
+
+# Reflog manipulation
+git[[:space:]]+reflog[[:space:]]+expire
+git[[:space:]]+reflog[[:space:]]+delete
+
+# Garbage collection (can remove unreachable objects)
+git[[:space:]]+gc[[:space:]]+--prune
+git[[:space:]]+prune
+
+# Submodule removal
+git[[:space:]]+submodule[[:space:]]+deinit
+git[[:space:]]+rm[[:space:]]+--cached
+
+# Worktree removal
+git[[:space:]]+worktree[[:space:]]+remove
+git[[:space:]]+worktree[[:space:]]+prune
+
+# Tag deletion
+git[[:space:]]+tag[[:space:]]+-d
+git[[:space:]]+tag[[:space:]]+--delete
+git[[:space:]]+push[[:space:]]+.*[[:space:]]+:refs/tags/
+
+# Remote manipulation
+git[[:space:]]+remote[[:space:]]+remove
+git[[:space:]]+remote[[:space:]]+rm
+
+# Config manipulation (security-sensitive)
+git[[:space:]]+config[[:space:]]+--global[[:space:]]+--unset
+git[[:space:]]+config[[:space:]]+--system

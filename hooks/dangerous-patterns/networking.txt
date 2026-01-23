@@ -1,0 +1,103 @@
+# networking.txt - Network configuration and firewall operations
+
+# iptables (Linux firewall)
+iptables[[:space:]]+-F
+iptables[[:space:]]+-X
+iptables[[:space:]]+-D
+iptables[[:space:]]+--flush
+iptables[[:space:]]+--delete
+iptables[[:space:]]+--delete-chain
+ip6tables[[:space:]]+-F
+ip6tables[[:space:]]+-X
+ip6tables[[:space:]]+-D
+iptables-restore[[:space:]]
+
+# nftables
+nft[[:space:]]+flush
+nft[[:space:]]+delete
+nft[[:space:]]+destroy
+
+# UFW (Ubuntu firewall)
+ufw[[:space:]]+disable
+ufw[[:space:]]+reset
+ufw[[:space:]]+delete
+
+# firewalld
+firewall-cmd[[:space:]]+--remove
+firewall-cmd[[:space:]]+--delete
+firewall-cmd[[:space:]]+--panic-on
+systemctl[[:space:]]+stop[[:space:]]+firewalld
+
+# pf (macOS/BSD firewall)
+pfctl[[:space:]]+-d
+pfctl[[:space:]]+-F
+
+# Network interface control
+ifconfig[[:space:]]+.*[[:space:]]+down
+ifdown[[:space:]]+
+ip[[:space:]]+link[[:space:]]+set[[:space:]]+.*[[:space:]]+down
+ip[[:space:]]+link[[:space:]]+delete
+ip[[:space:]]+addr[[:space:]]+del
+ip[[:space:]]+addr[[:space:]]+flush
+
+# Route manipulation
+route[[:space:]]+del
+route[[:space:]]+delete
+ip[[:space:]]+route[[:space:]]+del
+ip[[:space:]]+route[[:space:]]+flush
+
+# macOS networksetup
+networksetup[[:space:]]+-setairportpower[[:space:]]+.*[[:space:]]+off
+networksetup[[:space:]]+-setnetworkserviceenabled[[:space:]]+.*[[:space:]]+off
+networksetup[[:space:]]+-removeallpreferredwirelessnetworks
+networksetup[[:space:]]+-removepreferredwirelessnetwork
+
+# NetworkManager
+nmcli[[:space:]]+connection[[:space:]]+delete
+nmcli[[:space:]]+connection[[:space:]]+down
+nmcli[[:space:]]+device[[:space:]]+disconnect
+nmcli[[:space:]]+networking[[:space:]]+off
+nmcli[[:space:]]+radio[[:space:]]+wifi[[:space:]]+off
+
+# systemd-networkd
+networkctl[[:space:]]+down
+networkctl[[:space:]]+delete
+
+# Wireless tools
+iwconfig[[:space:]]+.*[[:space:]]+txpower[[:space:]]+off
+rfkill[[:space:]]+block
+
+# Bridge manipulation
+brctl[[:space:]]+delbr
+brctl[[:space:]]+delif
+ip[[:space:]]+link[[:space:]]+set[[:space:]]+.*[[:space:]]+nomaster
+
+# VLAN manipulation
+vconfig[[:space:]]+rem
+ip[[:space:]]+link[[:space:]]+delete[[:space:]]+.*[[:space:]]+type[[:space:]]+vlan
+
+# VPN/tunnel destruction
+wg-quick[[:space:]]+down
+openvpn[[:space:]]+--kill
+strongswan[[:space:]]+down
+ipsec[[:space:]]+down
+tailscale[[:space:]]+down
+tailscale[[:space:]]+logout
+
+# DNS manipulation
+resolvectl[[:space:]]+reset
+resolvectl[[:space:]]+flush-caches
+systemd-resolve[[:space:]]+--flush-caches
+dscacheutil[[:space:]]+-flushcache
+killall[[:space:]]+-HUP[[:space:]]+mDNSResponder
+
+# SSH tunnels
+pkill[[:space:]]+-f[[:space:]]+ssh
+killall[[:space:]]+ssh
+
+# Proxy settings
+unset[[:space:]]+http_proxy
+unset[[:space:]]+https_proxy
+unset[[:space:]]+HTTP_PROXY
+unset[[:space:]]+HTTPS_PROXY
+unset[[:space:]]+all_proxy
