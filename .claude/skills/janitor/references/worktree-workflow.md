@@ -56,8 +56,8 @@ Create all needed worktrees upfront to allow parallel execution.
 Spawn one subagent per worktree using the Task tool:
 
 ```
-Task: Run /quality-security py in worktree
-Prompt: Navigate to $WORKTREE_BASE/py-security and run /quality-security py
+Task: Run /security py in worktree
+Prompt: Navigate to $WORKTREE_BASE/py-security and run /security py
         Fix ALL issues found, commit incrementally
 ```
 
