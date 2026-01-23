@@ -29,55 +29,17 @@ get_expansion() {
         "gd")
             echo "Grok deeply: Thoroughly analyze and understand the topic, code, or problem at hand. Go beyond surface-level explanation - explore the underlying concepts, design decisions, trade-offs, and implications. Connect it to broader patterns and principles. Explain it in a way that builds deep intuition."
             ;;
-        "assume")
-            echo "List all assumptions you are making about this task, code, or problem. What are you taking for granted? What could be wrong? What do you need to verify before proceeding? Be explicit about uncertainties and potential blind spots."
-            ;;
-        "edge")
-            echo "Explore the edge cases. What are the boundary conditions, error states, unusual inputs, race conditions, and failure modes? Think about empty values, nulls, extremes, concurrent access, and unexpected user behavior. Be thorough and paranoid."
-            ;;
         "hunt")
             echo "Hunt this down relentlessly. Search everywhere - files, code, logs, configs, dependencies. Try every angle, follow every lead, trace every reference. Do not stop until you find or solve it. If one approach fails, try another. Exhaust all possibilities before concluding it cannot be found."
             ;;
         "clarify")
             echo "Proactively use AskUserQuestion throughout this session to clarify ambiguities. Do not assume intent when multiple interpretations exist. Ask about unclear requirements, scope boundaries, implementation preferences, and trade-offs before proceeding. Better to confirm than to redo work."
             ;;
-        "lgtm")
-            cat << 'EXPANSION'
-Execute the following skills in succession:
-1. /compush
-2. /pr
-3. /merge
-
-If any step fails, stop and report the issue before continuing.
-EXPANSION
-            ;;
-        "wip")
-            cat << 'EXPANSION'
-Create a work-in-progress commit. Please:
-1. Stage all changed files with git add
-2. Create a commit with message format: 'wip: [brief description of current work state]'
-3. Do NOT run tests or any quality checks
-4. Do NOT push to remote
-
-This is just a local checkpoint commit for saving progress.
-EXPANSION
-            ;;
-        "revert")
-            cat << 'EXPANSION'
-Safely revert the last commit:
-1. Show the last commit details (hash, message, changed files) using git log -1 and git diff HEAD~1 --stat
-2. Use AskUserQuestion to confirm the user wants to revert this specific commit
-3. If confirmed, run: git revert HEAD --no-edit
-4. Show the result and new HEAD commit
-
-Do NOT use git reset. Always use git revert to preserve history.
-EXPANSION
-            ;;
     esac
 }
 
 # List of all shorthands
-shorthands="gd assume edge hunt clarify lgtm wip revert"
+shorthands="gd hunt clarify"
 
 # Collect all matching shorthands
 matched_shorthands=""

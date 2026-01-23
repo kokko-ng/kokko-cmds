@@ -45,7 +45,7 @@ Agent skills for code quality analysis (language-agnostic):
 | `pre-tool-branch-protection` | Prompts before commits to protected branches |
 | `pre-tool-destructive-git` | Prompts before force push, hard reset |
 | `pre-tool-destructive-bash` | Prompts before rm -rf, mkfs, chmod 777 |
-| `prompt-expand-shorthand` | Expands shortcuts: gd, assume, edge, hunt |
+| `prompt-expand-shorthand` | Expands shortcuts: gd, hunt, clarify |
 
 ## License
 
