@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Azure Cost Analysis
 
 Generate a comprehensive cost breakdown of Azure subscription resources.

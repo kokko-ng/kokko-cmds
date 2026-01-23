@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # C4 Architecture Templates Reference
 
 Shared templates and patterns for c4-map, c4-update, and c4-verify commands.

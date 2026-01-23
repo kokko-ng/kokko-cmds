@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Pull and Merge from Main
 
 Pull latest changes from main branch and merge into current branch.

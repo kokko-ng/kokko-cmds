@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Azure Daily Summary
 
 Generate a comprehensive daily summary of Azure subscription activity using Azure CLI.

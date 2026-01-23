@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Interactive Dependency Update
 
 Update outdated dependencies safely with validation between updates.

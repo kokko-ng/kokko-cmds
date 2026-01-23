@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # C4 Architecture Update
 
 Update the existing hierarchical C4 model based on code changes.

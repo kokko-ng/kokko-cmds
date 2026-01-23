@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Git Branch Cleanup
 
 Find and remove stale local and remote branches safely.
