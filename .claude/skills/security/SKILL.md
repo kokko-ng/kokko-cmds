@@ -1,5 +1,5 @@
 ---
-name: quality-security
+name: security
 description: Security analysis and vulnerability fixes (bandit for py, eslint-security/npm-audit for js, SecurityCodeScan for dotnet)
 argument-hint: "[py|js|dotnet]"
 disable-model-invocation: true
