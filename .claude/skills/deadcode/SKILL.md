@@ -1,5 +1,5 @@
 ---
-name: quality-deadcode
+name: deadcode
 description: Dead code detection and removal (vulture for py, knip for js, .NET analyzers for dotnet)
 argument-hint: "[py|js|dotnet]"
 disable-model-invocation: true
