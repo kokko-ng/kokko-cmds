@@ -1,0 +1,77 @@
+# users.txt - User and group management operations
+
+# User deletion
+userdel[[:space:]]+
+deluser[[:space:]]+
+user[[:space:]]+del[[:space:]]+
+
+# User modification (can lock out)
+usermod[[:space:]]+-L
+usermod[[:space:]]+--lock
+usermod[[:space:]]+-e[[:space:]]+1
+passwd[[:space:]]+-l
+passwd[[:space:]]+--lock
+passwd[[:space:]]+-d
+passwd[[:space:]]+--delete
+
+# Group deletion
+groupdel[[:space:]]+
+delgroup[[:space:]]+
+
+# Remove user from groups
+gpasswd[[:space:]]+-d
+usermod[[:space:]]+-G[[:space:]]+""
+
+# Modify /etc/passwd or /etc/shadow directly
+vipw
+vigr
+chpasswd
+newusers
+
+# Direct edits to auth files (extremely dangerous)
+echo[[:space:]]+.*>>[[:space:]]*/etc/passwd
+echo[[:space:]]+.*>>[[:space:]]*/etc/shadow
+echo[[:space:]]+.*>>[[:space:]]*/etc/group
+echo[[:space:]]+.*>>[[:space:]]*/etc/sudoers
+cat[[:space:]]+.*>[[:space:]]*/etc/passwd
+cat[[:space:]]+.*>[[:space:]]*/etc/shadow
+
+# PAM configuration
+rm[[:space:]]+.*pam\.d
+mv[[:space:]]+.*pam\.d
+
+# sudoers manipulation
+visudo[[:space:]]+
+rm[[:space:]]+.*sudoers
+mv[[:space:]]+.*sudoers
+echo[[:space:]]+.*sudoers
+
+# SSH authorized keys manipulation
+rm[[:space:]]+.*authorized_keys
+cat[[:space:]]+.*>[[:space:]].*authorized_keys
+echo[[:space:]]+.*>[[:space:]].*authorized_keys
+truncate[[:space:]]+.*authorized_keys
+
+# Home directory removal
+rm[[:space:]]+-rf[[:space:]]+/home/
+rm[[:space:]]+-rf[[:space:]]+/Users/
+userdel[[:space:]]+-r
+
+# Login shell manipulation
+chsh[[:space:]]+
+usermod[[:space:]]+-s[[:space:]]+/sbin/nologin
+usermod[[:space:]]+-s[[:space:]]+/bin/false
+
+# Kerberos
+kdestroy[[:space:]]+
+kinit[[:space:]]+.*-k
+
+# LDAP
+ldapdelete[[:space:]]+
+ldapmodify[[:space:]]+.*changetype:[[:space:]]*delete
+
+# macOS user management
+dscl[[:space:]]+.[[:space:]]+delete
+dscl[[:space:]]+.[[:space:]]+delete[[:space:]]+/Users
+dscl[[:space:]]+.[[:space:]]+delete[[:space:]]+/Groups
+sysadminctl[[:space:]]+-deleteUser

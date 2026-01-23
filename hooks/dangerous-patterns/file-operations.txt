@@ -1,0 +1,68 @@
+# file-operations.txt - File and directory deletion patterns
+
+# rm commands - file/directory deletion
+rm[[:space:]]+-rf
+rm[[:space:]]+-fr
+rm[[:space:]]+-r[[:space:]]+-f
+rm[[:space:]]+-f[[:space:]]+-r
+rm[[:space:]]+--recursive[[:space:]]+--force
+rm[[:space:]]+--force[[:space:]]+--recursive
+rm[[:space:]]+-r[[:space:]]
+rm[[:space:]]+--recursive
+rm[[:space:]]+-f[[:space:]]
+rm[[:space:]]+--force
+\brm[[:space:]]+/
+\brm[[:space:]]+\*
+\brm[[:space:]]+\.\.
+\brm[[:space:]]+~
+\brm[[:space:]]+\$HOME
+
+# Directory removal
+rmdir[[:space:]]+
+
+# Secure deletion utilities
+shred[[:space:]]+
+srm[[:space:]]+
+wipe[[:space:]]+
+secure-delete[[:space:]]+
+
+# Truncate files
+truncate[[:space:]]+-s[[:space:]]*0
+truncate[[:space:]]+--size[[:space:]]*0
+>[[:space:]]*/
+cat[[:space:]]+/dev/null[[:space:]]*>
+
+# Move to /dev/null (data loss)
+mv[[:space:]]+.*[[:space:]]+/dev/null
+
+# Overwrite files
+cp[[:space:]]+/dev/null[[:space:]]+
+dd[[:space:]]+of=.*[[:space:]]+if=/dev/zero
+dd[[:space:]]+of=.*[[:space:]]+if=/dev/urandom
+
+# Archive with source removal
+zip[[:space:]]+-m
+zip[[:space:]]+--move
+tar[[:space:]]+--remove-files
+7z[[:space:]]+d[[:space:]]
+
+# Dangerous find -delete
+find[[:space:]]+.*-delete
+find[[:space:]]+.*-exec[[:space:]]+rm
+
+# Core system files (extremely dangerous)
+\brm[[:space:]]+.*\.bashrc
+\brm[[:space:]]+.*\.zshrc
+\brm[[:space:]]+.*\.profile
+\brm[[:space:]]+.*\.bash_profile
+\brm[[:space:]]+.*\.gitconfig
+\brm[[:space:]]+.*\.ssh
+\brm[[:space:]]+.*\.gnupg
+\brm[[:space:]]+.*\.aws
+\brm[[:space:]]+.*\.kube
+\brm[[:space:]]+.*\.config
+
+# Clearing temp and cache (can break running processes)
+rm[[:space:]]+-rf[[:space:]]+/tmp
+rm[[:space:]]+-rf[[:space:]]+/var/tmp
+rm[[:space:]]+-rf[[:space:]]+.*\.cache

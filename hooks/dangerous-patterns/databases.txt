@@ -1,0 +1,104 @@
+# databases.txt - Database destructive operations
+
+# PostgreSQL
+dropdb[[:space:]]+
+psql[[:space:]]+.*DROP[[:space:]]+DATABASE
+psql[[:space:]]+.*DROP[[:space:]]+TABLE
+psql[[:space:]]+.*DROP[[:space:]]+SCHEMA
+psql[[:space:]]+.*TRUNCATE
+psql[[:space:]]+.*DELETE[[:space:]]+FROM[[:space:]]+[^[:space:]]+[[:space:]]*;
+pg_dump[[:space:]]+.*--clean
+pg_restore[[:space:]]+.*--clean
+vacuumdb[[:space:]]+--full
+
+# MySQL/MariaDB
+mysql[[:space:]]+.*DROP[[:space:]]+DATABASE
+mysql[[:space:]]+.*DROP[[:space:]]+TABLE
+mysql[[:space:]]+.*TRUNCATE
+mysql[[:space:]]+.*DELETE[[:space:]]+FROM[[:space:]]+[^[:space:]]+[[:space:]]*;
+mysqladmin[[:space:]]+drop
+mysqladmin[[:space:]]+flush
+
+# Generic SQL patterns
+drop[[:space:]]+database
+drop[[:space:]]+table
+drop[[:space:]]+schema
+drop[[:space:]]+index
+drop[[:space:]]+view
+drop[[:space:]]+procedure
+drop[[:space:]]+function
+drop[[:space:]]+trigger
+truncate[[:space:]]+table
+delete[[:space:]]+from[[:space:]]+[^[:space:]]+[[:space:]]+where[[:space:]]+1=1
+delete[[:space:]]+from[[:space:]]+[^[:space:]]+[[:space:]]*;
+
+# SQLite
+sqlite3[[:space:]]+.*DROP[[:space:]]+TABLE
+sqlite3[[:space:]]+.*DELETE[[:space:]]+FROM
+rm[[:space:]]+.*\.sqlite
+rm[[:space:]]+.*\.db
+
+# MongoDB
+mongosh[[:space:]]+.*dropDatabase
+mongosh[[:space:]]+.*drop\(
+mongo[[:space:]]+.*dropDatabase
+mongo[[:space:]]+.*\.drop\(
+mongosh[[:space:]]+.*deleteMany
+mongo[[:space:]]+.*deleteMany
+mongosh[[:space:]]+.*remove\(
+mongo[[:space:]]+.*remove\(
+
+# Redis
+redis-cli[[:space:]]+FLUSHALL
+redis-cli[[:space:]]+FLUSHDB
+redis-cli[[:space:]]+DEBUG[[:space:]]+SEGFAULT
+redis-cli[[:space:]]+SHUTDOWN
+redis-cli[[:space:]]+DEL[[:space:]]+
+redis-cli[[:space:]]+KEYS[[:space:]]+.*\|.*DEL
+redis-cli[[:space:]]+--scan.*\|.*DEL
+
+# Elasticsearch/OpenSearch
+curl[[:space:]]+.*-X[[:space:]]+DELETE.*localhost:9200
+curl[[:space:]]+.*-X[[:space:]]+DELETE.*:9200
+curl[[:space:]]+.*-XDELETE.*:9200
+
+# Cassandra
+cqlsh[[:space:]]+.*DROP[[:space:]]+KEYSPACE
+cqlsh[[:space:]]+.*DROP[[:space:]]+TABLE
+cqlsh[[:space:]]+.*TRUNCATE
+nodetool[[:space:]]+drain
+nodetool[[:space:]]+decommission
+nodetool[[:space:]]+removenode
+
+# CouchDB
+curl[[:space:]]+.*-X[[:space:]]+DELETE.*:5984
+
+# Neo4j
+cypher-shell[[:space:]]+.*DELETE
+cypher-shell[[:space:]]+.*DETACH[[:space:]]+DELETE
+cypher-shell[[:space:]]+.*DROP
+
+# InfluxDB
+influx[[:space:]]+.*drop[[:space:]]+database
+influx[[:space:]]+.*drop[[:space:]]+measurement
+influx[[:space:]]+.*delete
+
+# etcd
+etcdctl[[:space:]]+del
+etcdctl[[:space:]]+rm
+etcdctl[[:space:]]+rmdir
+
+# Consul
+consul[[:space:]]+kv[[:space:]]+delete
+
+# Memcached
+echo[[:space:]]+"flush_all".*\|.*nc.*11211
+
+# Database backup/restore that can overwrite
+pg_restore[[:space:]]+--clean
+mysql[[:space:]]+.*<[[:space:]].*\.sql
+
+# Database user management
+psql[[:space:]]+.*DROP[[:space:]]+USER
+psql[[:space:]]+.*DROP[[:space:]]+ROLE
+mysql[[:space:]]+.*DROP[[:space:]]+USER

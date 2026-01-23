@@ -1,0 +1,89 @@
+# cloud-github.txt - GitHub CLI destructive operations
+
+# Repository operations
+gh[[:space:]]+repo[[:space:]]+delete
+gh[[:space:]]+repo[[:space:]]+archive
+gh[[:space:]]+repo[[:space:]]+unarchive
+gh[[:space:]]+repo[[:space:]]+rename
+gh[[:space:]]+repo[[:space:]]+edit[[:space:]]+--visibility
+
+# Branch operations
+gh[[:space:]]+api[[:space:]]+.*repos/.*/git/refs[[:space:]]+-X[[:space:]]+DELETE
+
+# Release operations
+gh[[:space:]]+release[[:space:]]+delete
+gh[[:space:]]+release[[:space:]]+delete-asset
+
+# Issue and PR operations
+gh[[:space:]]+issue[[:space:]]+delete
+gh[[:space:]]+issue[[:space:]]+close
+gh[[:space:]]+issue[[:space:]]+lock
+gh[[:space:]]+pr[[:space:]]+close
+gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+--delete-branch
+gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+-d
+
+# Secret operations
+gh[[:space:]]+secret[[:space:]]+delete
+gh[[:space:]]+secret[[:space:]]+remove
+
+# Variable operations
+gh[[:space:]]+variable[[:space:]]+delete
+
+# Environment operations
+gh[[:space:]]+api[[:space:]]+.*environments.*[[:space:]]+-X[[:space:]]+DELETE
+
+# Workflow operations
+gh[[:space:]]+workflow[[:space:]]+disable
+gh[[:space:]]+run[[:space:]]+cancel
+gh[[:space:]]+run[[:space:]]+delete
+
+# SSH key operations
+gh[[:space:]]+ssh-key[[:space:]]+delete
+
+# GPG key operations
+gh[[:space:]]+gpg-key[[:space:]]+delete
+
+# Label operations
+gh[[:space:]]+label[[:space:]]+delete
+
+# Codespace operations
+gh[[:space:]]+codespace[[:space:]]+delete
+gh[[:space:]]+codespace[[:space:]]+stop
+gh[[:space:]]+cs[[:space:]]+delete
+gh[[:space:]]+cs[[:space:]]+stop
+
+# Gist operations
+gh[[:space:]]+gist[[:space:]]+delete
+
+# Project operations
+gh[[:space:]]+project[[:space:]]+delete
+gh[[:space:]]+project[[:space:]]+close
+
+# Extension operations
+gh[[:space:]]+extension[[:space:]]+remove
+
+# Auth operations (potentially dangerous)
+gh[[:space:]]+auth[[:space:]]+logout
+
+# Admin operations (bypass protections / repository settings)
+gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+.*--admin
+gh[[:space:]]+repo[[:space:]]+edit[[:space:]]+.*--admin
+gh[[:space:]]+api[[:space:]]+.*--admin
+gh[[:space:]]+.*--admin
+
+# API DELETE operations
+gh[[:space:]]+api[[:space:]]+.*[[:space:]]+-X[[:space:]]+DELETE
+gh[[:space:]]+api[[:space:]]+.*[[:space:]]+--method[[:space:]]+DELETE
+
+# GitHub Actions cache deletion
+gh[[:space:]]+cache[[:space:]]+delete
+gh[[:space:]]+actions-cache[[:space:]]+delete
+
+# Package/Container deletion
+gh[[:space:]]+api[[:space:]]+.*packages.*[[:space:]]+-X[[:space:]]+DELETE
+
+# Webhook deletion
+gh[[:space:]]+api[[:space:]]+.*hooks.*[[:space:]]+-X[[:space:]]+DELETE
+
+# Deploy key deletion
+gh[[:space:]]+api[[:space:]]+.*keys.*[[:space:]]+-X[[:space:]]+DELETE

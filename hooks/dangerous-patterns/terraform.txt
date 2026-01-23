@@ -1,0 +1,75 @@
+# terraform.txt - Infrastructure as Code destructive operations
+
+# Terraform destructive
+terraform[[:space:]]+destroy
+terraform[[:space:]]+apply[[:space:]]+-auto-approve
+terraform[[:space:]]+apply[[:space:]]+--auto-approve
+terraform[[:space:]]+taint
+terraform[[:space:]]+untaint
+terraform[[:space:]]+state[[:space:]]+rm
+terraform[[:space:]]+state[[:space:]]+mv
+terraform[[:space:]]+state[[:space:]]+replace-provider
+terraform[[:space:]]+state[[:space:]]+push
+terraform[[:space:]]+force-unlock
+terraform[[:space:]]+workspace[[:space:]]+delete
+terraform[[:space:]]+import[[:space:]]+-allow-missing-config
+
+# OpenTofu (Terraform fork)
+tofu[[:space:]]+destroy
+tofu[[:space:]]+apply[[:space:]]+-auto-approve
+tofu[[:space:]]+apply[[:space:]]+--auto-approve
+tofu[[:space:]]+taint
+tofu[[:space:]]+untaint
+tofu[[:space:]]+state[[:space:]]+rm
+tofu[[:space:]]+state[[:space:]]+mv
+tofu[[:space:]]+force-unlock
+tofu[[:space:]]+workspace[[:space:]]+delete
+
+# Pulumi destructive
+pulumi[[:space:]]+destroy
+pulumi[[:space:]]+up[[:space:]]+-y
+pulumi[[:space:]]+up[[:space:]]+--yes
+pulumi[[:space:]]+refresh[[:space:]]+-y
+pulumi[[:space:]]+refresh[[:space:]]+--yes
+pulumi[[:space:]]+stack[[:space:]]+rm
+pulumi[[:space:]]+stack[[:space:]]+remove
+pulumi[[:space:]]+cancel
+pulumi[[:space:]]+state[[:space:]]+delete
+
+# Terragrunt destructive
+terragrunt[[:space:]]+destroy
+terragrunt[[:space:]]+run-all[[:space:]]+destroy
+terragrunt[[:space:]]+apply[[:space:]]+-auto-approve
+
+# CDK destructive
+cdk[[:space:]]+destroy
+cdktf[[:space:]]+destroy
+
+# CloudFormation
+aws[[:space:]]+cloudformation[[:space:]]+delete-stack
+aws[[:space:]]+cloudformation[[:space:]]+delete-change-set
+
+# Ansible destructive patterns
+ansible[[:space:]]+.*-m[[:space:]]+file[[:space:]]+.*state=absent
+ansible-playbook[[:space:]]+.*--tags[[:space:]]+destroy
+ansible-playbook[[:space:]]+.*--tags[[:space:]]+delete
+
+# Crossplane
+kubectl[[:space:]]+delete[[:space:]]+.*\.crossplane\.io
+
+# Serverless Framework
+serverless[[:space:]]+remove
+sls[[:space:]]+remove
+
+# SAM (AWS Serverless)
+sam[[:space:]]+delete
+aws[[:space:]]+sam[[:space:]]+delete
+
+# Waypoint
+waypoint[[:space:]]+destroy
+
+# Vagrant
+vagrant[[:space:]]+destroy
+
+# Packer (less destructive but can affect AMIs)
+packer[[:space:]]+.*-force

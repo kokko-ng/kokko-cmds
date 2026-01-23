@@ -1,0 +1,65 @@
+# process.txt - Process control and termination operations
+
+# Kill commands
+kill[[:space:]]+-9
+kill[[:space:]]+-SIGKILL
+kill[[:space:]]+-KILL
+kill[[:space:]]+-9[[:space:]]+1\b
+kill[[:space:]]+-9[[:space:]]+-1
+
+# Kill all processes by name
+killall[[:space:]]+
+pkill[[:space:]]+
+pkill[[:space:]]+-9
+pkill[[:space:]]+-SIGKILL
+
+# Kill process groups
+kill[[:space:]]+-[0-9]+[[:space:]]+-
+killpg[[:space:]]+
+
+# Force kill user processes
+fuser[[:space:]]+-k
+fuser[[:space:]]+-KILL
+fuser[[:space:]]+-9
+
+# X11 process killing
+xkill
+
+# Terminate by PID file
+start-stop-daemon[[:space:]]+--stop
+
+# Process control
+renice[[:space:]]+.*[[:space:]]+-p[[:space:]]+1
+ionice[[:space:]]+.*-p[[:space:]]+1
+
+# Memory management
+sync[[:space:]]+&&[[:space:]]+echo[[:space:]]+3[[:space:]]+>[[:space:]]*/proc/sys/vm/drop_caches
+echo[[:space:]]+[123][[:space:]]+>[[:space:]]*/proc/sys/vm/drop_caches
+
+# OOM killer manipulation
+echo[[:space:]]+-17[[:space:]]+>[[:space:]]*/proc/.*/oom_adj
+echo[[:space:]]+-1000[[:space:]]+>[[:space:]]*/proc/.*/oom_score_adj
+
+# Control groups (cgroups)
+cgdelete[[:space:]]+
+systemd-cgtop[[:space:]]+--kill
+
+# Process namespace destruction
+unshare[[:space:]]+--kill-child
+nsenter[[:space:]]+.*kill
+
+# Container process killing
+docker[[:space:]]+exec[[:space:]]+.*kill
+kubectl[[:space:]]+exec[[:space:]]+.*kill
+
+# Debugger that can kill
+gdb[[:space:]]+.*-ex[[:space:]]+"kill"
+lldb[[:space:]]+.*-o[[:space:]]+"kill"
+
+# Trace/debug interruption
+strace[[:space:]]+-p[[:space:]]+.*-k
+ltrace[[:space:]]+-p[[:space:]]+.*-k
+
+# Job control
+disown[[:space:]]+-a
+jobs[[:space:]]+-p[[:space:]]*\|[[:space:]]*xargs[[:space:]]+kill

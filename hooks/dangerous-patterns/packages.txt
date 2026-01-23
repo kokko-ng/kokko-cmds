@@ -1,0 +1,150 @@
+# packages.txt - Package manager destructive operations
+
+# APT (Debian/Ubuntu)
+apt[[:space:]]+remove
+apt[[:space:]]+purge
+apt[[:space:]]+autoremove
+apt-get[[:space:]]+remove
+apt-get[[:space:]]+purge
+apt-get[[:space:]]+autoremove
+dpkg[[:space:]]+-r
+dpkg[[:space:]]+--remove
+dpkg[[:space:]]+-P
+dpkg[[:space:]]+--purge
+
+# YUM/DNF (Red Hat/Fedora)
+yum[[:space:]]+remove
+yum[[:space:]]+erase
+yum[[:space:]]+autoremove
+dnf[[:space:]]+remove
+dnf[[:space:]]+erase
+dnf[[:space:]]+autoremove
+rpm[[:space:]]+-e
+rpm[[:space:]]+--erase
+
+# Pacman (Arch)
+pacman[[:space:]]+-R
+pacman[[:space:]]+-Rs
+pacman[[:space:]]+-Rns
+pacman[[:space:]]+-Rdd
+pacman[[:space:]]+-Sc
+pacman[[:space:]]+-Scc
+
+# Zypper (openSUSE)
+zypper[[:space:]]+remove
+zypper[[:space:]]+rm
+
+# APK (Alpine)
+apk[[:space:]]+del
+apk[[:space:]]+remove
+
+# Homebrew (macOS)
+brew[[:space:]]+uninstall
+brew[[:space:]]+remove
+brew[[:space:]]+rm
+brew[[:space:]]+cleanup[[:space:]]+--prune-prefix
+brew[[:space:]]+autoremove
+
+# Snap
+snap[[:space:]]+remove
+snap[[:space:]]+disable
+
+# Flatpak
+flatpak[[:space:]]+uninstall
+flatpak[[:space:]]+remove
+
+# Nix
+nix-env[[:space:]]+-e
+nix-env[[:space:]]+--uninstall
+nix-collect-garbage
+nix[[:space:]]+profile[[:space:]]+remove
+
+# pip (Python)
+pip[[:space:]]+uninstall
+pip3[[:space:]]+uninstall
+python[[:space:]]+-m[[:space:]]+pip[[:space:]]+uninstall
+python3[[:space:]]+-m[[:space:]]+pip[[:space:]]+uninstall
+
+# npm (Node.js)
+npm[[:space:]]+uninstall[[:space:]]+-g
+npm[[:space:]]+remove[[:space:]]+-g
+npm[[:space:]]+un[[:space:]]+-g
+npm[[:space:]]+rm[[:space:]]+-g
+npm[[:space:]]+cache[[:space:]]+clean
+npm[[:space:]]+prune
+
+# yarn
+yarn[[:space:]]+global[[:space:]]+remove
+yarn[[:space:]]+cache[[:space:]]+clean
+
+# pnpm
+pnpm[[:space:]]+remove[[:space:]]+-g
+pnpm[[:space:]]+uninstall[[:space:]]+-g
+pnpm[[:space:]]+store[[:space:]]+prune
+
+# bun
+bun[[:space:]]+remove[[:space:]]+-g
+bun[[:space:]]+uninstall[[:space:]]+-g
+
+# gem (Ruby)
+gem[[:space:]]+uninstall
+gem[[:space:]]+cleanup
+
+# Bundler (Ruby)
+bundle[[:space:]]+clean
+
+# Cargo (Rust)
+cargo[[:space:]]+uninstall
+rustup[[:space:]]+self[[:space:]]+uninstall
+rustup[[:space:]]+toolchain[[:space:]]+uninstall
+rustup[[:space:]]+component[[:space:]]+remove
+
+# Go
+go[[:space:]]+clean[[:space:]]+-cache
+go[[:space:]]+clean[[:space:]]+-modcache
+
+# Composer (PHP)
+composer[[:space:]]+remove
+composer[[:space:]]+clear-cache
+
+# NuGet (.NET)
+dotnet[[:space:]]+tool[[:space:]]+uninstall
+nuget[[:space:]]+delete
+
+# Conda
+conda[[:space:]]+remove
+conda[[:space:]]+uninstall
+conda[[:space:]]+env[[:space:]]+remove
+conda[[:space:]]+clean
+
+# Poetry (Python)
+poetry[[:space:]]+remove
+poetry[[:space:]]+cache[[:space:]]+clear
+
+# Pipenv (Python)
+pipenv[[:space:]]+uninstall
+pipenv[[:space:]]+--rm
+
+# Version managers
+nvm[[:space:]]+uninstall
+nvm[[:space:]]+cache[[:space:]]+clear
+pyenv[[:space:]]+uninstall
+rbenv[[:space:]]+uninstall
+goenv[[:space:]]+uninstall
+asdf[[:space:]]+uninstall
+asdf[[:space:]]+plugin[[:space:]]+remove
+volta[[:space:]]+uninstall
+fnm[[:space:]]+uninstall
+
+# SDKMAN
+sdk[[:space:]]+uninstall
+sdk[[:space:]]+flush
+
+# Chocolatey (Windows)
+choco[[:space:]]+uninstall
+
+# Scoop (Windows)
+scoop[[:space:]]+uninstall
+
+# Winget (Windows)
+winget[[:space:]]+uninstall

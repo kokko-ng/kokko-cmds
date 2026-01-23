@@ -1,0 +1,95 @@
+# kubernetes.txt - Kubernetes destructive operations
+
+# kubectl delete operations
+kubectl[[:space:]]+delete
+kubectl[[:space:]]+drain
+kubectl[[:space:]]+cordon
+kubectl[[:space:]]+uncordon
+kubectl[[:space:]]+taint
+
+# Force operations
+kubectl[[:space:]]+replace[[:space:]]+--force
+kubectl[[:space:]]+apply[[:space:]]+--force
+kubectl[[:space:]]+create[[:space:]]+--force
+
+# Rollout operations
+kubectl[[:space:]]+rollout[[:space:]]+undo
+kubectl[[:space:]]+rollout[[:space:]]+restart
+
+# Scale to zero
+kubectl[[:space:]]+scale[[:space:]]+.*--replicas=0
+
+# Edit/patch (live changes)
+kubectl[[:space:]]+patch
+kubectl[[:space:]]+edit
+
+# Namespace deletion (deletes everything in it)
+kubectl[[:space:]]+delete[[:space:]]+namespace
+kubectl[[:space:]]+delete[[:space:]]+ns
+
+# Context manipulation
+kubectl[[:space:]]+config[[:space:]]+delete-context
+kubectl[[:space:]]+config[[:space:]]+delete-cluster
+kubectl[[:space:]]+config[[:space:]]+unset
+
+# Exec with destructive commands
+kubectl[[:space:]]+exec[[:space:]]+.*rm[[:space:]]
+kubectl[[:space:]]+exec[[:space:]]+.*kill[[:space:]]
+
+# Helm operations
+helm[[:space:]]+uninstall
+helm[[:space:]]+delete
+helm[[:space:]]+rollback
+helm[[:space:]]+repo[[:space:]]+remove
+helm[[:space:]]+plugin[[:space:]]+uninstall
+
+# Kustomize delete
+kubectl[[:space:]]+delete[[:space:]]+-k
+kustomize[[:space:]]+build[[:space:]]+.*\|[[:space:]]*kubectl[[:space:]]+delete
+
+# Operator/CRD removal
+kubectl[[:space:]]+delete[[:space:]]+crd
+kubectl[[:space:]]+delete[[:space:]]+customresourcedefinition
+
+# RBAC deletion
+kubectl[[:space:]]+delete[[:space:]]+clusterrole
+kubectl[[:space:]]+delete[[:space:]]+clusterrolebinding
+kubectl[[:space:]]+delete[[:space:]]+role
+kubectl[[:space:]]+delete[[:space:]]+rolebinding
+kubectl[[:space:]]+delete[[:space:]]+serviceaccount
+
+# Secret/ConfigMap deletion
+kubectl[[:space:]]+delete[[:space:]]+secret
+kubectl[[:space:]]+delete[[:space:]]+configmap
+
+# PV/PVC deletion (data loss)
+kubectl[[:space:]]+delete[[:space:]]+pv
+kubectl[[:space:]]+delete[[:space:]]+pvc
+kubectl[[:space:]]+delete[[:space:]]+persistentvolume
+kubectl[[:space:]]+delete[[:space:]]+persistentvolumeclaim
+
+# k9s destructive (if run non-interactively)
+k9s[[:space:]]+.*--command[[:space:]]
+
+# Argo CD
+argocd[[:space:]]+app[[:space:]]+delete
+argocd[[:space:]]+cluster[[:space:]]+rm
+argocd[[:space:]]+repo[[:space:]]+rm
+argocd[[:space:]]+project[[:space:]]+delete
+
+# Flux CD
+flux[[:space:]]+uninstall
+flux[[:space:]]+delete
+flux[[:space:]]+suspend
+
+# Istio
+istioctl[[:space:]]+uninstall
+istioctl[[:space:]]+x[[:space:]]+uninstall
+
+# Linkerd
+linkerd[[:space:]]+uninstall
+
+# Knative
+kn[[:space:]]+service[[:space:]]+delete
+kn[[:space:]]+revision[[:space:]]+delete
+kn[[:space:]]+route[[:space:]]+delete

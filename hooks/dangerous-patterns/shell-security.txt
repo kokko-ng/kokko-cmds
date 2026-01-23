@@ -1,0 +1,114 @@
+# shell-security.txt - Shell, history, and security-sensitive operations
+
+# Privilege escalation
+sudo[[:space:]]+
+\bsu[[:space:]]+-
+\bsu[[:space:]]+root
+\bsu[[:space:]]+--login
+doas[[:space:]]+
+pkexec[[:space:]]+
+
+# Environment destruction
+unset[[:space:]]+PATH
+export[[:space:]]+PATH=''
+export[[:space:]]+PATH=""
+export[[:space:]]+PATH=$
+unset[[:space:]]+HOME
+unset[[:space:]]+USER
+unset[[:space:]]+SHELL
+export[[:space:]]+LD_PRELOAD=
+export[[:space:]]+LD_LIBRARY_PATH=
+
+# History manipulation
+history[[:space:]]+-c
+history[[:space:]]+-w[[:space:]]*/dev/null
+\brm[[:space:]]+.*\.bash_history
+\brm[[:space:]]+.*\.zsh_history
+\brm[[:space:]]+.*\.history
+\brm[[:space:]]+.*\.sh_history
+cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*.*_history
+truncate[[:space:]]+.*_history
+export[[:space:]]+HISTFILE=/dev/null
+export[[:space:]]+HISTSIZE=0
+unset[[:space:]]+HISTFILE
+
+# Dangerous shell options
+set[[:space:]]+\+o[[:space:]]+history
+shopt[[:space:]]+-u[[:space:]]+histappend
+
+# Remote code execution
+curl[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)
+wget[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)
+curl[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)
+wget[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)
+eval[[:space:]]+\$\(curl
+eval[[:space:]]+\$\(wget
+\$\(curl[[:space:]]
+\$\(wget[[:space:]]
+`curl[[:space:]]
+`wget[[:space:]]
+
+# SSH agent manipulation
+ssh-add[[:space:]]+-D
+ssh-add[[:space:]]+--delete-all
+ssh-agent[[:space:]]+-k
+
+# SSH known hosts manipulation
+ssh-keygen[[:space:]]+-R
+\brm[[:space:]]+.*known_hosts
+truncate[[:space:]]+.*known_hosts
+
+# GPG key manipulation
+gpg[[:space:]]+--delete-key
+gpg[[:space:]]+--delete-secret-key
+\brm[[:space:]]+-rf[[:space:]]+.*\.gnupg
+
+# Certificate manipulation
+\brm[[:space:]]+.*\.pem
+\brm[[:space:]]+.*\.crt
+\brm[[:space:]]+.*\.key
+\brm[[:space:]]+.*\.p12
+\brm[[:space:]]+.*\.pfx
+update-ca-certificates[[:space:]]+--fresh
+
+# Keychain/credential manipulation
+security[[:space:]]+delete-keychain
+security[[:space:]]+delete-generic-password
+security[[:space:]]+delete-internet-password
+keyctl[[:space:]]+clear
+keyctl[[:space:]]+revoke
+keyctl[[:space:]]+unlink
+
+# Shell profile modification
+echo[[:space:]]+.*>>[[:space:]]*.*bashrc
+echo[[:space:]]+.*>>[[:space:]]*.*zshrc
+echo[[:space:]]+.*>>[[:space:]]*.*profile
+cat[[:space:]]+.*>[[:space:]]*.*bashrc
+cat[[:space:]]+.*>[[:space:]]*.*zshrc
+
+# Audit log manipulation
+auditctl[[:space:]]+-D
+auditctl[[:space:]]+-e[[:space:]]+0
+\brm[[:space:]]+.*audit\.log
+truncate[[:space:]]+.*audit\.log
+
+# System log manipulation
+\brm[[:space:]]+/var/log/
+truncate[[:space:]]+/var/log/
+cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*/var/log/
+journalctl[[:space:]]+--vacuum-time=0
+journalctl[[:space:]]+--rotate[[:space:]]+--vacuum-size=0
+
+# Core dump manipulation
+ulimit[[:space:]]+-c[[:space:]]+0
+echo[[:space:]]+0[[:space:]]+>[[:space:]]*/proc/sys/kernel/core_pattern
+
+# Cron manipulation
+crontab[[:space:]]+-r
+crontab[[:space:]]+-ir
+\brm[[:space:]]+/etc/cron
+\brm[[:space:]]+/var/spool/cron
+
+# Systemd journal clearing
+journalctl[[:space:]]+--flush
+journalctl[[:space:]]+--relinquish-var
