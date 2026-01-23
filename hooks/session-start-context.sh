@@ -56,25 +56,16 @@ if [ -f "Cargo.toml" ]; then
 fi
 
 # Get git info
-has_git=false
 git_branch=""
 git_dirty=false
 if git rev-parse --git-dir >/dev/null 2>&1; then
-    has_git=true
     git_branch=$(git branch --show-current 2>/dev/null)
     if ! git diff-index --quiet HEAD -- 2>/dev/null; then
         git_dirty=true
     fi
 fi
 
-# Build JSON array of detected files
-if [ ${#detected_files[@]} -eq 0 ]; then
-    files_json="[]"
-else
-    files_json=$(printf '%s\n' "${detected_files[@]}" | jq -R . | jq -s .)
-fi
-
-# Output context as JSON (stdout goes to Claude's context)
+# Output context as text (stdout goes to Claude's context)
 cat << EOF
 PROJECT CONTEXT:
 - Type: $project_type
