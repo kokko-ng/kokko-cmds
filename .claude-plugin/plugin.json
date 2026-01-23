@@ -1,7 +1,7 @@
 {
   "name": "kokko-cmds",
-  "version": "1.1.14",
-  "description": "A comprehensive Claude Code plugin with commands for C4 architecture mapping, code analysis, quality checks, git workflows, infrastructure management, and AI configuration.",
+  "version": "1.2.0",
+  "description": "A comprehensive Claude Code plugin with commands for C4 architecture mapping, code analysis, quality checks, git workflows, infrastructure management, AI configuration, and agent skills for code quality tasks.",
   "author": {
     "name": "kokko-ng"
   },
@@ -15,14 +15,28 @@
     "quality",
     "git-workflow",
     "infrastructure",
-    "ai-config"
+    "ai-config",
+    "deadcode",
+    "security",
+    "type-safety",
+    "complexity",
+    "code-cleanup"
   ],
   "commands": [
     "./commands/ai-config/",
     "./commands/analysis/",
+    "./commands/clean/",
     "./commands/git/",
     "./commands/infra/",
     "./commands/quality/",
     "./commands/viz/"
+  ],
+  "skills": [
+    "./skills/complexity/",
+    "./skills/deadcode/",
+    "./skills/docs/",
+    "./skills/janitor/",
+    "./skills/security/",
+    "./skills/types/"
   ]
 }
