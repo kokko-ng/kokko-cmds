@@ -37,25 +37,34 @@ git status
 git diff --stat
 ```
 
-**Atomic commits are mandatory.** If changes span multiple concerns, create multiple separate commits in sequence:
-- One feature = one commit
-- One bug fix = one commit
-- Refactoring separate from feature work
-- Tests can be with their feature or separate
+**Small, modular commits are mandatory.** Prefer many small commits over fewer large ones. Each commit should represent ONE logical change:
 
-If you cannot describe the change in ~50 characters, split into multiple commits. Stage and commit each logical change separately before moving to the next.
+- One file rename = one commit
+- One function refactor = one commit
+- One bug fix = one commit
+- One new feature = one commit
+- Config changes separate from code changes
+- Refactoring separate from feature work
+- Moving files separate from modifying them
+
+**Signs you need to split:**
+- Commit message needs "and" (e.g., "add X and fix Y")
+- Changes span unrelated files or concerns
+- You cannot describe the change in ~50 characters
+- Diff touches more than one logical unit
+
+**Never use `git commit --amend` to combine unrelated changes.** Create separate commits instead. Stage and commit each logical change separately before moving to the next.
 
 ### 3. Stage Changes
 
-Stage files for commit:
-```bash
-git add .
-```
-
-For specific files:
+Stage only the files for ONE logical change:
 ```bash
 git add <file1> <file2>
 ```
+
+Use `git add -p` to stage partial files when a file contains multiple unrelated changes.
+
+Avoid `git add .` unless all changes belong to the same logical commit.
 
 ### 4. Write Commit Message
 
@@ -168,6 +177,7 @@ git push -u origin $(git branch --show-current)
 ## Success Criteria
 
 - Security scan passes (no secrets)
-- Commit message follows Conventional Commits format
-- Changes logically grouped
+- Each commit represents ONE logical change
+- Commit messages follow Conventional Commits format
+- No "and" in commit subjects
 - Push successful
