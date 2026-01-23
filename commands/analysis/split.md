@@ -27,6 +27,7 @@ If `$ARGUMENTS` is provided, use it as the target path or threshold.
 ### 1. Identify Candidates
 
 Find files meeting any of these criteria:
+
 - Files > 500 lines
 - Files with > 5 distinct classes/functions handling different concerns
 - Files with multiple unrelated responsibilities
@@ -37,12 +38,14 @@ Find files meeting any of these criteria:
 find . -name "*.py" -not -path "./.venv/*" -exec wc -l {} + | sort -rn | head -20
 
 # Find large TypeScript/JavaScript files
-find . -name "*.ts" -o -name "*.js" | grep -v node_modules | xargs wc -l | sort -rn | head -20
+find . \( -name "*.ts" -o -name "*.js" \) \
+  | grep -v node_modules | xargs wc -l | sort -rn | head -20
 ```
 
 ### 2. Analyze File Contents
 
 For each large file:
+
 - Count distinct classes/functions
 - Identify separate concerns
 - Map dependencies between components
@@ -51,6 +54,7 @@ For each large file:
 ### 3. Plan Split Strategy
 
 Separate by:
+
 - **Domain/functionality** - Models, services, utils, validators
 - **Cohesion** - Group related classes/functions together
 - **Dependencies** - Minimize circular dependencies
@@ -61,6 +65,7 @@ Separate by:
 For each file to split:
 
 1. Create new module structure:
+
    ```bash
    mkdir -p module_name/
    touch module_name/__init__.py  # Python
@@ -70,6 +75,7 @@ For each file to split:
 2. Move related code to new files
 
 3. Update imports across codebase:
+
    ```bash
    # Find files importing the old module
    grep -r "from old_module import" --include="*.py"
@@ -96,6 +102,7 @@ uv run pytest  # or npm test
 ### 6. Maintain Backward Compatibility
 
 Where possible:
+
 - Re-export from original location
 - Add deprecation warnings for old imports
 - Update documentation
@@ -110,8 +117,8 @@ git commit -m "refactor(<module>): split <file> into <components>"
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
-| Circular imports | Interdependent modules | Extract shared code to separate module |
+| ----- | ----- | ---------- |
+| Circular imports | Interdependent modules | Extract shared code to module |
 | Import errors | Missing re-exports | Update index file |
 | Test failures | Broken imports | Update test imports |
 

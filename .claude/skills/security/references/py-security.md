@@ -22,7 +22,7 @@ uv run bandit -r src/ lib/
 ## Common Issues and Fixes
 
 | Test ID | Issue | Fix |
-|---------|-------|-----|
+| ------- | ----- | --- |
 | B303/B304 | Insecure hash (MD5/SHA1) | Use `hashlib.sha256()` or `blake2b` |
 | B102 | `exec()` usage | Remove or sandbox execution |
 | B602-B607 | Shell injection risk | Remove `shell=True`, use args list |
@@ -37,6 +37,7 @@ uv run bandit -r src/ lib/
 ## Classification
 
 For each finding, classify as:
+
 - **TRUE_POSITIVE** - Fix now
 - **NEEDS_REFACTOR** - Create safer abstraction then fix
 - **FALSE_POSITIVE** - Justify and suppress locally
@@ -45,6 +46,7 @@ For each finding, classify as:
 ## Suppression Pattern
 
 Use narrowest suppression with explanation:
+
 ```python
 password = os.environ["DB_PASSWORD"]  # nosec B105 - loaded from environment
 ```
@@ -52,6 +54,7 @@ password = os.environ["DB_PASSWORD"]  # nosec B105 - loaded from environment
 ## Validation
 
 After each fix:
+
 ```bash
 uv run pytest -q
 uv run bandit -r <affected_path> -ll
@@ -59,7 +62,7 @@ uv run bandit -r <affected_path> -ll
 
 ## Commit Format
 
-```
+```text
 security(bandit): mitigate <TestID> in <symbol>
 ```
 

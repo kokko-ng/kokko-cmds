@@ -14,6 +14,7 @@ npx eslint . --ext .js,.ts,.vue --rule 'complexity: ["warn", 10]'
 ## Thresholds
 
 Target functions with:
+
 - Cyclomatic complexity > 10
 - Many branches (if/else, switch)
 - Deep nesting levels (> 3)
@@ -22,6 +23,7 @@ Target functions with:
 ## Configure ESLint Rules
 
 Add to ESLint config:
+
 ```javascript
 {
   rules: {
@@ -49,6 +51,7 @@ Apply one tactic at a time:
 ## Validation
 
 After each change:
+
 ```bash
 npm test
 npx eslint <target_file> --rule 'complexity: ["error", 10]'
@@ -56,7 +59,7 @@ npx eslint <target_file> --rule 'complexity: ["error", 10]'
 
 ## Commit Format
 
-```
+```text
 refactor(complexity): reduce complexity in <function>
 ```
 

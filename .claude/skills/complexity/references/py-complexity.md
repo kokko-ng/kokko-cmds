@@ -22,12 +22,14 @@ uv run radon hal . --exclude "venv/*,.venv/*"
 ## Thresholds
 
 Target functions/classes with:
+
 - Complexity grade >= C (or numeric > 10)
 - Maintainability Index < 65
 
 ## Prioritization
 
 Rank by:
+
 1. Worst grade (F, E, D first)
 2. Frequency of change (`git log -p --follow <file>`)
 3. Business criticality
@@ -49,6 +51,7 @@ Apply one tactic at a time:
 ## Validation
 
 After each micro-change:
+
 ```bash
 uv run pytest tests/test_<module>.py
 uv run radon cc -s <target_file>
@@ -57,7 +60,7 @@ uv run radon mi -s <target_file>
 
 ## Commit Format
 
-```
+```text
 refactor(radon): reduce complexity in <symbol> (C->B)
 ```
 
@@ -71,6 +74,7 @@ refactor(radon): reduce complexity in <symbol> (C->B)
 ## Hard Cases
 
 If complexity resists decomposition:
+
 - Introduce a decision table or data-driven structure
 - Split algorithm into phases (parse -> transform -> emit)
 - Accept temporary adapter layer while migrating callers

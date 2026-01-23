@@ -19,7 +19,7 @@ npx knip --include files,exports,types,duplicates
 ## What Knip Detects
 
 | Finding | Description |
-|---------|-------------|
+| ------- | ----------- |
 | Unused files | Files not imported anywhere |
 | Unused exports | Exported items not imported elsewhere |
 | Unused dependencies | Packages in package.json not used |
@@ -32,6 +32,7 @@ npx knip --include files,exports,types,duplicates
 For each item detected, cross-check references:
 
 **Check for indirect usage:**
+
 - Dynamic imports: `import()`, `require()`
 - String-based access: `components[name]`
 - Vue/React template references
@@ -62,13 +63,14 @@ npm test
 
 ## Commit Format
 
-```
+```text
 chore(cleanup): remove unused <item>
 ```
 
 ## Configure Knip
 
 Create `knip.json` for project-specific settings:
+
 ```json
 {
   "entry": ["src/main.ts", "src/index.ts"],
@@ -79,6 +81,7 @@ Create `knip.json` for project-specific settings:
 ```
 
 For monorepos:
+
 ```json
 {
   "workspaces": {
@@ -92,7 +95,7 @@ For monorepos:
 ## Error Recovery
 
 | Issue | Resolution |
-|-------|------------|
+| ----- | ---------- |
 | False positive on entry point | Add to `entry` in knip.json |
 | Plugin not detected as used | Add to `ignoreDependencies` |
 | Build fails after removal | Revert, investigate |

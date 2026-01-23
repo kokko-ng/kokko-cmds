@@ -20,11 +20,13 @@ Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` firs
 
 ## Orchestration
 
-```
-Phase 1: Preparation --> Phase 2: Parallel Verification --> Phase 3: Synthesis --> Phase 4: Apply Fixes --> Phase 5: Re-Verification --> Phase 6: Finalization
+```text
+Phase 1: Preparation -> Phase 2: Parallel Verification -> Phase 3: Synthesis
+-> Phase 4: Apply Fixes -> Phase 5: Re-Verification -> Phase 6: Finalization
 ```
 
-Phase 2 runs five checks in parallel: Completeness, Accuracy, Hierarchy, Diagram Quality, and Image Pairing.
+Phase 2 runs five checks in parallel: Completeness, Accuracy, Hierarchy,
+Diagram Quality, and Image Pairing.
 
 ---
 
@@ -33,9 +35,12 @@ Phase 2 runs five checks in parallel: Completeness, Accuracy, Hierarchy, Diagram
 ```bash
 SYSTEM_ID=$(ls codemap/ | head -1)
 echo "System ID: $SYSTEM_ID"
-find codemap/$SYSTEM_ID -type f \( -name "*.md" -o -name "*.puml" -o -name "*.png" \) | sort
-echo "Containers: $(find codemap/$SYSTEM_ID/containers -maxdepth 1 -type d | wc -l)"
-echo "Components: $(find codemap/$SYSTEM_ID -type d -name components -exec ls {} \; | wc -l)"
+find codemap/$SYSTEM_ID -type f \
+  \( -name "*.md" -o -name "*.puml" -o -name "*.png" \) | sort
+echo "Containers: $(find codemap/$SYSTEM_ID/containers \
+  -maxdepth 1 -type d | wc -l)"
+echo "Components: $(find codemap/$SYSTEM_ID -type d -name components \
+  -exec ls {} \; | wc -l)"
 ```
 
 ---
@@ -46,7 +51,7 @@ Launch ALL FIVE subagents IN PARALLEL in a single message.
 
 ### Subagent 1: Completeness Check
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -77,7 +82,7 @@ Parameters:
 
 ### Subagent 2: Accuracy Check
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -110,7 +115,7 @@ Parameters:
 
 ### Subagent 3: Hierarchy Validation
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -139,7 +144,7 @@ Parameters:
 
 ### Subagent 4: Diagram Quality Check
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -168,7 +173,7 @@ Parameters:
 
 ### Subagent 5: Image Pairing Check
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -215,7 +220,7 @@ Parameters:
 
 ## Phase 3: Synthesis
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "general-purpose"
@@ -281,7 +286,7 @@ rm -rf <paths>
 
 For each diagram fix, spawn focused subagent:
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -319,7 +324,7 @@ done
 
 ## Phase 5: Re-Verification
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -352,7 +357,8 @@ Parameters:
 ### Step 6A: Regenerate All PNGs
 
 ```bash
-find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
+find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" \
+  -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 ```
 
 ### Step 6B: Write Verification Report
@@ -367,7 +373,7 @@ Create `codemap/VERIFICATION.md`:
 ## Summary
 
 | Metric | Value |
-|--------|-------|
+| ------ | ----- |
 | Completeness | X/4 |
 | Accuracy | X% |
 | Hierarchy | X/5 |

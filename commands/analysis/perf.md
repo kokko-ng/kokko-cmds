@@ -25,16 +25,20 @@ If `$ARGUMENTS` is provided, use it as the target or focus area.
 
 ### 1. Spawn Opus Subagents for Deep Analysis
 
-Use the Task tool with `model: "opus"` to spawn subagents for thorough analysis. Opus excels at:
+Use the Task tool with `model: "opus"` to spawn subagents for thorough
+analysis. Opus excels at:
+
 - Tracing complex execution paths
 - Identifying subtle performance anti-patterns
 - Understanding system-wide bottleneck interactions
 
-Spawn parallel Opus agents per focus area (database, api, frontend, backend, memory) for comprehensive coverage.
+Spawn parallel Opus agents per focus area (database, api, frontend, backend,
+memory) for comprehensive coverage.
 
 ### 2. Database and Query Performance
 
 **Search for:**
+
 - N+1 query patterns (loops containing database queries)
 - Missing indexes on frequently queried columns
 - `SELECT *` queries instead of specific columns
@@ -56,6 +60,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ### 3. API and Network Performance
 
 **Search for:**
+
 - Sequential API calls that could be parallelized
 - Missing request/response caching
 - Large payloads without compression
@@ -69,6 +74,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ### 4. Frontend Performance
 
 **Search for:**
+
 - Large inline scripts/data in templates
 - Missing lazy loading for images/components
 - Excessive DOM manipulation in loops
@@ -83,6 +89,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ### 5. Backend Processing Performance
 
 **Search for:**
+
 - Synchronous processing of large datasets
 - Missing async/await patterns
 - Blocking I/O operations
@@ -97,6 +104,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ### 6. Memory and Resource Management
 
 **Search for:**
+
 - Memory leaks (unclosed connections, unreleased resources)
 - Large objects kept in memory unnecessarily
 - Missing context managers for file/connection handling
@@ -110,6 +118,7 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ### 7. Concurrency and Parallelization
 
 **Search for:**
+
 - Sequential operations that could run in parallel
 - Missing async patterns for I/O-bound operations
 - Thread-safety issues in shared resources
@@ -121,12 +130,14 @@ grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ### 8. Analysis Approach
 
 **Prioritize hot paths:**
+
 1. User-facing request handlers
 2. Background job processing
 3. Database query-heavy operations
 4. External API integrations
 
 **Measure before optimizing:**
+
 - Check for existing performance metrics/logging
 - Identify actual bottlenecks vs perceived issues
 - Look for TODO comments mentioning performance
@@ -141,7 +152,7 @@ Provide actionable recommendations:
 ### Critical (High Impact)
 | Location | Issue | Impact | Fix |
 |----------|-------|--------|-----|
-| file:line | N+1 query in loop | 100+ queries per request | Use prefetch/eager loading |
+| file:line | N+1 query in loop | 100+ queries | Use prefetch/eager loading |
 
 ### Important (Medium Impact)
 ...
@@ -158,8 +169,8 @@ Provide actionable recommendations:
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
-| Can't reproduce slowness | Environment difference | Profile in production-like setup |
+| ----- | ----- | ---------- |
+| Can't reproduce slowness | Environment diff | Profile in prod-like setup |
 | Too many findings | Large codebase | Focus on hot paths first |
 | Unclear impact | No metrics | Add timing/profiling first |
 

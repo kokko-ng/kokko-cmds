@@ -28,10 +28,13 @@ Find files containing emoji characters:
 
 ```bash
 # Search for common emoji patterns in source files
-grep -rn --include="*.py" --include="*.ts" --include="*.js" --include="*.vue" --include="*.md" -P '[\x{1F300}-\x{1F9FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]' .
+grep -rn --include="*.py" --include="*.ts" --include="*.js" \
+  --include="*.vue" --include="*.md" \
+  -P '[\x{1F300}-\x{1F9FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]' .
 ```
 
 Or use ripgrep for faster search:
+
 ```bash
 rg -n '[\p{Emoji}--\p{ASCII}]' --type py --type ts --type js --type vue --type md
 ```
@@ -39,6 +42,7 @@ rg -n '[\p{Emoji}--\p{ASCII}]' --type py --type ts --type js --type vue --type m
 ### 2. Review and Categorize Findings
 
 For each file with emojis, determine:
+
 - **Remove:** Decorative emojis in comments, logs, or UI strings
 - **Replace:** Emojis with semantic meaning (replace with text equivalent)
 - **Keep:** Emojis in test fixtures or data files that intentionally contain them
@@ -46,6 +50,7 @@ For each file with emojis, determine:
 ### 3. Remove Emojis
 
 For each file:
+
 1. Open the file
 2. Remove or replace emoji characters
 3. Ensure string meaning is preserved (e.g., replace with descriptive text if needed)
@@ -54,6 +59,7 @@ For each file:
 ### 4. Exclusions
 
 Skip the following:
+
 - `node_modules/`, `.venv/`, `venv/`, `__pycache__/`
 - Vendored or third-party code
 - Test fixtures that intentionally contain emojis for testing
@@ -72,8 +78,8 @@ uv run pytest  # or npm test
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
-| Syntax error after removal | Emoji was part of string | Ensure quotes are preserved |
+| ----- | ----- | ---------- |
+| Syntax error after removal | Emoji was part of string | Preserve quotes |
 | Test failure | Test expected emoji in output | Update test expectation |
 | Encoding issues | File encoding mismatch | Ensure UTF-8 encoding |
 

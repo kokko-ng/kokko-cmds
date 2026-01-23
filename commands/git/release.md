@@ -26,6 +26,7 @@ If `$ARGUMENTS` is provided, use it as bump type or version.
 ### 1. Detect Current Version
 
 Find version in common locations:
+
 - `pyproject.toml` (version field)
 - `package.json` (version field)
 - `src/__init__.py` or `<package>/__init__.py` (`__version__`)
@@ -43,6 +44,7 @@ grep "__version__" **/__init__.py 2>/dev/null
 ```
 
 Also check git tags:
+
 ```bash
 git describe --tags --abbrev=0
 ```
@@ -50,6 +52,7 @@ git describe --tags --abbrev=0
 ### 2. Calculate New Version
 
 Based on semantic versioning (vX.Y.Z):
+
 - **patch** (Z+1): Bug fixes, minor changes
 - **minor** (Y+1, Z=0): New features, backward compatible
 - **major** (X+1, Y=0, Z=0): Breaking changes
@@ -59,6 +62,7 @@ Example: v0.2.7 -> v0.2.8 (patch)
 ### 3. Update All Version References
 
 Replace old version with new in ALL files identified in step 1. Common files include:
+
 - `pyproject.toml`
 - `package.json`
 - `__init__.py` files
@@ -67,7 +71,8 @@ Replace old version with new in ALL files identified in step 1. Common files inc
 - `Cargo.toml`
 - Any other files containing version strings
 
-**Important**: Version in files must match the git tag (without 'v' prefix in files, with 'v' prefix in tags).
+**Important**: Version in files must match the git tag (without 'v' prefix
+in files, with 'v' prefix in tags).
 
 ### 4. Verify Changes
 
@@ -85,7 +90,9 @@ git add .
 git commit -m "chore: bump version to vX.Y.Z"
 git push -u origin version-bump-vX.Y.Z
 
-gh pr create --base main --title "Bump version to vX.Y.Z" --body "Update version from vX.Y.Z to vX.Y.Z across all files"
+gh pr create --base main \
+  --title "Bump version to vX.Y.Z" \
+  --body "Update version from vX.Y.Z to vX.Y.Z across all files"
 ```
 
 ### 6. Merge PR
@@ -112,6 +119,7 @@ git diff <previous-tag>..HEAD --stat
 ```
 
 Categorize into:
+
 - Features
 - Improvements
 - Bug Fixes
@@ -165,7 +173,7 @@ gh run watch
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
+| ----- | ----- | ---------- |
 | Version not found | Unusual location | Search manually, add to version files |
 | Quality checks fail | Test/lint issues | Fix before proceeding to release |
 | Release workflow fails | CI/CD issue | Check workflow logs |

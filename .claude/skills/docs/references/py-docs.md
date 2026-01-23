@@ -35,6 +35,7 @@ uv run pydocstyle <target_dir> --convention=google
 ## Processing Order
 
 Work through files systematically:
+
 1. Public API functions and classes
 2. Complex functions (high cyclomatic complexity)
 3. Entry points and orchestration code
@@ -44,6 +45,7 @@ Work through files systematically:
 ## Docstring Standards (Google-style)
 
 **For functions:**
+
 ```python
 def function_name(param1: str, param2: int) -> bool:
     """Short one-line summary ending with period.
@@ -64,6 +66,7 @@ def function_name(param1: str, param2: int) -> bool:
 ```
 
 **For classes:**
+
 ```python
 class ClassName:
     """Short one-line summary.
@@ -79,6 +82,7 @@ class ClassName:
 ## Validation
 
 After fixing each file:
+
 ```bash
 uv run interrogate -v <file.py>
 uv run pydocstyle <file.py> --convention=google
@@ -86,14 +90,14 @@ uv run pydocstyle <file.py> --convention=google
 
 ## Commit Format
 
-```
+```text
 docs(<module>): add docstrings to <file>
 ```
 
 ## Error Handling
 
 | Issue | Resolution |
-|-------|------------|
+| ----- | ---------- |
 | D100 in `__init__.py` | Add module-level docstring at top of file |
 | D107 false positive | Add simple docstring or configure exception |
 | Style conflicts | Standardize on Google style |

@@ -7,11 +7,13 @@ disable-model-invocation: true
 
 # Janitor Skill
 
-Run code quality checks in parallel using subagents and git worktrees, then merge all fixes.
+Run code quality checks in parallel using subagents and git worktrees, then
+merge all fixes.
 
 ## Arguments
 
 Parse `$ARGUMENTS` for:
+
 - `target-branch` - Branch to merge fixes into (default: current branch)
 - `--langs` - Comma-separated languages to check (default: auto-detect all present)
 - `--checks` - Comma-separated checks to run (default: all)
@@ -37,6 +39,7 @@ Read `references/worktree-workflow.md` for detailed orchestration steps.
 ### 2. Create Worktrees
 
 For each language + check combination:
+
 ```bash
 git worktree add $WORKTREE_BASE/<lang>-<check> -b janitor/<lang>-<check>
 ```
@@ -44,6 +47,7 @@ git worktree add $WORKTREE_BASE/<lang>-<check> -b janitor/<lang>-<check>
 ### 3. Launch Parallel Subagents
 
 Spawn one subagent per worktree using the Task tool. Each subagent:
+
 1. Navigates to its worktree
 2. Runs `/<check> <lang>`
 3. Fixes ALL issues found (not just reports)
@@ -53,6 +57,7 @@ Spawn one subagent per worktree using the Task tool. Each subagent:
 ### 4. Monitor Completion
 
 Track all subagents until complete:
+
 - Which checks finished
 - Issues fixed per check
 - Any failures or blockers
@@ -71,6 +76,7 @@ Preserve small logical commits (use merge, not squash).
 ### 6. Resolve Conflicts
 
 If merge conflicts occur:
+
 - Understand both changes
 - Preserve intent of both fixes
 - Test the resolution
@@ -91,13 +97,15 @@ git branch -d $(git branch --list 'janitor/*')
 ### 8. Final Validation
 
 Run all quality checks on merged result:
+
 - Tests pass
 - Linters pass
 - No regressions introduced
 
 ## Reference Files
 
-- `references/worktree-workflow.md` - Detailed worktree orchestration and conflict resolution
+- `references/worktree-workflow.md` - Detailed worktree orchestration and
+  conflict resolution
 
 ## Success Criteria
 

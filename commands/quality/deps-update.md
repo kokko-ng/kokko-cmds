@@ -23,6 +23,7 @@ If `$ARGUMENTS` is provided, use it as a package name filter or category.
 ### 1. Audit Current State
 
 Run in parallel:
+
 - `uv pip list --outdated` for Python packages
 - `npm outdated` in any directory with package.json
 - `pip-audit` for Python security vulnerabilities
@@ -31,6 +32,7 @@ Run in parallel:
 ### 2. Categorize Updates
 
 Group packages by risk level:
+
 - **Critical**: Security vulnerabilities (update first)
 - **Major**: Breaking version changes (x.0.0)
 - **Minor**: Feature additions (0.x.0)
@@ -52,6 +54,7 @@ For each package, starting with critical:
 ### 4. Final Validation
 
 After all updates:
+
 - Run `uv run pytest` (if tests exist) or type check with `uv run mypy .`
 - Run `npm test` or `npm run build` for JS projects
 - Report summary of what was updated
@@ -59,9 +62,10 @@ After all updates:
 ## Output
 
 Provide a summary table:
-| Package | Old Version | New Version | Status |
-|---------|-------------|-------------|--------|
-| ... | ... | ... | Updated/Skipped/Failed |
+
+| Package | Old | New | Status                 |
+| ------- | --- | --- | ---------------------- |
+| ...     | ... | ... | Updated/Skipped/Failed |
 
 ## Notes
 

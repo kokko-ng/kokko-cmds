@@ -6,18 +6,21 @@ disable-model-invocation: true
 
 Identify and remove cruft files that shouldn't be in the repository.
 
-**Important**: This command only reports files that are NOT already in .gitignore. Properly ignored files are excluded from results.
+**Important**: This command only reports files that are NOT already in
+.gitignore. Properly ignored files are excluded from results.
 
 ## Process
 
 ### 1. Scan for Cruft Files (Excluding Gitignored)
 
 For each search, filter out gitignored files using:
+
 ```bash
 find ... | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
 **AI-Generated Reports:**
+
 ```bash
 find . -type f \( \
   -name "VALIDATION_REPORT*.md" \
@@ -30,11 +33,12 @@ find . -type f \( \
   -o -name "report*.md" \
   -o -name "claude_*.md" \
   -o -name "ai_*.md" \
-\) -not -path "./.git/*" -not -path "./tmp/*" -not -path "./.tmp/*" 2>/dev/null \
+\) -not -path "./.git/*" -not -path "./tmp/*" 2>/dev/null \
 | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
 **Temporary/Development Files:**
+
 ```bash
 find . -type f \( \
   -name "*.tmp" \
@@ -48,22 +52,27 @@ find . -type f \( \
   -o -name ".DS_Store" \
   -o -name "Thumbs.db" \
   -o -name "desktop.ini" \
-\) -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./.venv/*" 2>/dev/null \
+\) -not -path "./.git/*" -not -path "./node_modules/*" \
+  -not -path "./.venv/*" 2>/dev/null \
 | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
 **Log Files Outside tmp:**
+
 ```bash
 find . -type f \( \
   -name "*.log" \
   -o -name "*.logs" \
   -o -name "debug*.txt" \
   -o -name "error*.txt" \
-\) -not -path "./.git/*" -not -path "./tmp/*" -not -path "./.tmp/*" -not -path "./logs/*" -not -path "./node_modules/*" -not -path "./.venv/*" 2>/dev/null \
+\) -not -path "./.git/*" -not -path "./tmp/*" \
+  -not -path "./logs/*" -not -path "./node_modules/*" \
+  -not -path "./.venv/*" 2>/dev/null \
 | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
 **Test/Coverage Artifacts Outside tmp:**
+
 ```bash
 find . \( -type f -o -type d \) \( \
   -name "test_output*.json" \
@@ -73,11 +82,13 @@ find . \( -type f -o -type d \) \( \
   -o -name ".coverage" \
   -o -name "htmlcov" \
   -o -name ".pytest_cache" \
-\) -not -path "./.git/*" -not -path "./tmp/*" -not -path "./.tmp/*" -not -path "./node_modules/*" -not -path "./.venv/*" 2>/dev/null \
+\) -not -path "./.git/*" -not -path "./tmp/*" \
+  -not -path "./node_modules/*" -not -path "./.venv/*" 2>/dev/null \
 | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
 **Orphaned Config/Draft Files:**
+
 ```bash
 find . -type f \( \
   -name "*.draft" \
@@ -88,17 +99,19 @@ find . -type f \( \
   -o -name "test_scratch*" \
   -o -name "temp_*" \
   -o -name "tmp_*" \
-\) -not -path "./.git/*" -not -path "./tmp/*" -not -path "./.tmp/*" -not -path "./node_modules/*" -not -path "./.venv/*" 2>/dev/null \
+\) -not -path "./.git/*" -not -path "./tmp/*" \
+  -not -path "./node_modules/*" -not -path "./.venv/*" 2>/dev/null \
 | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
 **Database Files in Unexpected Locations:**
+
 ```bash
 find . -maxdepth 2 -type f \( \
   -name "*.db" \
   -o -name "*.sqlite" \
   -o -name "*.sqlite3" \
-\) -not -path "./.git/*" -not -path "./.tmp/*" -not -path "./tmp/*" 2>/dev/null \
+\) -not -path "./.git/*" -not -path "./tmp/*" 2>/dev/null \
 | while read f; do git check-ignore -q "$f" || echo "$f"; done
 ```
 
@@ -119,32 +132,34 @@ git ls-files --error-unmatch "$file" 2>/dev/null && echo "tracked" || echo "untr
 ### 3. Present Results
 
 Only show files that are:
+
 - NOT in .gitignore
 - Either tracked (shouldn't be) or untracked (should be removed or added to .gitignore)
 
-```
+```text
 ## Cruft Scan Results
 
 Found X files not covered by .gitignore:
 
 ### Should Remove (untracked cruft)
 | File | Size | Last Modified | Action |
-|------|------|---------------|--------|
+| ---- | ---- | ------------- | ------ |
 | ./server.log | 16KB | 2024-01-10 | Delete or add to .gitignore |
 
 ### Should Not Be Tracked (committed cruft)
 | File | Size | Last Modified | Action |
-|------|------|---------------|--------|
-| ./VALIDATION_REPORT.md | 12KB | 2024-01-08 | git rm and add pattern to .gitignore |
+| ---- | ---- | ------------- | ------ |
+| ./VALIDATION_REPORT.md | 12KB | 2024-01-08 | git rm and add to .gitignore |
 
 ### No cruft found
-If no files match, report: "Repository is clean - no cruft files found outside .gitignore"
+If no files match, report: "Repository is clean - no cruft found"
 ```
 
 ### 4. Interactive Cleanup
 
 Use AskUserQuestion with options:
-- "Remove all and update .gitignore" - Delete files and add patterns to prevent recurrence
+
+- "Remove all and update .gitignore" - Delete files and add patterns
 - "Remove files only" - Delete files without updating .gitignore
 - "Update .gitignore only" - Add patterns but keep files (for manual review)
 - "Select individually" - Go through each file
@@ -153,6 +168,7 @@ Use AskUserQuestion with options:
 ### 5. Execute Cleanup
 
 For approved deletions:
+
 ```bash
 # For untracked files - just delete
 rm -rf <file_or_dir>
@@ -164,12 +180,14 @@ git rm -r <file_or_dir>
 ### 6. Update .gitignore (if selected)
 
 Suggest patterns based on what was found:
+
 ```bash
 # Append to .gitignore if not already present
 grep -q "pattern" .gitignore || echo "pattern" >> .gitignore
 ```
 
 Common patterns to add:
+
 - `*_REPORT.md` - AI-generated reports
 - `*.log` - Log files
 - `.coverage` - Coverage data
@@ -179,7 +197,7 @@ Common patterns to add:
 
 ### 7. Summary
 
-```
+```text
 ## Cleanup Summary
 
 Deleted: X files/directories (Y MB)

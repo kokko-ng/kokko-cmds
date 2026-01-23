@@ -10,7 +10,7 @@ Shared templates and patterns for c4-map, c4-update, and c4-verify commands.
 
 ## Output Structure
 
-```
+```text
 codemap/
 ├── README.md
 ├── VERIFICATION.md
@@ -134,7 +134,7 @@ codemap/
 
 The C4-PlantUML library files must be stored locally in `codemap/.c4-plantuml/`:
 
-```
+```text
 codemap/.c4-plantuml/
 ├── C4.puml
 ├── C4_Context.puml
@@ -143,6 +143,7 @@ codemap/.c4-plantuml/
 ```
 
 **Download URLs** (fetch if not already present):
+
 - `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml`
 - `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml`
 - `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml`
@@ -150,23 +151,26 @@ codemap/.c4-plantuml/
 
 ### Include Statements by Level
 
-All `.puml` diagrams must set `!RELATIVE_INCLUDE` and use relative paths to the local library:
+All `.puml` diagrams must set `!RELATIVE_INCLUDE` and use relative paths to
+the local library:
 
-| Level | Include Statement (relative from diagram location) |
-|-------|---------------------------------------------------|
-| Context | `!define RELATIVE_INCLUDE .`<br>`!include ../.c4-plantuml/C4_Context.puml` |
-| Container | `!define RELATIVE_INCLUDE .`<br>`!include ../../../.c4-plantuml/C4_Container.puml` |
-| Component | `!define RELATIVE_INCLUDE .`<br>`!include ../../../../../.c4-plantuml/C4_Component.puml` |
+| Level | Include Statement |
+| ----- | ----------------- |
+| Context | `!include ../.c4-plantuml/C4_Context.puml` |
+| Container | `!include ../../../.c4-plantuml/C4_Container.puml` |
+| Component | `!include ../../../../../.c4-plantuml/C4_Component.puml` |
 
-**Path calculation:** Count directory levels from diagram to `codemap/.c4-plantuml/`:
+**Path calculation:** Count directory levels from diagram to
+`codemap/.c4-plantuml/`:
+
 - `codemap/<system>/context.puml` -> `../.c4-plantuml/`
-- `codemap/<system>/containers/<container>/container.puml` -> `../../../.c4-plantuml/`
-- `codemap/<system>/containers/<container>/components/<component>/component.puml` -> `../../../../../.c4-plantuml/`
+- `codemap/<system>/containers/<c>/container.puml` -> `../../../.c4-plantuml/`
+- `codemap/<s>/containers/<c>/components/<x>/component.puml` -> `../../../../../.c4-plantuml/`
 
 ### Valid Macros by Level
 
 | Level | Valid Macros |
-|-------|-------------|
+| ----- | ------------ |
 | Context | `Person()`, `System()`, `System_Ext()`, `Rel()` |
 | Container | `Container()`, `ContainerDb()`, `ContainerQueue()`, `Rel()` |
 | Component | `Component()`, `Rel()` |
@@ -260,7 +264,7 @@ All `.puml` diagrams must set `!RELATIVE_INCLUDE` and use relative paths to the 
   "id": "change-001",
   "type": "ADDITION|DELETION|MODIFICATION|RENAME",
   "level": "CONTEXT|CONTAINER|COMPONENT",
-  "affected_element": {"id": "string", "current_path": "string", "source_path": "string"},
+  "affected_element": {"id": "string", "current_path": "...", "source_path": "..."},
   "description": "string",
   "cascade_up": true,
   "cascade_down": false,
@@ -274,7 +278,7 @@ All `.puml` diagrams must set `!RELATIVE_INCLUDE` and use relative paths to the 
 
 ### External System Detection
 
-```
+```text
 Glob: **/*.env*, **/config.*, **/settings.*
 Grep: "requests\.", "httpx\.", "import.*azure", "import.*aws"
 Check: docker-compose.yml for external services
@@ -282,7 +286,7 @@ Check: docker-compose.yml for external services
 
 ### Container Detection
 
-```
+```text
 Glob: **/Dockerfile, **/docker-compose.yml, **/main.py, **/app.py
 Grep: "FastAPI", "Express", "Flask", "if __name__"
 Check: Directory structure for deployable units
@@ -290,7 +294,7 @@ Check: Directory structure for deployable units
 
 ### Component Detection
 
-```
+```text
 Glob: **/__init__.py, **/index.ts
 Grep: "class \w+", "def \w+", "export"
 Check: Package/module structure under each container
@@ -301,7 +305,7 @@ Check: Package/module structure under each container
 ## Navigation Link Patterns
 
 | From Level | Parent Link | Example |
-|------------|-------------|---------|
+| ---------- | ----------- | ------- |
 | Container | `../../context.md` | Go to system context |
 | Component | `../../container.md` | Go to parent container |
 
@@ -319,13 +323,15 @@ Check: Package/module structure under each container
 
 ```bash
 # Generate all PNGs (with local C4-PlantUML library)
-find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
+find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" \
+  -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 
 # Generate single PNG
 plantuml -DRELATIVE_INCLUDE="." -tpng codemap/<system-id>/context.puml
 ```
 
-**Note:** The `-DRELATIVE_INCLUDE="."` flag enables local file resolution for C4-PlantUML includes. Exclude `.c4-plantuml/` directory from PNG generation.
+**Note:** The `-DRELATIVE_INCLUDE="."` flag enables local file resolution for
+C4-PlantUML includes. Exclude `.c4-plantuml/` directory from PNG generation.
 
 ---
 

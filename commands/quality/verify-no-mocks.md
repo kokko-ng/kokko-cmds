@@ -4,7 +4,8 @@ disable-model-invocation: true
 
 # Verify No Mocks in Production Code
 
-Scan codebase to ensure production code does not rely on mock, stub, or dummy data. Verify that all features use real integrations.
+Scan codebase to ensure production code does not rely on mock, stub, or dummy
+data. Verify that all features use real integrations.
 
 ## When to Use
 
@@ -28,12 +29,13 @@ If `$ARGUMENTS` is provided, use it as the target path.
 Search for common mock/stub indicators in non-test files:
 
 **File name patterns to flag:**
+
 - `*mock*`, `*stub*`, `*fake*`, `*dummy*`
 - Exclude: `test/`, `tests/`, `__tests__/`, `spec/`, `*_test.*`, `*.test.*`, `*.spec.*`
 
 **Code patterns to flag:**
 
-```
+```text
 # Python
 mock_data, stub_data, dummy_data, fake_data
 MOCK_, STUB_, DUMMY_, FAKE_
@@ -65,15 +67,18 @@ Look for suspicious patterns:
 For each external service the project uses:
 
 **API Clients:**
+
 - Check if real API endpoints are configured
 - Verify no localhost/mock URLs in production configs
 - Ensure environment variables are used (not hardcoded values)
 
 **Databases:**
+
 - Check connection strings point to real databases
 - Verify no in-memory or SQLite fallbacks in production mode
 
 **Third-party Services:**
+
 - Ensure SDK clients are properly initialized
 - Check for conditional mock returns
 
@@ -83,7 +88,8 @@ Check configuration files:
 
 ```bash
 # Look for mock indicators in config
-grep -r "mock\|stub\|fake\|dummy" .env* config/ --include="*.json" --include="*.yaml" --include="*.toml" 2>/dev/null
+grep -r "mock\|stub\|fake\|dummy" .env* config/ \
+  --include="*.json" --include="*.yaml" --include="*.toml" 2>/dev/null
 ```
 
 Exclude `.env.example` and `.env.test` from violations.
@@ -93,37 +99,42 @@ Exclude `.env.example` and `.env.test` from violations.
 Categorize findings by severity:
 
 **Critical (must fix):**
+
 - Mock data returned to users
 - Hardcoded credentials
 - Fake external service responses
 
 **Warning (review needed):**
+
 - Suspicious variable names
 - Placeholder comments
 - Conditional mock logic
 
 **Info (likely acceptable):**
+
 - Test utilities
 - Development-only fallbacks with proper guards
 
 ### 6. Fix or Document Exceptions
 
 For each finding:
+
 1. If mock data: implement real integration
 2. If development fallback: ensure proper environment guards
-3. If intentional: add comment explaining why (e.g., `# Not a mock: this is the actual default value`)
+3. If intentional: add comment explaining why
+   (e.g., `# Not a mock: this is the actual default value`)
 
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
-| False positive in test file | Test not properly excluded | Verify file path matches test patterns |
-| Mock in shared utility | Utility used by both prod and test | Split into separate modules |
-| Environment-gated mock | Dev fallback leaking to prod | Add proper NODE_ENV/environment checks |
+| ----- | ----- | ---------- |
+| False positive | Test not excluded | Check path matches test patterns |
+| Mock in shared util | Used by prod/test | Split into separate modules |
+| Environment mock | Dev fallback leaking | Add environment checks |
 
 ## Success Criteria
 
-- No mock/stub/dummy data in production code paths
+- No mock/stub/dummy data in production code
 - All external integrations use real endpoints
 - Environment variables used for all secrets/endpoints
 - Any exceptions are documented with justification
