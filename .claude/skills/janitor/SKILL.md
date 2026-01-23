@@ -1,11 +1,11 @@
 ---
-name: quality-janitor
+name: janitor
 description: Orchestrate all quality checks via subagents and git worktrees
 argument-hint: "[target-branch] [--langs py,js,dotnet] [--checks security,types,complexity,deadcode,docs]"
 disable-model-invocation: true
 ---
 
-# Quality Janitor Skill
+# Janitor Skill
 
 Run code quality checks in parallel using subagents and git worktrees, then merge all fixes.
 
@@ -45,7 +45,7 @@ git worktree add $WORKTREE_BASE/<lang>-<check> -b janitor/<lang>-<check>
 
 Spawn one subagent per worktree using the Task tool. Each subagent:
 1. Navigates to its worktree
-2. Runs `/quality-<check> <lang>`
+2. Runs `/<check> <lang>`
 3. Fixes ALL issues found (not just reports)
 4. Groups fixes into small, logical commits
 5. Uses commit format: `fix(<check>): <description>`
