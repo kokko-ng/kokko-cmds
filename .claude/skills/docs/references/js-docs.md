@@ -9,6 +9,7 @@ npm install -D eslint-plugin-jsdoc
 ## Configure ESLint
 
 Add to ESLint config:
+
 ```javascript
 {
   plugins: ['jsdoc'],
@@ -40,6 +41,7 @@ npx eslint . --ext .js,.ts,.vue --rule 'jsdoc/require-jsdoc: warn'
 ## Processing Order
 
 Work through files systematically:
+
 1. Public API functions and classes
 2. Complex functions in components
 3. Store actions and getters
@@ -49,6 +51,7 @@ Work through files systematically:
 ## JSDoc Standards
 
 **For functions:**
+
 ```typescript
 /**
  * Short one-line summary ending with period.
@@ -72,6 +75,7 @@ function functionName(param1: string, param2: number): boolean {
 ```
 
 **For classes:**
+
 ```typescript
 /**
  * Short one-line summary.
@@ -95,20 +99,21 @@ class ClassName {
 ## Validation
 
 After fixing each file:
+
 ```bash
 npx eslint <file> --ext .ts,.vue
 ```
 
 ## Commit Format
 
-```
+```text
 docs(<module>): add JSDoc to <file>
 ```
 
 ## Error Handling
 
 | Issue | Resolution |
-|-------|------------|
+| ----- | ---------- |
 | TypeScript conflicts | Use `plugin:jsdoc/recommended-typescript` |
 | Too many warnings | Process file by file |
 | Vue SFC issues | Focus on script section |

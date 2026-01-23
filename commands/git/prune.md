@@ -19,6 +19,7 @@ git fetch --all --prune
 Analyze branches and categorize:
 
 **Merged Branches** (safe to delete):
+
 ```bash
 # Local branches merged into main
 git branch --merged main | grep -v "main\|master\|\*"
@@ -28,20 +29,24 @@ git branch -r --merged origin/main | grep -v "main\|master\|HEAD"
 ```
 
 **Orphaned Branches** (no remote tracking):
+
 ```bash
 git branch -vv | grep ': gone]'
 ```
 
 **Old Branches** (no commits in 30+ days):
+
 ```bash
-git for-each-ref --sort=committerdate --format='%(refname:short) %(committerdate:relative)' refs/heads/
+git for-each-ref --sort=committerdate \
+  --format='%(refname:short) %(committerdate:relative)' refs/heads/
 ```
 
 ### 3. Generate Report
 
 Create a table showing:
+
 | Branch | Status | Last Commit | Age | Recommendation |
-|--------|--------|-------------|-----|----------------|
+| ------ | ------ | ----------- | --- | -------------- |
 | feature/old-thing | merged | abc1234 | 45 days | Delete |
 | bugfix/stale | orphaned | def5678 | 30 days | Delete |
 | feature/active | tracking | ghi9012 | 2 days | Keep |
@@ -49,6 +54,7 @@ Create a table showing:
 ### 4. Interactive Cleanup
 
 Use AskUserQuestion to confirm deletions in batches:
+
 - Show branches recommended for deletion
 - Let user select which to delete
 - Options: "Delete all merged", "Delete all orphaned", "Select individually", "Skip"
@@ -56,6 +62,7 @@ Use AskUserQuestion to confirm deletions in batches:
 ### 5. Execute Cleanup
 
 For approved deletions:
+
 ```bash
 # Delete local branch
 git branch -d branch-name  # Use -D if not fully merged but approved
@@ -67,7 +74,8 @@ git push origin --delete branch-name
 ### 6. Final Summary
 
 Report what was cleaned:
-```
+
+```text
 ## Cleanup Summary
 
 Deleted Local Branches: X
@@ -89,4 +97,6 @@ Optionally run `git gc` to reclaim space.
 
 ## Arguments
 
-- `$ARGUMENTS` - Optional: "local" (only local), "remote" (only remote), "merged" (only merged branches), or number of days for age threshold (default: 30)
+- `$ARGUMENTS` - Optional: "local" (only local), "remote" (only remote),
+  "merged" (only merged branches), or number of days for age threshold
+  (default: 30)

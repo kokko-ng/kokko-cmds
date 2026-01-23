@@ -8,6 +8,7 @@
 ## Enable Strict Type Checking
 
 Add to `.csproj` or `Directory.Build.props`:
+
 ```xml
 <PropertyGroup>
   <Nullable>enable</Nullable>
@@ -34,21 +35,22 @@ dotnet build src/MyProject/MyProject.csproj
 ## Common Errors and Fixes
 
 | Error Code | Description | Fix |
-|------------|-------------|-----|
-| CS8600 | Converting null literal to non-nullable | Add null check or use nullable type |
-| CS8602 | Dereference of possibly null reference | Add null check or use `?.` operator |
-| CS8603 | Possible null reference return | Return non-null or change return type |
-| CS8604 | Possible null argument | Validate argument or mark parameter nullable |
-| CS8618 | Non-nullable property uninitialized | Initialize in constructor or make nullable |
+| ---------- | ----------- | --- |
+| CS8600 | Converting null to non-nullable | Add null check or nullable type |
+| CS8602 | Dereference of possibly null | Add null check or use `?.` |
+| CS8603 | Possible null reference return | Return non-null or change type |
+| CS8604 | Possible null argument | Validate or mark parameter nullable |
+| CS8618 | Non-nullable uninitialized | Initialize in constructor or nullable |
 | CS8619 | Nullability mismatch in interface | Match interface nullability |
-| CS8625 | Cannot convert null to non-nullable | Add null check |
+| CS8625 | Cannot convert null | Add null check |
 | CS8629 | Nullable value type may be null | Use `?.Value` or null check |
-| CA1062 | Validate parameter is non-null | Add `ArgumentNullException.ThrowIfNull()` |
-| CA2201 | Do not raise reserved exception types | Use specific exception types |
+| CA1062 | Validate parameter is non-null | Add `ThrowIfNull()` |
+| CA2201 | Do not raise reserved exceptions | Use specific exception types |
 
 ## Nullable Annotation Patterns
 
 **For parameters:**
+
 ```csharp
 // If null is valid
 public void Process(string? data) { }
@@ -61,6 +63,7 @@ public void Process(string data)
 ```
 
 **For properties:**
+
 ```csharp
 // Initialized
 public string Name { get; set; } = string.Empty;
@@ -73,6 +76,7 @@ public required string Name { get; set; }
 ```
 
 **For return types:**
+
 ```csharp
 // Explicitly nullable
 public User? GetUser(int id) { }
@@ -86,6 +90,7 @@ public User GetUser(int id) =>
 ## Configure Strictness
 
 Add to `.editorconfig`:
+
 ```ini
 [*.cs]
 dotnet_diagnostic.CS8600.severity = error
@@ -100,17 +105,20 @@ dotnet_diagnostic.CA1062.severity = warning
 **CRITICAL**: Avoid `object` and `dynamic` unless absolutely necessary.
 
 **Instead of `object`, use:**
+
 - Generic types `<T>` - to preserve type relationships
 - Interfaces - for polymorphism
 - `record` types - for data transfer
 - Union types via inheritance or `OneOf<>` library
 
 **Instead of `dynamic`, use:**
+
 - Strong typing with interfaces
 - `System.Text.Json` with typed models
 - Source generators for runtime scenarios
 
 **If unavoidable:**
+
 - Add a comment explaining why
 - Limit scope as much as possible
 - Add runtime type checks immediately after
@@ -130,13 +138,14 @@ if (value is null)
 ## Validation
 
 After each fix:
+
 ```bash
 dotnet build src/MyProject/MyProject.csproj
 ```
 
 ## Commit Format
 
-```
+```text
 fix(types): resolve <error_code> in <file>
 ```
 

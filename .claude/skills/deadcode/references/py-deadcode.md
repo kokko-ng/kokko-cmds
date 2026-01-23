@@ -24,6 +24,7 @@ uv run vulture . vulture_whitelist.py --exclude .venv
 For each item detected, **thoroughly verify** it is truly unused:
 
 **Cross-check references:**
+
 - All internal imports across the codebase
 - Dynamic imports (`importlib`, `__import__`)
 - Entry points in `pyproject.toml` or `setup.py`
@@ -32,6 +33,7 @@ For each item detected, **thoroughly verify** it is truly unused:
 - Metaprogramming patterns
 
 **Check for indirect usage:**
+
 - Reflection: `getattr()`, `globals()`, `locals()`
 - String-based access: `eval()`, `exec()`
 - Framework magic (Django models, FastAPI routes, pytest fixtures)
@@ -44,10 +46,13 @@ For each item detected, **thoroughly verify** it is truly unused:
 
 1. Remove the dead code
 2. Run tests immediately:
+
    ```bash
    uv run pytest
    ```
+
 3. Create a separate commit:
+
    ```bash
    git add .
    git commit -m "chore(cleanup): remove unused <function_name>"
@@ -55,11 +60,13 @@ For each item detected, **thoroughly verify** it is truly unused:
 
 ## Handle One Item at a Time
 
-Do NOT batch deletions. Process one finding at a time to maintain traceability and safety.
+Do NOT batch deletions. Process one finding at a time to maintain
+traceability and safety.
 
 ## Whitelist for False Positives
 
 Create a whitelist file for code used but not detected:
+
 ```python
 # vulture_whitelist.py
 from mymodule import used_by_framework  # noqa: F401
@@ -68,14 +75,14 @@ used_by_framework  # Mark as used
 
 ## Commit Format
 
-```
+```text
 chore(cleanup): remove unused <function_name>
 ```
 
 ## Error Recovery
 
 | Issue | Resolution |
-|-------|------------|
+| ----- | ---------- |
 | Test failures after removal | Revert, investigate usage pattern |
 | Import errors | Check all import paths |
 | False positive | Add to whitelist |

@@ -55,7 +55,7 @@ Create all needed worktrees upfront to allow parallel execution.
 
 Spawn one subagent per worktree using the Task tool:
 
-```
+```text
 Task: Run /security py in worktree
 Prompt: Navigate to $WORKTREE_BASE/py-security and run /security py
         Fix ALL issues found, commit incrementally
@@ -66,6 +66,7 @@ Launch all subagents in parallel for maximum efficiency.
 ## Step 5: Monitor Progress
 
 Track subagent completion:
+
 - Use TaskList to monitor active agents
 - Note any failures or blockers
 - Count issues fixed per agent
@@ -78,8 +79,10 @@ Track subagent completion:
 git checkout $TARGET_BRANCH
 
 # Merge each branch
-git merge janitor/py-security --no-ff -m "chore(quality): merge py security fixes"
-git merge janitor/py-types --no-ff -m "chore(quality): merge py type fixes"
+git merge janitor/py-security --no-ff \
+  -m "chore(quality): merge py security fixes"
+git merge janitor/py-types --no-ff \
+  -m "chore(quality): merge py type fixes"
 # ... continue for all branches
 ```
 
@@ -91,11 +94,14 @@ If merge conflicts occur:
 2. **Determine intent** - What was each fix trying to accomplish?
 3. **Resolve preserving both** - Usually both fixes are valid
 4. **Test resolution**:
+
    ```bash
    # Run relevant tests
    uv run pytest  # or npm test, dotnet test
    ```
+
 5. **Complete merge**:
+
    ```bash
    git add .
    git commit -m "chore(quality): resolve merge conflict in <file>"
@@ -104,8 +110,8 @@ If merge conflicts occur:
 ### Common Conflict Patterns
 
 | Pattern | Resolution |
-|---------|------------|
-| Same line modified | Keep both changes if independent, combine if related |
+| ------- | ---------- |
+| Same line modified | Keep both if independent, combine if related |
 | Import ordering | Accept either, let formatter fix |
 | Adjacent lines | Both changes usually apply |
 | Delete vs modify | Prefer the fix unless delete was intentional |

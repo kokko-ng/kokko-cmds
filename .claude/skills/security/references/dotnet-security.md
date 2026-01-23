@@ -23,6 +23,7 @@ dotnet list package --vulnerable --format json
 ### Enable Security Analyzers
 
 Add to `.csproj` or `Directory.Build.props`:
+
 ```xml
 <PropertyGroup>
   <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -31,8 +32,10 @@ Add to `.csproj` or `Directory.Build.props`:
 </PropertyGroup>
 
 <ItemGroup>
-  <PackageReference Include="SecurityCodeScan.VS2019" Version="5.*" PrivateAssets="all" />
-  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.*" PrivateAssets="all" />
+  <PackageReference Include="SecurityCodeScan.VS2019"
+                    Version="5.*" PrivateAssets="all" />
+  <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"
+                    Version="8.*" PrivateAssets="all" />
 </ItemGroup>
 ```
 
@@ -49,8 +52,8 @@ dotnet build -warnaserror
 ## Common Issues and Fixes
 
 | Rule ID | Issue | Fix |
-|---------|-------|-----|
-| SCS0001 | Command injection | Use parameterized commands, avoid string concatenation |
+| ------- | ----- | --- |
+| SCS0001 | Command injection | Use parameterized commands |
 | SCS0002 | SQL injection | Use parameterized queries or EF Core |
 | SCS0005 | Weak random | Use `RandomNumberGenerator` for security |
 | SCS0006 | Weak hash (MD5/SHA1) | Use SHA256 or SHA512 |
@@ -66,6 +69,7 @@ dotnet build -warnaserror
 ## Classification
 
 For each finding, classify as:
+
 - **TRUE_POSITIVE** - Fix now
 - **NEEDS_REFACTOR** - Create safer abstraction then fix
 - **FALSE_POSITIVE** - Justify and suppress locally
@@ -79,12 +83,14 @@ var random = new Random();
 #pragma warning restore SCS0005
 
 // Or use attribute
-[SuppressMessage("Security", "SCS0005", Justification = "Non-security random for UI")]
+[SuppressMessage("Security", "SCS0005",
+    Justification = "Non-security random for UI")]
 ```
 
 ## Validation
 
 After each fix:
+
 ```bash
 dotnet build
 dotnet test
@@ -92,7 +98,7 @@ dotnet test
 
 ## Commit Format
 
-```
+```text
 security(dotnet): mitigate <RuleID> in <file>
 ```
 

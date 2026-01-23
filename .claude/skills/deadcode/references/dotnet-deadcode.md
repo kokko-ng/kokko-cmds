@@ -8,6 +8,7 @@
 ## Enable Dead Code Analyzers
 
 Add to `.csproj` or `Directory.Build.props`:
+
 ```xml
 <PropertyGroup>
   <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -15,7 +16,8 @@ Add to `.csproj` or `Directory.Build.props`:
 </PropertyGroup>
 
 <ItemGroup>
-  <PackageReference Include="Roslynator.Analyzers" Version="4.*" PrivateAssets="all" />
+  <PackageReference Include="Roslynator.Analyzers" Version="4.*"
+                    PrivateAssets="all" />
 </ItemGroup>
 ```
 
@@ -23,7 +25,8 @@ Add to `.csproj` or `Directory.Build.props`:
 
 ```bash
 # Build with dead code warnings as errors
-dotnet build -warnaserror:CS0168,CS0169,CS0219,CS0414,IDE0051,IDE0052,IDE0059,IDE0060,CA1822
+dotnet build \
+  -warnaserror:CS0168,CS0169,CS0219,CS0414,IDE0051,IDE0052,IDE0059,IDE0060,CA1822
 
 # Full analysis
 dotnet build
@@ -59,6 +62,7 @@ dotnet list package --outdated
 For each item detected, **thoroughly verify** it is truly unused:
 
 **Cross-check references:**
+
 - All internal references across the solution
 - Reflection-based access: `typeof()`, `nameof()`, `GetType()`
 - Serialization attributes: `[JsonProperty]`, `[DataMember]`
@@ -68,6 +72,7 @@ For each item detected, **thoroughly verify** it is truly unused:
 - ASP.NET conventions (controllers, handlers)
 
 **Check for indirect usage:**
+
 - `dynamic` keyword usage
 - `Activator.CreateInstance()`
 - Assembly scanning (DI containers)
@@ -81,10 +86,13 @@ For each item detected, **thoroughly verify** it is truly unused:
 
 1. Remove the dead code
 2. Run tests immediately:
+
    ```bash
    dotnet test
    ```
+
 3. Create a separate commit:
+
    ```bash
    git add .
    git commit -m "chore(cleanup): remove unused <member>"
@@ -101,6 +109,7 @@ dotnet test
 ## Suppress False Positives
 
 For code used via reflection or conventions:
+
 ```csharp
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "CodeQuality", "IDE0051",
@@ -109,6 +118,7 @@ private ICollection<Order> Orders { get; set; }
 ```
 
 Or configure in `.editorconfig`:
+
 ```ini
 [*.cs]
 [**/Entities/*.cs]
@@ -117,7 +127,7 @@ dotnet_diagnostic.IDE0051.severity = none
 
 ## Commit Format
 
-```
+```text
 chore(cleanup): remove unused <member>
 ```
 

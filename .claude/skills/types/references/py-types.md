@@ -7,6 +7,7 @@ uv add --dev mypy
 ```
 
 Install type stubs as needed:
+
 ```bash
 uv add --dev types-requests types-PyYAML types-redis
 ```
@@ -24,20 +25,21 @@ uv run mypy src/ tests/
 ## Common Errors and Fixes
 
 | Error Code | Description | Fix |
-|------------|-------------|-----|
-| `[assignment]` | Incompatible types in assignment | Fix type or add proper annotation |
-| `[arg-type]` | Argument type mismatch | Fix argument or update function signature |
-| `[return-value]` | Return type mismatch | Fix return statement or annotation |
+| ---------- | ----------- | --- |
+| `[assignment]` | Incompatible types | Fix type or add proper annotation |
+| `[arg-type]` | Argument type mismatch | Fix argument or update signature |
+| `[return-value]` | Return type mismatch | Fix return or annotation |
 | `[name-defined]` | Name not defined | Import missing type or fix typo |
 | `[attr-defined]` | Attribute not defined | Add attribute or fix access |
-| `[union-attr]` | Attribute access on Optional | Add None check or use `assert` |
-| `[no-untyped-def]` | Function missing type annotations | Add parameter and return types |
+| `[union-attr]` | Access on Optional | Add None check or use `assert` |
+| `[no-untyped-def]` | Missing annotations | Add param and return types |
 | `[import]` | Cannot find module | Install stubs or add to ignore list |
 | `[misc]` | Various issues | Read message carefully |
 
 ## Handle External Dependencies
 
 Add to `pyproject.toml`:
+
 ```toml
 [tool.mypy]
 ignore_missing_imports = true
@@ -51,6 +53,7 @@ ignore_missing_imports = true
 ## Configure Strictness
 
 Add to `pyproject.toml`:
+
 ```toml
 [tool.mypy]
 python_version = "3.11"
@@ -68,6 +71,7 @@ no_implicit_optional = true
 **CRITICAL**: Avoid `Any` types unless absolutely necessary.
 
 **Instead of `Any`, use:**
+
 - `object` - for truly unknown types that you won't access
 - `TypeVar` - for generic functions preserving type relationships
 - `Union[X, Y]` - when value can be one of several types
@@ -76,6 +80,7 @@ no_implicit_optional = true
 - `dict[str, object]` - instead of `dict[str, Any]`
 
 **If `Any` is unavoidable:**
+
 - Add a comment explaining why
 - Limit scope as much as possible
 - Consider wrapping in a function with proper types at boundaries
@@ -83,13 +88,14 @@ no_implicit_optional = true
 ## Validation
 
 After each fix:
+
 ```bash
 uv run mypy path/to/file.py
 ```
 
 ## Commit Format
 
-```
+```text
 fix(types): resolve mypy errors in <module>
 ```
 

@@ -32,18 +32,21 @@ wc -l README.md
 ### 2. Categorize Content by Priority
 
 **Priority 1 - Must Keep:**
+
 - Project name and one-line description
 - Prerequisites (language version, required tools)
 - Installation steps
 - Basic usage/run command
 
 **Priority 2 - Keep if Space Allows:**
+
 - Configuration options (brief)
 - Common troubleshooting
 - Contributing guidelines (or link)
 - License
 
 **Priority 3 - Remove:**
+
 - Lengthy architecture explanations (move to docs/)
 - Multiple usage examples (keep one, link to more)
 - Changelog content (use CHANGELOG.md)
@@ -53,12 +56,14 @@ wc -l README.md
 ### 3. Principles for Pruning
 
 **Keep information that:**
+
 - Enables quick start (clone, install, run in under 5 minutes)
 - Explains the purpose (one paragraph max)
 - Shows basic usage
 - Points to more info (links, not duplicated content)
 
 **Remove information that:**
+
 - Duplicates info elsewhere (package.json scripts, inline comments)
 - Is obvious from code or file structure
 - Contains excessive examples when one suffices
@@ -73,7 +78,7 @@ wc -l README.md
 4. **Remove badges** that don't provide useful info
 5. **Collapse optional sections** using details/summary if supported
 
-### 5. Validate Final Size. Loop back to Step 2 if still not under target.
+### 5. Validate Final Size. Loop back to Step 2 if still not under target
 
 ```bash
 wc -l README.md
@@ -84,6 +89,7 @@ Target: Under 100 lines (simple), under 200 (complex).
 ## Guidance on Effectiveness
 
 Ask: "Could a new developer go from clone to running in 5 minutes?"
+
 - If yes, pruning is complete
 - If no, add back minimum needed steps
 

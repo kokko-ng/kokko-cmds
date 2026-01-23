@@ -4,7 +4,8 @@ disable-model-invocation: true
 
 # C4 Architecture Mapping
 
-Map the codebase architecture using a hierarchical C4 model (Context -> Containers -> Components).
+Map the codebase architecture using a hierarchical C4 model
+(Context -> Containers -> Components).
 
 ## Arguments
 
@@ -16,15 +17,18 @@ If `$ARGUMENTS` is provided, use it as the target directory to analyze.
 
 ## Prerequisites
 
-A codebase to analyze. No existing C4 model required - this command generates the initial map.
+A codebase to analyze. No existing C4 model required - this command
+generates the initial map.
 
 ## Orchestration
 
-```
-Phase 1: Context ──> Phase 2: Containers ──> Phase 3: Components ──> Phase 4: Synthesis ──> Phase 5: Files
+```text
+Phase 1: Context -> Phase 2: Containers -> Phase 3: Components ->
+Phase 4: Synthesis -> Phase 5: Files
 ```
 
-Each level depends on outputs from the previous level. Execute sequentially, passing outputs forward.
+Each level depends on outputs from the previous level. Execute sequentially,
+passing outputs forward.
 
 **Output structure:** See [c4-templates.md](./c4-templates.md#output-structure)
 
@@ -32,7 +36,7 @@ Each level depends on outputs from the previous level. Execute sequentially, pas
 
 ## Phase 1: System Context
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -64,7 +68,7 @@ Store: `SYSTEM_ID`, `EXTERNAL_SYSTEMS`, `PRELIMINARY_CONTAINERS`
 
 ## Phase 2: Containers
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -102,7 +106,7 @@ Store: `CONTAINERS` with `PRELIMINARY_COMPONENTS`, `CONTAINER_RELATIONSHIPS`
 
 ## Phase 3: Components
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -138,7 +142,7 @@ Store: `COMPONENTS_BY_CONTAINER`
 
 ## Phase 4: Synthesis
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -180,12 +184,17 @@ Download the C4-PlantUML library files if not already present:
 
 ```bash
 mkdir -p codemap/.c4-plantuml
+BASE_URL="https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master"
 
 # Download only if files don't exist
-[ -f codemap/.c4-plantuml/C4.puml ] || curl -sL -o codemap/.c4-plantuml/C4.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml
-[ -f codemap/.c4-plantuml/C4_Context.puml ] || curl -sL -o codemap/.c4-plantuml/C4_Context.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
-[ -f codemap/.c4-plantuml/C4_Container.puml ] || curl -sL -o codemap/.c4-plantuml/C4_Container.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-[ -f codemap/.c4-plantuml/C4_Component.puml ] || curl -sL -o codemap/.c4-plantuml/C4_Component.puml https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+[ -f codemap/.c4-plantuml/C4.puml ] || \
+  curl -sL -o codemap/.c4-plantuml/C4.puml "$BASE_URL/C4.puml"
+[ -f codemap/.c4-plantuml/C4_Context.puml ] || \
+  curl -sL -o codemap/.c4-plantuml/C4_Context.puml "$BASE_URL/C4_Context.puml"
+[ -f codemap/.c4-plantuml/C4_Container.puml ] || \
+  curl -sL -o codemap/.c4-plantuml/C4_Container.puml "$BASE_URL/C4_Container.puml"
+[ -f codemap/.c4-plantuml/C4_Component.puml ] || \
+  curl -sL -o codemap/.c4-plantuml/C4_Component.puml "$BASE_URL/C4_Component.puml"
 ```
 
 ### Step 1: Create Folders
@@ -207,12 +216,13 @@ done
 Use templates from [c4-templates.md](./c4-templates.md#markdown-templates):
 
 | Level | Files |
-|-------|-------|
+| ----- | ----- |
 | System | `context.puml`, `context.md` |
 | Container | `container.puml`, `container.md` |
 | Component | `component.puml`, `component.md` |
 
 Each markdown file must include:
+
 - Parent navigation link
 - Drill-down table to children
 - `<!-- Last updated: YYYY-MM-DD -->` timestamp
@@ -220,7 +230,8 @@ Each markdown file must include:
 ### Step 3: Generate PNGs
 
 ```bash
-find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
+find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" \
+  -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 ```
 
 ### Step 4: Write README

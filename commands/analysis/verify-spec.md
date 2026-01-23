@@ -31,12 +31,14 @@ Read the spec.md file and verify it exists. If not found, report an error.
 Check that the spec file contains required sections:
 
 **Required sections:**
+
 - [ ] `# Application Test Specification` or similar title
 - [ ] `## Overview` section with application description
 - [ ] `## User Stories` section
 - [ ] At least one `### Feature:` subsection
 
 **For each user story, verify:**
+
 - [ ] User story ID format (US-XXX)
 - [ ] "As a" statement (user type)
 - [ ] "I want to" statement (action)
@@ -49,7 +51,7 @@ Check that the spec file contains required sections:
 
 Identify issues:
 
-```
+```text
 STRUCTURE ISSUES:
 - Missing overview section
 - User story US-005 missing acceptance criteria
@@ -65,18 +67,20 @@ FORMATTING ISSUES:
 For each documented feature, verify it exists in the codebase:
 
 **For web applications:**
+
 - Routes mentioned exist in router configuration
 - Components referenced are implemented
 - API endpoints documented are defined
 - data-testid attributes mentioned exist in templates
 
 **For CLI applications:**
+
 - Commands documented exist in command definitions
 - Options and flags are implemented
 
 Report any mismatches:
 
-```
+```text
 CODEBASE MISMATCHES:
 - US-002 references /admin route but route not found
 - US-008 mentions "Delete Account" button but no such element exists
@@ -87,7 +91,7 @@ CODEBASE MISMATCHES:
 
 Scan the codebase for features NOT documented in the spec:
 
-```
+```text
 UNDOCUMENTED FEATURES:
 - Route /settings exists but not in spec
 - Component UserProfile has testable interactions not covered
@@ -97,12 +101,13 @@ UNDOCUMENTED FEATURES:
 ### 6. Validate Test Scenarios
 
 For each test scenario, check:
+
 - Happy path scenario exists
 - At least one error/edge case documented
 - Prerequisites are clear
 - Expected outcomes are specific and measurable
 
-```
+```text
 SCENARIO ISSUES:
 - US-001: Missing error case scenario
 - US-004: Expected outcome is vague ("should work correctly")
@@ -155,6 +160,7 @@ Output a summary report:
 ## Output Format
 
 The verification produces:
+
 - Console summary of pass/fail status
 - Detailed report of all issues found
 - Actionable recommendations
@@ -162,8 +168,8 @@ The verification produces:
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
-| Spec file not found | Wrong path or not generated | Run `/analysis/spec` first |
+| ----- | ----- | ---------- |
+| Spec file not found | Wrong path | Run `/analysis/spec` first |
 | Cannot parse spec | Malformed markdown | Check markdown syntax |
 | Cannot analyze codebase | Missing files | Verify project structure |
 

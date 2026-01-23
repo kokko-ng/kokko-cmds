@@ -15,7 +15,9 @@ Requires `tsconfig.json` configured.
 npx tsc --noEmit
 
 # Using project's build script
-npm run build:check 2>/dev/null || npm run typecheck 2>/dev/null || npx tsc --noEmit
+npm run build:check 2>/dev/null \
+  || npm run typecheck 2>/dev/null \
+  || npx tsc --noEmit
 
 # Specific tsconfig
 npx tsc --noEmit -p tsconfig.json
@@ -24,8 +26,8 @@ npx tsc --noEmit -p tsconfig.json
 ## Common Errors and Fixes
 
 | Error Code | Description | Fix |
-|------------|-------------|-----|
-| TS2339 | Property does not exist | Add to interface or use type assertion |
+| ---------- | ----------- | --- |
+| TS2339 | Property does not exist | Add to interface or type assertion |
 | TS7006 | Parameter has implicit any | Add explicit type annotation |
 | TS2345 | Argument type mismatch | Fix the type or use type guard |
 | TS2322 | Type not assignable | Ensure types are compatible |
@@ -38,6 +40,7 @@ npx tsc --noEmit -p tsconfig.json
 ## Configure Strict Mode
 
 Ensure `tsconfig.json` includes:
+
 ```json
 {
   "compilerOptions": {
@@ -67,6 +70,7 @@ echo "declare module 'package-name';" > src/types/package-name.d.ts
 **CRITICAL**: Avoid `any` types unless absolutely necessary.
 
 **Instead of `any`, use:**
+
 - `unknown` - for truly unknown types (requires narrowing before use)
 - `never` - for impossible states
 - `Record<string, unknown>` - instead of `Record<string, any>`
@@ -75,21 +79,24 @@ echo "declare module 'package-name';" > src/types/package-name.d.ts
 - `Parameters<T>` / `ReturnType<T>` - to extract types from functions
 
 **If `any` is unavoidable:**
+
 - Add a comment explaining why
 - Limit scope as much as possible
 - Consider wrapping in a function with proper types at boundaries
-- Use `// eslint-disable-next-line @typescript-eslint/no-explicit-any` with explanation
+- Use `// eslint-disable-next-line @typescript-eslint/no-explicit-any`
+  with explanation
 
 ## Validation
 
 After each fix:
+
 ```bash
 npx tsc --noEmit <file>
 ```
 
 ## Commit Format
 
-```
+```text
 fix(types): resolve TS<code> in <file>
 ```
 

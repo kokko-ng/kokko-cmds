@@ -20,11 +20,13 @@ Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` firs
 
 ## Orchestration
 
-```
-Phase 1: Detect Changes ──> Phase 2: Plan Updates ──> Phase 3: Apply ──> Phase 4: Verify ──> Phase 5: Finalize
+```text
+Phase 1: Detect Changes -> Phase 2: Plan Updates -> Phase 3: Apply ->
+Phase 4: Verify -> Phase 5: Finalize
 ```
 
 **Update order:**
+
 - Deletions: Component -> Container -> Context (bottom-up)
 - Additions: Context -> Container -> Component (top-down)
 - Modifications: Affected level + adjacent levels
@@ -50,7 +52,7 @@ git diff --name-status $LAST_UPDATE..HEAD -- . ':!codemap' ':!*.md' | head -50
 
 ### Step 1C: Categorize Changes
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -86,7 +88,7 @@ Parameters:
 
 ## Phase 2: Impact Analysis
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -106,7 +108,7 @@ Parameters:
     OUTPUT:
     {
       "EXECUTION_PLAN": [
-        {"step": N, "phase": "deletion|modification|addition", "depends_on": [], "tasks": [...]}
+        {"step": N, "phase": "...", "depends_on": [], "tasks": [...]}
       ],
       "SUBAGENT_SPAWNS": {"sequential": [], "parallel_safe": []}
     }
@@ -129,7 +131,7 @@ Update navigation links in parent files after deletions.
 
 For each modified element, spawn level-specific subagent:
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -170,7 +172,7 @@ mkdir -p codemap/$SYSTEM_ID/containers/<container>/components/<new-id>
 
 ## Phase 4: Cross-Level Consistency
 
-```
+```yaml
 Tool: Task
 Parameters:
   subagent_type: "Explore"
@@ -234,7 +236,7 @@ Update `codemap/README.md` with timestamp and change summary.
 
 ## Structural Changes
 | Type | Element | Action |
-|------|---------|--------|
+| ---- | ------- | ------ |
 | ADDITION | component:oauth | Created folder |
 | DELETION | component:legacy | Removed folder |
 
@@ -251,5 +253,5 @@ Update `codemap/README.md` with timestamp and change summary.
 ## Error Handling
 
 - **No changes detected:** Report and exit
-- **Subagent failure:** Report which update failed, do not proceed with dependent updates
+- **Subagent failure:** Report which update failed, skip dependent updates
 - **Consistency issues:** List issues, apply automatic fixes where possible

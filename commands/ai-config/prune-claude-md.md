@@ -32,17 +32,20 @@ wc -l CLAUDE.md
 ### 2. Categorize Content by Priority
 
 **Priority 1 - Must Keep:**
+
 - Project-specific commands (build, test, run)
 - Critical constraints or requirements
 - Non-obvious architectural decisions
 - Environment setup essentials
 
 **Priority 2 - Keep if Space Allows:**
+
 - Code style preferences beyond linting
 - Common gotchas specific to codebase
 - Key file locations for important modules
 
 **Priority 3 - Remove:**
+
 - General programming advice
 - Lengthy explanations of standard tools
 - Verbose examples when terse ones work
@@ -51,12 +54,14 @@ wc -l CLAUDE.md
 ### 3. Principles for Pruning
 
 **Keep information that:**
+
 - Directly affects code generation
 - Prevents common mistakes
 - Enables task completion
 - Is unique to this project
 
 **Remove information that:**
+
 - Claude already knows (general best practices)
 - Is redundant or repeated
 - Is too verbose when shorter version suffices
@@ -72,7 +77,7 @@ wc -l CLAUDE.md
 5. **Link to docs** instead of duplicating
 6. **Use code blocks sparingly** - only for non-obvious commands
 
-### 5. Validate Final Size. Loop back to Step 2 if still not under 300 lines.
+### 5. Validate Final Size. Loop back to Step 2 if still not under 300 lines
 
 ```bash
 wc -l CLAUDE.md
@@ -83,6 +88,7 @@ Target: Under 300 lines while retaining critical information.
 ## Guidance on Effectiveness
 
 Ask: "Could an agent complete common tasks with only this CLAUDE.md?"
+
 - If yes for all critical workflows, pruning is complete
 - If no, add back minimum needed context
 

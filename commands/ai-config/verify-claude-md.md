@@ -29,28 +29,35 @@ Read and understand all instructions in the CLAUDE.md file.
 ### 2. Verify Each Section
 
 **Repository Context:**
+
 - Does the description match actual project purpose?
 - Is the project structure accurate?
 
 **Package Management:**
+
 ```bash
 # Check which package manager is used
-ls pyproject.toml uv.lock package.json pnpm-lock.yaml yarn.lock requirements.txt 2>/dev/null
+ls pyproject.toml uv.lock package.json pnpm-lock.yaml \
+   yarn.lock requirements.txt 2>/dev/null
 ```
 
 **Build/Run Commands:**
+
 - Test each documented command
 - Verify they execute successfully
 
 **File Structure:**
+
 - Check that documented paths exist
 - Verify directory structure matches description
 
 **Dependencies:**
+
 - Confirm mentioned tools are in dependency files
 - Check version requirements are current
 
 **Configuration:**
+
 - Verify config files exist
 - Check that documented settings match actual files
 
@@ -59,27 +66,33 @@ ls pyproject.toml uv.lock package.json pnpm-lock.yaml yarn.lock requirements.txt
 Identify important aspects not documented:
 
 **Entry Points:**
+
 - Main files, scripts, or commands
 - How to run the application
 
 **Testing:**
+
 - How to run tests
 - Test frameworks used
 
 **Environment Setup:**
+
 - Required environment variables
 - .env file requirements
 
 **Key Patterns:**
+
 - Architectural patterns used
 - Coding conventions
 
 **External Services:**
+
 - APIs, databases, or services used
 
 ### 4. Check for Outdated Information
 
 Look for:
+
 - References to deleted files or directories
 - Deprecated commands or workflows
 - Old dependency versions
@@ -88,6 +101,7 @@ Look for:
 ### 5. Update CLAUDE.md
 
 Fix any inaccuracies found:
+
 - Remove outdated information
 - Add missing critical context
 - Update changed commands
@@ -96,6 +110,7 @@ Fix any inaccuracies found:
 ### 6. Validate Changes
 
 After updates, verify:
+
 - All documented commands execute successfully
 - All referenced paths exist
 - Instructions are clear and actionable
@@ -103,7 +118,7 @@ After updates, verify:
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
+| ----- | ----- | ---------- |
 | Command fails | Outdated or wrong command | Update to correct command |
 | Path not found | File moved or deleted | Update path or remove reference |
 | Missing context | Documentation gap | Add necessary information |

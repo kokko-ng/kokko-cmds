@@ -4,7 +4,8 @@ disable-model-invocation: true
 
 # Create Test Specification
 
-Generate a comprehensive specification file documenting all testable user stories in the application.
+Generate a specification file documenting all testable user stories in the
+application.
 
 ## When to Use
 
@@ -28,6 +29,7 @@ If `$ARGUMENTS` is provided, use it as the target path or output file.
 Explore the application to identify all user-facing features:
 
 **For web applications:**
+
 - Routes and pages
 - Forms and user inputs
 - Navigation flows
@@ -36,6 +38,7 @@ Explore the application to identify all user-facing features:
 - API endpoints
 
 **For CLI applications:**
+
 - Commands and subcommands
 - Input/output behavior
 - Configuration options
@@ -74,6 +77,7 @@ Brief description of the application and its purpose.
 ### 3. Focus on Playwright-Testable Features
 
 Include only features that can be tested via browser automation:
+
 - Page navigation
 - Form submissions
 - Button clicks
@@ -84,7 +88,9 @@ Include only features that can be tested via browser automation:
 
 ### 4. Document Existing Features Only
 
-**Do NOT add speculative features.** Only document functionality that exists in the current codebase:
+**Do NOT add speculative features.** Only document functionality that exists in
+the current codebase:
+
 - Check route definitions
 - Review component implementations
 - Verify API endpoints exist
@@ -93,6 +99,7 @@ Include only features that can be tested via browser automation:
 ### 5. Organize by Priority
 
 Group user stories by:
+
 1. Critical path (authentication, core features)
 2. Primary features (main functionality)
 3. Secondary features (nice-to-have)
@@ -101,6 +108,7 @@ Group user stories by:
 ## Output Format
 
 The spec.md file should include:
+
 - Clear user story identifiers (US-001, US-002, etc.)
 - Testable acceptance criteria
 - Mapping to actual UI elements (data-testid attributes)
@@ -110,8 +118,8 @@ The spec.md file should include:
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
-| Feature unclear | Code is ambiguous | Read implementation, add TODO for clarification |
+| ----- | ----- | ---------- |
+| Feature unclear | Code is ambiguous | Read implementation, add TODO |
 | No UI for feature | Backend-only functionality | Mark as "API test only" |
 | Dynamic content | Content varies | Document expected patterns |
 

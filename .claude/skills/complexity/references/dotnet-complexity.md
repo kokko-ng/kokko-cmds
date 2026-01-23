@@ -7,6 +7,7 @@
 ## Enable Code Metrics Analyzers
 
 Add to `.csproj` or `Directory.Build.props`:
+
 ```xml
 <PropertyGroup>
   <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -33,6 +34,7 @@ dotnet msbuild /t:Metrics
 ## Configure Thresholds
 
 Create or update `.editorconfig`:
+
 ```ini
 [*.cs]
 # Cyclomatic complexity threshold
@@ -48,12 +50,14 @@ dotnet_code_quality.CA1506.threshold = 40
 ## Identify Hotspots
 
 Target methods with:
+
 - Cyclomatic complexity > 15
 - Maintainability index < 40
 - High class coupling (> 40 dependencies)
 - Deep nesting levels (> 3)
 
 Prioritize by:
+
 1. Highest complexity first
 2. Frequency of change (`git log --follow <file>`)
 3. Business criticality
@@ -76,6 +80,7 @@ Apply one tactic at a time:
 ## Validation
 
 After each micro-change:
+
 ```bash
 dotnet test
 dotnet build -warnaserror:CA1502
@@ -83,7 +88,7 @@ dotnet build -warnaserror:CA1502
 
 ## Commit Format
 
-```
+```text
 refactor(complexity): reduce complexity in <method>
 ```
 
@@ -97,6 +102,7 @@ refactor(complexity): reduce complexity in <method>
 ## Hard Cases
 
 If complexity resists decomposition:
+
 - Introduce a decision table or data-driven structure
 - Split algorithm into phases (parse -> transform -> emit)
 - Use the Strategy pattern for variant behavior

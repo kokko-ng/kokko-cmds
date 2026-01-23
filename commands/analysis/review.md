@@ -24,12 +24,15 @@ If `$ARGUMENTS` is provided, use it as the review target.
 
 ### 1. Spawn Opus Subagents for Deep Analysis
 
-Use the Task tool with `model: "opus"` to spawn subagents for thorough review. Opus excels at:
+Use the Task tool with `model: "opus"` to spawn subagents for thorough review.
+Opus excels at:
+
 - Detecting subtle logic errors and edge cases
 - Evaluating architectural decisions
 - Identifying security vulnerabilities
 
-For large changes, spawn parallel Opus agents per file or module for comprehensive coverage.
+For large changes, spawn parallel Opus agents per file or module for
+comprehensive coverage.
 
 ### 2. Identify Review Scope
 
@@ -49,30 +52,35 @@ git diff <file>
 
 ### 3. Evaluate Against Criteria
 
-**Correctness**
+#### Correctness
+
 - Does this code actually work?
 - Are there edge cases that will break it?
 - Are there logic errors or off-by-one mistakes?
 - Will this fail silently or produce wrong results?
 
-**Design Problems**
+#### Design Problems
+
 - Is this the wrong approach entirely?
 - Is this over-engineered for what it does?
 - Is this under-engineered and will cause problems later?
 - Does this duplicate existing functionality?
 
-**Code Quality**
+#### Code Quality
+
 - Is this code hard to read or understand?
 - Are the names misleading or unclear?
 - Is the structure confusing?
 - Would you struggle to debug this at 3am?
 
-**Security and Reliability**
+#### Security and Reliability
+
 - Are there obvious security holes?
 - Will this break under load or unusual conditions?
 - Are errors handled properly or swallowed?
 
-**Maintenance Burden**
+#### Maintenance Burden
+
 - Will future developers curse this code?
 - Is this adding unnecessary complexity?
 - Does this violate established patterns in the codebase?
@@ -81,7 +89,7 @@ git diff <file>
 
 Be direct. No praise sandwiches. No "great job but...". State issues plainly.
 
-```
+```text
 CRITICAL: [Issues that must be fixed before merge]
 - The SQL query on line 45 is vulnerable to injection.
 
@@ -97,17 +105,20 @@ VERDICT: APPROVE | NEEDS CHANGES | REJECT
 
 ### 5. Be Accurate, Not Thorough-Looking
 
-Do not add false positives to appear thorough. If the code is genuinely good, say so briefly and move on:
+Do not add false positives to appear thorough. If the code is genuinely good,
+say so briefly and move on:
 
-```
-No significant issues found. Code is clear, handles edge cases, and follows existing patterns.
+```text
+No significant issues found. Code is clear, handles edge cases, follows
+existing patterns.
 
 VERDICT: APPROVE
 ```
 
 ## Guidelines
 
-- **State facts, not feelings** - "This function is 200 lines" not "This feels too long"
+- **State facts, not feelings** - "This function is 200 lines" not "This
+  feels too long"
 - **Be specific** - Include file:line references
 - **Explain why** - Not just what's wrong, but why it matters
 - **Suggest fixes** - When possible, indicate how to resolve issues
@@ -116,10 +127,10 @@ VERDICT: APPROVE
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
+| ----- | ----- | ---------- |
 | No changes to review | Empty diff | Check branch, staging area |
-| Too much to review | Large PR | Focus on changed files, suggest splitting |
-| Unfamiliar domain | Specialized code | Note uncertainty, focus on general quality |
+| Too much to review | Large PR | Focus on changed files, suggest split |
+| Unfamiliar domain | Specialized code | Note uncertainty, focus on quality |
 
 ## Success Criteria
 

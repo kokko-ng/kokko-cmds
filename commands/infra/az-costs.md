@@ -15,11 +15,13 @@ Ensure Azure CLI is authenticated: `az account show`
 ### 1. Confirm Target Subscription
 
 ALWAYS use AskUserQuestion to confirm:
+
 - Which subscription to analyze
 - Specific resource group to focus on (or all)
 - Time period (default: MonthToDate)
 
 Never assume subscription or resource group. List available options if needed:
+
 ```bash
 az account list --query "[].{Name:name, Id:id}" -o table
 az group list --query "[].name" -o tsv
@@ -31,10 +33,14 @@ Fetch cost data for the specified period (default: last 30 days):
 
 ```bash
 # Current billing period costs by resource group
-az cost query --type ActualCost --dataset-grouping name=ResourceGroup type=Dimension --timeframe MonthToDate
+az cost query --type ActualCost \
+  --dataset-grouping name=ResourceGroup type=Dimension \
+  --timeframe MonthToDate
 
 # Daily cost trend
-az cost query --type ActualCost --dataset-grouping name=ServiceName type=Dimension --timeframe MonthToDate --dataset-aggregation totalCost=Sum
+az cost query --type ActualCost \
+  --dataset-grouping name=ServiceName type=Dimension \
+  --timeframe MonthToDate --dataset-aggregation totalCost=Sum
 
 # Forecast for current month
 az cost query --type AmortizedCost --timeframe MonthToDate
@@ -43,6 +49,7 @@ az cost query --type AmortizedCost --timeframe MonthToDate
 ### 3. Resource Group Breakdown
 
 For each resource group, show:
+
 - Total cost MTD
 - Top 3 cost drivers (specific resources)
 - Cost trend (increasing/decreasing/stable)
@@ -51,6 +58,7 @@ For each resource group, show:
 ### 4. Service Category Analysis
 
 Break down by service type:
+
 - Compute (VMs, Container Apps, Functions)
 - Storage (Blob, Cosmos DB, SQL)
 - AI Services (OpenAI, Cognitive Services)
@@ -60,6 +68,7 @@ Break down by service type:
 ### 5. Anomaly Detection
 
 Flag any of these conditions:
+
 - Daily cost spike > 20% above 7-day average
 - New resources appearing that weren't present last week
 - Resources with zero usage but ongoing cost (idle resources)
@@ -68,6 +77,7 @@ Flag any of these conditions:
 ### 6. Optimization Suggestions
 
 Based on usage patterns, suggest:
+
 - Underutilized resources that could be downsized
 - Reserved instance opportunities for consistent workloads
 - Dev/test resources that could use B-series VMs
@@ -75,7 +85,7 @@ Based on usage patterns, suggest:
 
 ## Output Format
 
-```
+```text
 ## Azure Cost Summary (MTD)
 
 Total Spend: $X,XXX.XX
@@ -100,4 +110,5 @@ vs Last Month: +/- XX%
 
 ## Arguments
 
-- `$ARGUMENTS` - Optional: "daily" for daily breakdown, "weekly" for weekly, or resource group name to filter
+- `$ARGUMENTS` - Optional: "daily" for daily breakdown, "weekly" for weekly,
+  or resource group name to filter

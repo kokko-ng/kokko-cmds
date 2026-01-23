@@ -7,6 +7,7 @@
 ## Enable Documentation Warnings
 
 Add to `.csproj` or `Directory.Build.props`:
+
 ```xml
 <PropertyGroup>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -37,6 +38,7 @@ dotnet build
 ## Processing Order
 
 Work through files systematically:
+
 1. Public API classes and interfaces
 2. Public methods on controllers/services
 3. Public properties and events
@@ -46,6 +48,7 @@ Work through files systematically:
 ## XML Documentation Standards
 
 **For methods:**
+
 ```csharp
 /// <summary>
 /// Short one-line summary ending with period.
@@ -72,6 +75,7 @@ public bool MethodName(string param1, int param2)
 ```
 
 **For classes:**
+
 ```csharp
 /// <summary>
 /// Short one-line summary.
@@ -90,6 +94,7 @@ public class ClassName<T>
 ```
 
 **For interfaces:**
+
 ```csharp
 /// <summary>
 /// Defines the contract for user management operations.
@@ -108,6 +113,7 @@ public interface IUserService
 ## Use InheritDoc
 
 For interface implementations:
+
 ```csharp
 /// <inheritdoc />
 public User? GetUser(int id)
@@ -117,6 +123,7 @@ public User? GetUser(int id)
 ```
 
 For overrides:
+
 ```csharp
 /// <inheritdoc />
 /// <remarks>
@@ -131,6 +138,7 @@ public override string ToString()
 ## Configure Scope
 
 Exclude assemblies from documentation requirements:
+
 ```xml
 <PropertyGroup>
   <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -138,6 +146,7 @@ Exclude assemblies from documentation requirements:
 ```
 
 Or exclude types in `.editorconfig`:
+
 ```ini
 [**/Internal/**/*.cs]
 dotnet_diagnostic.CS1591.severity = none
@@ -149,20 +158,21 @@ dotnet_diagnostic.CS1591.severity = none
 ## Validation
 
 After fixing each file:
+
 ```bash
 dotnet build src/MyProject/MyProject.csproj -warnaserror:CS1591
 ```
 
 ## Commit Format
 
-```
+```text
 docs(<namespace>): add XML docs to <type>
 ```
 
 ## Error Handling
 
 | Issue | Resolution |
-|-------|------------|
+| ----- | ---------- |
 | CS1591 on generated code | Exclude from documentation requirements |
 | CS1574 cref not found | Add full namespace or using directive |
 | Too many warnings | Process namespace by namespace |

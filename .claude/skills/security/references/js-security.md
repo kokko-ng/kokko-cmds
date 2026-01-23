@@ -34,6 +34,7 @@ npm install -D eslint-plugin-security @typescript-eslint/eslint-plugin
 ```
 
 ESLint config addition:
+
 ```javascript
 {
   plugins: ['security'],
@@ -44,20 +45,20 @@ ESLint config addition:
 ## Common Issues and Fixes
 
 | Rule | Issue | Risk |
-|------|-------|------|
-| detect-object-injection | Bracket notation with user input | Object prototype pollution |
+| ---- | ----- | ---- |
+| detect-object-injection | Bracket notation with user input | Pollution |
 | detect-non-literal-fs-filename | Dynamic file paths | Path traversal |
 | detect-non-literal-regexp | User input in regex | ReDoS |
 | detect-eval-with-expression | eval() with variables | Code injection |
-| detect-no-csrf-before-method-override | CSRF vulnerability | Cross-site request forgery |
-| detect-possible-timing-attacks | String comparison timing | Information leak |
+| detect-no-csrf-before-method-override | CSRF vulnerability | CSRF |
+| detect-possible-timing-attacks | String comparison timing | Info leak |
 
 ## Fix Patterns
 
 | Issue | Fix |
-|-------|-----|
+| ----- | --- |
 | `eval()` / `new Function()` | Use safe alternatives, `JSON.parse()` for data |
-| `innerHTML` / `dangerouslySetInnerHTML` | Use `textContent` or sanitize with DOMPurify |
+| `innerHTML` / `dangerouslySetInnerHTML` | Use `textContent` or DOMPurify |
 | Dynamic `require()` | Use static imports |
 | Unvalidated redirects | Whitelist allowed URLs |
 | SQL/NoSQL injection | Use parameterized queries |
@@ -66,13 +67,15 @@ ESLint config addition:
 ## Suppression Pattern
 
 ```javascript
-// eslint-disable-next-line security/detect-object-injection -- key is validated enum
+// eslint-disable-next-line security/detect-object-injection
+// key is validated enum
 const value = obj[validatedKey];
 ```
 
 ## Validation
 
 After each fix:
+
 ```bash
 npm test
 npx eslint <affected_files>
@@ -80,7 +83,7 @@ npx eslint <affected_files>
 
 ## Commit Format
 
-```
+```text
 security(eslint): mitigate <issue> in <file>
 ```
 

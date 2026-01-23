@@ -4,7 +4,8 @@ disable-model-invocation: true
 
 # Technical Debt Analysis
 
-Perform deep manual analysis of the codebase to identify technical debt through comprehensive code reading.
+Perform deep manual analysis of the codebase to identify technical debt
+through comprehensive code reading.
 
 ## When to Use
 
@@ -25,7 +26,9 @@ If `$ARGUMENTS` is provided, use it as the target path.
 
 ### 1. Spawn Opus Subagents for Deep Analysis
 
-Use the Task tool with `model: "opus"` to spawn subagents for thorough analysis. Opus excels at:
+Use the Task tool with `model: "opus"` to spawn subagents for thorough
+analysis. Opus excels at:
+
 - Complex reasoning about code architecture
 - Identifying subtle design flaws
 - Understanding nuanced business logic
@@ -35,6 +38,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 2. Deep Code Reading (delegate to Opus)
 
 **Read every source file systematically:**
+
 - Understand complete codebase structure
 - Trace logic flow and execution paths
 - Analyze data flow and transformations
@@ -43,6 +47,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 3. Architecture and Design Debt
 
 **Identify:**
+
 - Architectural inconsistencies (patterns not followed)
 - SOLID principle violations (multiple responsibilities, tight coupling)
 - Abstraction leaks (implementation details exposed)
@@ -52,6 +57,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 4. Code Quality Issues
 
 **Look for:**
+
 - Complex functions/methods (hard to understand)
 - Poor naming (confusing variable, function, class names)
 - Code duplication (repeated logic to consolidate)
@@ -61,6 +67,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 5. Maintainability Problems
 
 **Find:**
+
 - Commented-out code (dead code in comments)
 - TODO/FIXME comments (deferred work, shortcuts)
 - Brittle code (fragile implementations)
@@ -70,6 +77,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 6. Business Logic Issues
 
 **Identify:**
+
 - Domain model inconsistencies
 - Missing error handling
 - Incomplete features (half-implemented functionality)
@@ -78,6 +86,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 7. Testing and Documentation Gaps
 
 **Find:**
+
 - Untestable code (tightly coupled, hard to test)
 - Missing edge case handling
 - Undocumented complex logic
@@ -86,6 +95,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 8. Security and Data Handling
 
 **Check for:**
+
 - Input validation gaps
 - Information leakage
 - Authentication/authorization inconsistencies
@@ -106,7 +116,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 [Most severe debt posing immediate risks]
 
 | Issue | Location | Severity | Impact |
-|-------|----------|----------|--------|
+| ----- | -------- | -------- | ------ |
 | [Description] | file:line | High/Medium/Low | [Business impact] |
 
 ## Systemic Problems
@@ -135,6 +145,7 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 ### 10. Review Like a Senior Developer
 
 Question every design decision:
+
 - Why was this done this way?
 - What edge cases are missing?
 - How will this scale?
@@ -143,10 +154,10 @@ Question every design decision:
 ## Error Handling
 
 | Issue | Cause | Resolution |
-|-------|-------|------------|
+| ----- | ----- | ---------- |
 | Too much to analyze | Large codebase | Focus on core modules first |
-| Unclear original intent | Missing documentation | Document assumptions, flag for review |
-| Conflicting patterns | Multiple developers | Identify dominant pattern, recommend standardization |
+| Unclear original intent | Missing documentation | Document assumptions, flag |
+| Conflicting patterns | Multiple developers | Identify dominant pattern |
 
 ## Success Criteria
 
