@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Version Bump and Release
 
 Increment version, create PR, merge, and publish release.

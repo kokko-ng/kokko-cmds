@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Verify Test Specification
 
 Validate that a spec.md file is complete, well-formed, and matches the actual codebase.

@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Create Test Specification
 
 Generate a comprehensive specification file documenting all testable user stories in the application.

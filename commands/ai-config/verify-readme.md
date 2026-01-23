@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Verify README.md Accuracy
 
 Audit README.md to ensure it accurately reflects the codebase and provides working instructions.

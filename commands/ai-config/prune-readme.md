@@ -1,3 +1,7 @@
+---
+disable-model-invocation: true
+---
+
 # Prune README.md
 
 Reduce README.md to essential information for developer onboarding.
