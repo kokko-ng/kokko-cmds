@@ -2,7 +2,6 @@
 name: docs
 description: Documentation coverage and formatting (interrogate/pydocstyle for py, eslint-jsdoc for js, XML docs for dotnet)
 argument-hint: "[py|js|dotnet]"
-disable-model-invocation: true
 ---
 
 # Documentation Coverage Skill

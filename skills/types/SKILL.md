@@ -2,7 +2,6 @@
 name: types
 description: Type checking and annotation fixes (mypy for py, tsc for js, nullable analyzers for dotnet)
 argument-hint: "[py|js|dotnet]"
-disable-model-invocation: true
 ---
 
 # Type Checking Skill

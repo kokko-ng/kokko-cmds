@@ -2,7 +2,6 @@
 name: complexity
 description: Complexity analysis and refactoring (radon for py, eslint for js, .NET analyzers for dotnet)
 argument-hint: "[py|js|dotnet]"
-disable-model-invocation: true
 ---
 
 # Complexity Analysis Skill
