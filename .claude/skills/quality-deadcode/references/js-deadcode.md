@@ -1,45 +1,22 @@
-# Find and Remove Dead Code with Knip
-
-Use Knip to detect unused exports, dependencies, and dead code in JavaScript/TypeScript projects.
-
-## When to Use
-
-- During codebase cleanup
-- Before major refactoring
-- To reduce bundle size and maintenance burden
-
-## Arguments
-
-Usage: `/quality/js-quality/deadcode [target]`
-
-- `target` - Directory to analyze (default: current directory with package.json)
-
-If `$ARGUMENTS` is provided, use it as the target path.
+# JavaScript/TypeScript Dead Code Detection with Knip
 
 ## Prerequisites
-
-- knip: `npm install -D knip`
-
-## Steps
-
-### 1. Install Knip (if missing)
 
 ```bash
 npm install -D knip
 ```
 
-### 2. Run Dead Code Analysis
+## Commands
 
 ```bash
+# Run dead code analysis
 npx knip
-```
 
-For more verbose output:
-```bash
+# Verbose output
 npx knip --include files,exports,types,duplicates
 ```
 
-### 3. What Knip Detects
+## What Knip Detects
 
 | Finding | Description |
 |---------|-------------|
@@ -50,7 +27,7 @@ npx knip --include files,exports,types,duplicates
 | Unlisted dependencies | Used but not in package.json |
 | Duplicate exports | Same thing exported multiple times |
 
-### 4. Verify Each Finding
+## Verification Checklist
 
 For each item detected, cross-check references:
 
@@ -65,7 +42,7 @@ For each item detected, cross-check references:
 - Global component registration
 - Runtime computed property access
 
-### 5. Remove Verified Dead Code
+## Removal Process
 
 **If certain the code is unused:**
 
@@ -76,21 +53,20 @@ npm uninstall <package-name>
 # Or remove unused file/export manually
 ```
 
-### 6. Test After Each Removal
+## Test After Each Removal
 
 ```bash
 npm run build 2>/dev/null || npm run build:check 2>/dev/null || true
 npm test
 ```
 
-### 7. Commit Incrementally
+## Commit Format
 
-```bash
-git add .
-git commit -m "chore(cleanup): remove unused <item>"
+```
+chore(cleanup): remove unused <item>
 ```
 
-### 8. Configure Knip
+## Configure Knip
 
 Create `knip.json` for project-specific settings:
 ```json
@@ -113,25 +89,18 @@ For monorepos:
 }
 ```
 
-### 9. Final Validation
+## Error Recovery
+
+| Issue | Resolution |
+|-------|------------|
+| False positive on entry point | Add to `entry` in knip.json |
+| Plugin not detected as used | Add to `ignoreDependencies` |
+| Build fails after removal | Revert, investigate |
+
+## Final Quality Gate
 
 ```bash
 npx knip
 npm run build
 npm test
 ```
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-|-------|-------|------------|
-| False positive on entry point | Not configured | Add to `entry` in knip.json |
-| Plugin not detected as used | Dynamic registration | Add to `ignoreDependencies` |
-| Build fails after removal | Code was actually used | Revert, investigate |
-
-## Success Criteria
-
-- Zero unused exports, files, or dependencies
-- All removals tested and committed separately
-- Build and tests pass
-- knip.json configured for project specifics
