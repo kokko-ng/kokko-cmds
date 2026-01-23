@@ -29,7 +29,7 @@ secure-delete[[:space:]]+
 # Truncate files
 truncate[[:space:]]+-s[[:space:]]*0
 truncate[[:space:]]+--size[[:space:]]*0
->[[:space:]]*/
+(^|[[:space:]])>[[:space:]]*/
 cat[[:space:]]+/dev/null[[:space:]]*>
 
 # Move to /dev/null (data loss)
