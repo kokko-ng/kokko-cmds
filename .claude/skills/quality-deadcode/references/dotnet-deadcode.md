@@ -1,29 +1,11 @@
-# Find and Remove Dead Code with .NET Analyzers
-
-Use .NET analyzers to detect unused code and safely remove it.
-
-## When to Use
-
-- During codebase cleanup
-- Before major refactoring
-- To reduce maintenance burden
-
-## Arguments
-
-Usage: `/quality/dotnet-quality/deadcode [target]`
-
-- `target` - Solution or project to analyze (default: auto-detect)
-
-If `$ARGUMENTS` is provided, use it as the target path.
+# .NET Dead Code Detection
 
 ## Prerequisites
 
 - .NET SDK 6.0+
 - Roslynator.Analyzers (optional): `dotnet add package Roslynator.Analyzers`
 
-## Steps
-
-### 1. Enable Dead Code Analyzers
+## Enable Dead Code Analyzers
 
 Add to `.csproj` or `Directory.Build.props`:
 ```xml
@@ -37,7 +19,7 @@ Add to `.csproj` or `Directory.Build.props`:
 </ItemGroup>
 ```
 
-### 2. Run Dead Code Analysis
+## Commands
 
 ```bash
 # Build with dead code warnings as errors
@@ -47,7 +29,8 @@ dotnet build -warnaserror:CS0168,CS0169,CS0219,CS0414,IDE0051,IDE0052,IDE0059,ID
 dotnet build
 ```
 
-Key analyzer rules:
+## Key Analyzer Rules
+
 - **CS0168** - Variable declared but never used
 - **CS0169** - Field never used
 - **CS0219** - Variable assigned but never used
@@ -58,7 +41,7 @@ Key analyzer rules:
 - **IDE0060** - Unused parameter
 - **CA1822** - Member can be static (not using instance data)
 
-### 3. Check for Unused Dependencies
+## Check for Unused Dependencies
 
 ```bash
 # List all package references
@@ -71,9 +54,9 @@ dotnet list package --deprecated
 dotnet list package --outdated
 ```
 
-### 4. Verify Each Finding
+## Verification Checklist
 
-For each item detected, **thoroughly verify** whether the code is truly unused:
+For each item detected, **thoroughly verify** it is truly unused:
 
 **Cross-check references:**
 - All internal references across the solution
@@ -92,7 +75,7 @@ For each item detected, **thoroughly verify** whether the code is truly unused:
 - Runtime compilation
 - gRPC/SignalR contracts
 
-### 5. Remove Verified Dead Code
+## Removal Process
 
 **Only if absolutely certain the code is unused:**
 
@@ -107,26 +90,18 @@ For each item detected, **thoroughly verify** whether the code is truly unused:
    git commit -m "chore(cleanup): remove unused <member>"
    ```
 
-### 6. Handle One Item at a Time
-
-Do not batch deletions. Process one finding at a time to maintain traceability and safety.
-
-### 7. Remove Unused Dependencies
+## Remove Unused Dependencies
 
 ```bash
-# Remove unused package
 dotnet remove package <package-name>
-
-# Verify build still works
 dotnet build
 dotnet test
 ```
 
-### 8. Suppress False Positives
+## Suppress False Positives
 
 For code used via reflection or conventions:
 ```csharp
-// Used by EF Core conventions
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "CodeQuality", "IDE0051",
     Justification = "Used by Entity Framework navigation")]
@@ -136,29 +111,19 @@ private ICollection<Order> Orders { get; set; }
 Or configure in `.editorconfig`:
 ```ini
 [*.cs]
-# Ignore unused members in specific files
 [**/Entities/*.cs]
 dotnet_diagnostic.IDE0051.severity = none
 ```
 
-### 9. Final Validation
+## Commit Format
+
+```
+chore(cleanup): remove unused <member>
+```
+
+## Final Quality Gate
 
 ```bash
 dotnet build -warnaserror:CS0168,CS0169,IDE0051,IDE0052
 dotnet test
 ```
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-|-------|-------|------------|
-| Test failures after removal | Code was actually used | Revert, investigate usage pattern |
-| False positive | Reflection/convention usage | Add suppression with explanation |
-| Build errors | Removed dependency still needed | Check all project references |
-
-## Success Criteria
-
-- All analyzer findings addressed (removed or suppressed)
-- Each removal has its own commit
-- All tests pass after each removal
-- No suppressions without documented justification

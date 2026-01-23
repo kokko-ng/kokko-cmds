@@ -1,30 +1,13 @@
-# Security Hardening with .NET Analyzers
-
-Use .NET security analyzers and NuGet audit to detect security issues in C# code.
-
-## When to Use
-
-- Before security audits
-- After adding authentication or data handling code
-- As part of CI/CD security checks
-
-## Arguments
-
-Usage: `/quality/dotnet-quality/security [target] [--severity low|medium|high]`
-
-- `target` - Solution or project to scan (default: auto-detect .sln or .csproj)
-- `--severity` - Minimum severity level to report (default: medium)
-
-If `$ARGUMENTS` is provided, use it as the target path or options.
+# .NET Security Analysis
 
 ## Prerequisites
 
 - .NET SDK 6.0+
 - SecurityCodeScan.VS2019 analyzer (optional): `dotnet add package SecurityCodeScan.VS2019`
 
-## Steps
+## Commands
 
-### 1. Run NuGet Vulnerability Scan
+### NuGet Vulnerability Scan
 
 ```bash
 # Check for vulnerable dependencies
@@ -37,9 +20,9 @@ dotnet list package --vulnerable --include-transitive
 dotnet list package --vulnerable --format json
 ```
 
-### 2. Enable Security Analyzers
+### Enable Security Analyzers
 
-Add to your `.csproj` or `Directory.Build.props`:
+Add to `.csproj` or `Directory.Build.props`:
 ```xml
 <PropertyGroup>
   <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -53,7 +36,7 @@ Add to your `.csproj` or `Directory.Build.props`:
 </ItemGroup>
 ```
 
-### 3. Run Build with Warnings
+### Build with Security Warnings
 
 ```bash
 # Build with warnings treated as errors for security rules
@@ -63,25 +46,7 @@ dotnet build /warnaserror:SCS0001,SCS0002,SCS0003,SCS0004,SCS0005
 dotnet build -warnaserror
 ```
 
-### 4. Parse Findings
-
-For each issue note:
-- File:Line
-- Rule ID (e.g., SCS0001, CA2100)
-- Severity / Category
-- Short description
-
-Create a working list sorted: High severity first.
-
-### 5. Classify Each Finding
-
-Choose one:
-- **TRUE_POSITIVE** - Fix now
-- **NEEDS_REFACTOR** - Create safer abstraction then fix
-- **FALSE_POSITIVE** - Justify and suppress locally
-- **ACCEPT_RISK** - Open tracking issue with rationale
-
-### 6. Common Issues and Fixes
+## Common Issues and Fixes
 
 | Rule ID | Issue | Fix |
 |---------|-------|-----|
@@ -98,23 +63,16 @@ Choose one:
 | CA5350 | Weak crypto | Use modern algorithms (AES, RSA-2048+) |
 | CA5351 | Broken crypto (DES) | Migrate to AES |
 
-### 7. Fix Incrementally
+## Classification
 
-For each finding fixed:
-```bash
-dotnet build
-dotnet test
-```
+For each finding, classify as:
+- **TRUE_POSITIVE** - Fix now
+- **NEEDS_REFACTOR** - Create safer abstraction then fix
+- **FALSE_POSITIVE** - Justify and suppress locally
+- **ACCEPT_RISK** - Open tracking issue with rationale
 
-Commit if clean:
-```bash
-git add <files>
-git commit -m "security(dotnet): mitigate <RuleID> in <file>"
-```
+## Suppression Pattern
 
-### 8. Suppress False Positives
-
-Use the narrowest suppression with explanation:
 ```csharp
 #pragma warning disable SCS0005 // Using weak random for non-security shuffle
 var random = new Random();
@@ -124,25 +82,24 @@ var random = new Random();
 [SuppressMessage("Security", "SCS0005", Justification = "Non-security random for UI")]
 ```
 
-### 9. Final Quality Gate
+## Validation
+
+After each fix:
+```bash
+dotnet build
+dotnet test
+```
+
+## Commit Format
+
+```
+security(dotnet): mitigate <RuleID> in <file>
+```
+
+## Final Quality Gate
 
 ```bash
 dotnet list package --vulnerable
 dotnet build -warnaserror
 dotnet test
 ```
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-|-------|-------|------------|
-| Too many findings | Legacy codebase | Prioritize high severity, fix incrementally |
-| False positives | Context not understood | Add targeted suppression with explanation |
-| NuGet vulnerabilities | Outdated packages | Run `dotnet outdated` then update |
-
-## Success Criteria
-
-- Zero high-severity findings
-- All medium-severity findings addressed or documented
-- No suppressions without explanation
-- All security fixes have tests
