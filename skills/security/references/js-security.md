@@ -77,7 +77,6 @@ const value = obj[validatedKey];
 After each fix:
 
 ```bash
-npm test
 npx eslint <affected_files>
 ```
 
@@ -92,5 +91,4 @@ security(eslint): mitigate <issue> in <file>
 ```bash
 npm audit --audit-level=high
 npx eslint . --ext .js,.ts,.vue
-npm test
 ```

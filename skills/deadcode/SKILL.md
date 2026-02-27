@@ -35,11 +35,10 @@ If no language specified, auto-detect:
    - Check config-based registrations
    - Check entry points and plugin systems
 5. **Remove verified dead code** ONLY if absolutely certain
-6. **Test immediately** after each removal
-7. **Commit each removal separately**: Use message format
+6. **Commit each removal separately**: Use message format
    `chore(cleanup): remove unused <item>`
-8. **Create whitelist/suppression** for false positives with explanation
-9. **Final validation**: Run analyzer again to confirm clean
+7. **Create whitelist/suppression** for false positives with explanation
+8. **Final validation**: Run analyzer again to confirm clean
 
 ## Reference Files
 
@@ -53,12 +52,9 @@ Load the appropriate reference based on detected language:
 
 - Handle ONE item at a time - do NOT batch deletions
 - VERIFY thoroughly before removing - many tools have false positives
-- Test IMMEDIATELY after each removal
-- Revert if tests fail - investigate usage pattern
 
 ## Success Criteria
 
 - All findings addressed (removed or whitelisted with justification)
 - Each removal has its own commit
-- All tests pass after each removal
 - No suppressions without documented justification

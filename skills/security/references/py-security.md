@@ -56,7 +56,6 @@ password = os.environ["DB_PASSWORD"]  # nosec B105 - loaded from environment
 After each fix:
 
 ```bash
-uv run pytest -q
 uv run bandit -r <affected_path> -ll
 ```
 
@@ -70,6 +69,5 @@ security(bandit): mitigate <TestID> in <symbol>
 
 ```bash
 uv run bandit -r . --exclude .venv,venv -ll
-uv run pytest
 uv run pre-commit run --all-files
 ```

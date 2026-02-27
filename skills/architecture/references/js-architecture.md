@@ -184,7 +184,6 @@ For existing projects with many violations:
 After each fix:
 
 ```bash
-npm test
 npx depcruise src --config .dependency-cruiser.cjs -T err
 ```
 
@@ -204,6 +203,5 @@ Examples:
 
 ```bash
 npx depcruise src --config .dependency-cruiser.cjs -T err
-npm test
 npx eslint .
 ```

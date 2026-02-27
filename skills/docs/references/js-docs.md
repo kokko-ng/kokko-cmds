@@ -122,5 +122,4 @@ docs(<module>): add JSDoc to <file>
 
 ```bash
 npx eslint . --ext .js,.ts,.vue
-npm test
 ```

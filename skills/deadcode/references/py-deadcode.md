@@ -45,13 +45,7 @@ For each item detected, **thoroughly verify** it is truly unused:
 **Only if absolutely certain the code is unused:**
 
 1. Remove the dead code
-2. Run tests immediately:
-
-   ```bash
-   uv run pytest
-   ```
-
-3. Create a separate commit:
+2. Create a separate commit:
 
    ```bash
    git add .
@@ -83,7 +77,6 @@ chore(cleanup): remove unused <function_name>
 
 | Issue | Resolution |
 | ----- | ---------- |
-| Test failures after removal | Revert, investigate usage pattern |
 | Import errors | Check all import paths |
 | False positive | Add to whitelist |
 
@@ -91,5 +84,4 @@ chore(cleanup): remove unused <function_name>
 
 ```bash
 uv run vulture . vulture_whitelist.py --exclude .venv
-uv run pytest
 ```

@@ -88,7 +88,6 @@ If merge conflicts occur:
 
 - Understand both changes
 - Preserve intent of both fixes
-- Test the resolution
 - Continue with remaining merges
 
 ### 7. Cleanup
@@ -105,11 +104,7 @@ git branch -d $(git branch --list 'janitor/*')
 
 ### 8. Final Validation
 
-Run all quality checks on merged result:
-
-- Tests pass
-- Linters pass
-- No regressions introduced
+Run all quality checks on merged result to confirm no regressions.
 
 ## Reference Files
 

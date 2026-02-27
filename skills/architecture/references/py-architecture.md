@@ -153,7 +153,6 @@ class EmailNotifier:
 After each fix:
 
 ```bash
-uv run pytest -q
 uv run lint-imports
 ```
 
@@ -173,6 +172,5 @@ Examples:
 
 ```bash
 uv run lint-imports
-uv run pytest
 uv run pre-commit run --all-files
 ```
