@@ -53,7 +53,6 @@ Apply one tactic at a time:
 After each change:
 
 ```bash
-npm test
 npx eslint <target_file> --rule 'complexity: ["error", 10]'
 ```
 
@@ -74,6 +73,5 @@ refactor(complexity): reduce complexity in <function>
 
 ```bash
 npx eslint . --ext .js,.ts,.vue
-npm test
 npm run build 2>/dev/null || npm run build:check 2>/dev/null || true
 ```

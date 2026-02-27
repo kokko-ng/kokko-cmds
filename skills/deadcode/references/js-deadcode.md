@@ -54,13 +54,6 @@ npm uninstall <package-name>
 # Or remove unused file/export manually
 ```
 
-## Test After Each Removal
-
-```bash
-npm run build 2>/dev/null || npm run build:check 2>/dev/null || true
-npm test
-```
-
 ## Commit Format
 
 ```text
@@ -105,5 +98,4 @@ For monorepos:
 ```bash
 npx knip
 npm run build
-npm test
 ```

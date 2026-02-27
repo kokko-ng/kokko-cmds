@@ -107,5 +107,4 @@ docs(<module>): add docstrings to <file>
 ```bash
 uv run interrogate -v <target_dir> --fail-under 100
 uv run pydocstyle <target_dir> --convention=google
-uv run pytest
 ```

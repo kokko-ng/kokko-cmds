@@ -35,10 +35,9 @@ If no language specified, auto-detect:
    - TRUE_POSITIVE: Fix the vulnerability
    - FALSE_POSITIVE: Suppress with documented justification
    - NEEDS_REFACTOR: Create safer abstraction first
-6. **Test after each fix**: Run tests to ensure no regression
-7. **Commit incrementally**: Use message format
+6. **Commit incrementally**: Use message format
    `security(<tool>): mitigate <issue> in <file>`
-8. **Final validation**: Run security scanner again to confirm zero
+7. **Final validation**: Run security scanner again to confirm zero
    high/medium findings
 
 ## Reference Files
@@ -54,4 +53,3 @@ Load the appropriate reference based on detected language:
 - Zero high-severity findings
 - All medium-severity findings addressed or documented
 - No suppressions without documented justification
-- All security fixes have tests

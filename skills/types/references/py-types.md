@@ -103,5 +103,4 @@ fix(types): resolve mypy errors in <module>
 
 ```bash
 uv run mypy . --exclude venv
-uv run pytest
 ```

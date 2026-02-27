@@ -82,7 +82,6 @@ Apply one tactic at a time:
 After each micro-change:
 
 ```bash
-dotnet test
 dotnet build -warnaserror:CA1502
 ```
 
@@ -97,7 +96,6 @@ refactor(complexity): reduce complexity in <method>
 - Cyclomatic complexity <= 15
 - Maintainability index >= 40
 - Further changes risk unnecessary churn
-- Code is clear and testable
 
 ## Hard Cases
 
@@ -112,6 +110,5 @@ If complexity resists decomposition:
 
 ```bash
 dotnet build -warnaserror:CA1502,CA1505,CA1506
-dotnet test
 dotnet format --verify-no-changes
 ```

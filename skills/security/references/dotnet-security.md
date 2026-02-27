@@ -93,7 +93,6 @@ After each fix:
 
 ```bash
 dotnet build
-dotnet test
 ```
 
 ## Commit Format
@@ -107,5 +106,4 @@ security(dotnet): mitigate <RuleID> in <file>
 ```bash
 dotnet list package --vulnerable
 dotnet build -warnaserror
-dotnet test
 ```

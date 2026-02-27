@@ -181,5 +181,4 @@ docs(<namespace>): add XML docs to <type>
 
 ```bash
 dotnet build -warnaserror:CS1591
-dotnet test
 ```

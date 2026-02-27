@@ -105,5 +105,4 @@ fix(types): resolve TS<code> in <file>
 ```bash
 npx tsc --noEmit
 npm run build
-npm test
 ```

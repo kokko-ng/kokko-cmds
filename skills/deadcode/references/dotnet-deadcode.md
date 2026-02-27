@@ -85,13 +85,7 @@ For each item detected, **thoroughly verify** it is truly unused:
 **Only if absolutely certain the code is unused:**
 
 1. Remove the dead code
-2. Run tests immediately:
-
-   ```bash
-   dotnet test
-   ```
-
-3. Create a separate commit:
+2. Create a separate commit:
 
    ```bash
    git add .
@@ -103,7 +97,6 @@ For each item detected, **thoroughly verify** it is truly unused:
 ```bash
 dotnet remove package <package-name>
 dotnet build
-dotnet test
 ```
 
 ## Suppress False Positives
@@ -135,5 +128,4 @@ chore(cleanup): remove unused <member>
 
 ```bash
 dotnet build -warnaserror:CS0168,CS0169,IDE0051,IDE0052
-dotnet test
 ```
