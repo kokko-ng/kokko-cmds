@@ -29,7 +29,10 @@ If no language specified, auto-detect:
    tool-specific instructions
 3. **Check for config**: Look for the tool's config file; create one if missing
    using the reference's bootstrap instructions
-4. **Run architecture analyzer** using the commands from the reference
+4. **Run architecture analyzer** using the commands from the reference. For
+   Python, use the Rich output workaround from the reference to get readable
+   output (import-linter v2.10+ renders Unicode box-drawing via Rich that is
+   unreadable in non-TTY contexts)
 5. **Parse violations** from output (cycles, forbidden imports, layer breaches)
 6. **Fix each violation**:
    - CYCLE: Break circular dependency by extracting shared module or

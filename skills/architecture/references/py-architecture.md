@@ -44,8 +44,50 @@ uv run lint-imports
 uv run lint-imports --verbose
 ```
 
-Output is plain text. A passing run prints `SUCCESS` per contract. Violations
-print the contract name, violation type, and the offending import chain.
+### Rich output workaround
+
+import-linter v2.10+ uses Python Rich for output, rendering Unicode
+box-drawing characters that are unreadable when captured in non-TTY contexts.
+`NO_COLOR=1` and `TERM=dumb` strip ANSI escapes but NOT the Unicode glyphs.
+
+**Use the API directly** to get structured, parseable results:
+
+```python
+import io, os, sys
+sys.path.insert(0, os.getcwd())
+
+from rich.console import Console as RichConsole
+from importlinter import configuration
+
+configuration.configure()
+
+buf = io.StringIO()
+capturing_console = RichConsole(
+    file=buf, force_terminal=False, no_color=True, width=200
+)
+
+import importlinter.application.output as output_mod
+output_mod.console = capturing_console
+
+from importlinter.application.use_cases import lint_imports
+result = lint_imports()
+
+captured = buf.getvalue()
+print(captured)
+print(f"Result: {'PASS' if result else 'FAIL'}")
+```
+
+This monkey-patches the global Rich Console so output goes to a StringIO
+buffer. With `force_terminal=False`, Rich strips control codes and the text
+content (contract names, KEPT/BROKEN status) comes through readable.
+
+### Standalone modules
+
+`root_packages` only accepts Python **packages** (directories with
+`__init__.py`), not standalone `.py` modules. If the project has standalone
+modules like `config.py` or `database.py`, exclude them from `root_packages`.
+They cannot be tracked by import-linter but can be imported freely by any
+layer.
 
 ## Contract Types
 
@@ -97,7 +139,8 @@ source_module = "myapp.services"
 
 ## Parsing Violations
 
-import-linter outputs text like:
+When using the Rich output workaround above, the captured output contains
+readable text like:
 
 ```text
 BROKEN CONTRACTS
