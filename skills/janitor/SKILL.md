@@ -1,7 +1,7 @@
 ---
 name: janitor
 description: Orchestrate all quality checks via subagents and git worktrees
-argument-hint: "[target-branch] [--langs py,js,dotnet] [--checks security,types,complexity,deadcode,docs]"
+argument-hint: "[target-branch] [--langs py,js,dotnet] [--checks security,types,complexity,deadcode,docs,architecture]"
 disable-model-invocation: true
 ---
 
@@ -25,6 +25,7 @@ Parse `$ARGUMENTS` for:
 - `complexity` - Complexity metrics (radon, eslint, CA1502)
 - `deadcode` - Dead code detection (vulture, knip, IDE0051)
 - `docs` - Documentation coverage (interrogate, jsdoc, XML docs)
+- `architecture` - Architecture enforcement (import-linter, dependency-cruiser)
 
 ## Workflow
 
@@ -48,10 +49,11 @@ git worktree add $WORKTREE_BASE/<lang>-<check> -b janitor/<lang>-<check>
 
 Spawn one subagent per worktree using the Task tool. The total number of
 subagents MUST equal `number_of_languages * number_of_checks`. For example,
-a Python + JS codebase with all 5 checks requires exactly 10 subagents:
-py-security, py-types, py-complexity, py-deadcode, py-docs, js-security,
-js-types, js-complexity, js-deadcode, js-docs. Never collapse multiple
-languages into a single subagent.
+a Python + JS codebase with all 6 checks requires exactly 12 subagents:
+py-security, py-types, py-complexity, py-deadcode, py-docs, py-architecture,
+js-security, js-types, js-complexity, js-deadcode, js-docs, js-architecture.
+Never collapse multiple languages into a single subagent. Note: `architecture`
+only supports py and js (not dotnet), so skip it for .NET languages.
 
 Each subagent:
 
