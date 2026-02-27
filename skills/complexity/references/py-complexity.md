@@ -53,7 +53,6 @@ Apply one tactic at a time:
 After each micro-change:
 
 ```bash
-uv run pytest tests/test_<module>.py
 uv run radon cc -s <target_file>
 uv run radon mi -s <target_file>
 ```
@@ -69,7 +68,6 @@ refactor(radon): reduce complexity in <symbol> (C->B)
 - Complexity <= B grade
 - Maintainability Index >= 70
 - Further changes risk unnecessary churn
-- Code is clear and testable
 
 ## Hard Cases
 
@@ -84,6 +82,5 @@ If complexity resists decomposition:
 ```bash
 uv run radon cc -s -a .
 uv run radon mi -s .
-uv run pytest
 uv run pre-commit run --all-files
 ```

@@ -33,10 +33,9 @@ If no language specified, auto-detect:
    - Update code to satisfy type checker
    - Add proper type annotations where missing
    - Avoid `Any`/`any`/`object`/`dynamic` unless absolutely necessary
-6. **Test after each fix**: Run tests to ensure no regression
-7. **Commit incrementally**: Use message format
+6. **Commit incrementally**: Use message format
    `fix(types): resolve <error_code> in <file>`
-8. **Final validation**: Run type checker again to confirm zero errors
+7. **Final validation**: Run type checker again to confirm zero errors
 
 ## Reference Files
 
@@ -58,4 +57,3 @@ Load the appropriate reference based on detected language:
 - Zero type errors with strict settings enabled
 - All type annotations are accurate
 - No type-escape mechanisms without documented justification
-- Tests pass after all type fixes

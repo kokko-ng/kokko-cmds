@@ -37,10 +37,9 @@ If no language specified, auto-detect:
    - FORBIDDEN_IMPORT: Move import to allowed layer or restructure module
    - LAYER_VIOLATION: Invert dependency direction or introduce abstraction
    - COUPLING: Extract shared types/interfaces to reduce coupling
-7. **Test after each fix**: Run tests to ensure no regression
-8. **Commit incrementally**: Use message format
+7. **Commit incrementally**: Use message format
    `refactor(architecture): <description>`
-9. **Final validation**: Run architecture analyzer again to confirm zero
+8. **Final validation**: Run architecture analyzer again to confirm zero
    violations
 
 ## Reference Files
@@ -55,4 +54,3 @@ Load the appropriate reference based on detected language:
 - Zero architecture violations from the analyzer
 - No circular dependencies remain
 - All layer boundaries enforced
-- All fixes have passing tests

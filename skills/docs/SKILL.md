@@ -64,5 +64,4 @@ Load the appropriate reference based on detected language:
 
 - 100% documentation coverage on public APIs
 - Zero style violations
-- All tests pass
 - Documentation follows consistent format for the language

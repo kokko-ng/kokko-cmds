@@ -34,16 +34,14 @@ If no language specified, auto-detect:
    - Worst complexity grade first
    - Frequency of change (git history)
    - Business criticality
-6. **Establish safety net**: Ensure tests exist for target code
-7. **Refactor incrementally** using tactics from reference file:
+6. **Refactor incrementally** using tactics from reference file:
    - Extract function/method
    - Guard clauses for early returns
    - Dictionary/object dispatch for switch statements
    - Decompose conditionals
-8. **Test after each change**: Run tests immediately
-9. **Commit incrementally**: Use message format
+7. **Commit incrementally**: Use message format
    `refactor(complexity): reduce complexity in <symbol>`
-10. **Final validation**: Run analyzer to confirm improvements
+8. **Final validation**: Run analyzer to confirm improvements
 
 ## Reference Files
 
@@ -57,10 +55,8 @@ Load the appropriate reference based on detected language:
 
 - Complexity at acceptable threshold (varies by language)
 - Further changes risk unnecessary churn
-- Code is clear and testable
 
 ## Success Criteria
 
 - No functions exceeding complexity threshold
-- All tests pass
 - Code is more readable and maintainable

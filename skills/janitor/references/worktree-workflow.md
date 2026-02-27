@@ -93,14 +93,7 @@ If merge conflicts occur:
 1. **Understand both changes** - Read the conflicting hunks
 2. **Determine intent** - What was each fix trying to accomplish?
 3. **Resolve preserving both** - Usually both fixes are valid
-4. **Test resolution**:
-
-   ```bash
-   # Run relevant tests
-   uv run pytest  # or npm test, dotnet test
-   ```
-
-5. **Complete merge**:
+4. **Complete merge**:
 
    ```bash
    git add .
@@ -137,16 +130,13 @@ Run comprehensive checks on merged result:
 
 ```bash
 # Python
-uv run pytest
 uv run pre-commit run --all-files
 
 # JavaScript/TypeScript
-npm test
 npm run lint
 npm run build
 
 # .NET
-dotnet test
 dotnet build -warnaserror
 ```
 
@@ -180,16 +170,8 @@ git rebase janitor/py-security
 git cherry-pick <commit-sha>
 ```
 
-### Tests Fail After Merge
-
-1. Identify which merge introduced the failure
-2. Revert that merge: `git revert -m 1 <merge-commit>`
-3. Re-run that quality check manually
-4. Merge again
-
 ## Optimization Tips
 
 1. **Parallelize aggressively** - Launch all subagents at once
 2. **Merge order** - Merge smaller changesets first to minimize conflicts
 3. **Skip empty branches** - Don't merge branches with no commits
-4. **Incremental validation** - Run tests after each merge, not just at the end

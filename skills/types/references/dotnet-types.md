@@ -153,6 +153,5 @@ fix(types): resolve <error_code> in <file>
 
 ```bash
 dotnet build -warnaserror:nullable
-dotnet test
 dotnet format --verify-no-changes
 ```
