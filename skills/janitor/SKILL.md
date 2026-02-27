@@ -46,7 +46,14 @@ git worktree add $WORKTREE_BASE/<lang>-<check> -b janitor/<lang>-<check>
 
 ### 3. Launch Parallel Subagents
 
-Spawn one subagent per worktree using the Task tool. Each subagent:
+Spawn one subagent per worktree using the Task tool. The total number of
+subagents MUST equal `number_of_languages * number_of_checks`. For example,
+a Python + JS codebase with all 5 checks requires exactly 10 subagents:
+py-security, py-types, py-complexity, py-deadcode, py-docs, js-security,
+js-types, js-complexity, js-deadcode, js-docs. Never collapse multiple
+languages into a single subagent.
+
+Each subagent:
 
 1. Navigates to its worktree
 2. Runs `/<check> <lang>`
