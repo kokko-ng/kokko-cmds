@@ -1,0 +1,33 @@
+{
+  "name": "kokko-code-quality",
+  "version": "1.4.0",
+  "description": "Code quality commands and skills covering analysis, technical debt, performance review, type checking, dead code detection, security scanning, documentation coverage, complexity analysis, and architecture enforcement.",
+  "author": {
+    "name": "kokko-ng"
+  },
+  "repository": "https://github.com/kokko-ng/kokko-cmds",
+  "license": "MIT",
+  "keywords": [
+    "code-quality",
+    "analysis",
+    "security",
+    "types",
+    "deadcode",
+    "complexity",
+    "architecture",
+    "documentation"
+  ],
+  "commands": [
+    "./commands/analysis/",
+    "./commands/quality/",
+    "./commands/clean/"
+  ],
+  "skills": [
+    "./skills/architecture/",
+    "./skills/complexity/",
+    "./skills/deadcode/",
+    "./skills/docs/",
+    "./skills/security/",
+    "./skills/types/"
+  ]
+}
