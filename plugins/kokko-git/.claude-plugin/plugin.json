@@ -1,0 +1,17 @@
+{
+  "name": "kokko-git",
+  "version": "1.4.0",
+  "description": "Git workflow commands for commit+push, branch pruning, releases, and syncing, plus the janitor skill for worktree-based clean-up workflows.",
+  "author": {
+    "name": "kokko-ng"
+  },
+  "repository": "https://github.com/kokko-ng/kokko-cmds",
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "workflow",
+    "release",
+    "worktree",
+    "janitor"
+  ]
+}
