@@ -43,6 +43,10 @@ Sound notifications for task completion events.
 | ---- | ------- |
 | `stop-notification` | Plays sounds on task completion |
 
+| Environment Variable | Default | Purpose |
+| -------------------- | ------- | ------- |
+| `KOKKO_SOUND_VOLUME` | `2.0` | afplay volume (macOS); `1.0` = system default |
+
 ### kokko-git
 
 Git workflow commands and the janitor skill.
