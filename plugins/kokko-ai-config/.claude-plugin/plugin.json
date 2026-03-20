@@ -1,0 +1,17 @@
+{
+  "name": "kokko-ai-config",
+  "version": "1.4.0",
+  "description": "AI configuration management commands for pruning and verifying CLAUDE.md and README files.",
+  "author": {
+    "name": "kokko-ng"
+  },
+  "repository": "https://github.com/kokko-ng/kokko-cmds",
+  "license": "MIT",
+  "keywords": [
+    "ai-config",
+    "claude-md",
+    "readme",
+    "documentation",
+    "cleanup"
+  ]
+}
