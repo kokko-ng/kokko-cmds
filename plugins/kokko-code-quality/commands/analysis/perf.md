@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Performance Bottleneck Analysis
 
 Perform deep analysis to identify performance bottlenecks across the codebase.

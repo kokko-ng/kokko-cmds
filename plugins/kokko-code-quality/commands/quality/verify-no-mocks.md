@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Verify No Mocks in Production Code
 
 Scan codebase to ensure production code does not rely on mock, stub, or dummy

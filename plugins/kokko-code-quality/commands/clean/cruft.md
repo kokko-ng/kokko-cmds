@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Remove Unnecessary Files
 
 Identify and remove cruft files that shouldn't be in the repository.

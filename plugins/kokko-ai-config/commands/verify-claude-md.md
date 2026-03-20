@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Verify CLAUDE.md Accuracy
 
 Audit CLAUDE.md to ensure it accurately reflects the current state of the codebase.
