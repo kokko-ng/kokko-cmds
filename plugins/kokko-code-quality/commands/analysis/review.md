@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Honest Code Review
 
 Perform a direct, no-nonsense code review without diplomatic softening.

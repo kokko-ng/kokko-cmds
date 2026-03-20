@@ -1,7 +1,7 @@
 {
   "name": "kokko-safety",
-  "version": "1.4.0",
-  "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and workflow enhancements including stop notifications, prompt shorthands, and session context.",
+  "version": "1.4.1",
+  "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context.",
   "author": {
     "name": "kokko-ng"
   },
@@ -12,7 +12,6 @@
     "hooks",
     "git-protection",
     "cloud-ops",
-    "notifications",
     "workflow"
   ]
 }

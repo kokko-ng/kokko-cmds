@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Prune CLAUDE.md
 
 Reduce CLAUDE.md to only essential information for effective agent performance.

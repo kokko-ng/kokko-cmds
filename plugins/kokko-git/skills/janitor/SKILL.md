@@ -2,7 +2,6 @@
 name: janitor
 description: Orchestrate all quality checks via subagents and git worktrees
 argument-hint: "[target-branch] [--langs py,js,dotnet] [--checks security,types,complexity,deadcode,docs,architecture]"
-disable-model-invocation: true
 ---
 
 # Janitor Skill
