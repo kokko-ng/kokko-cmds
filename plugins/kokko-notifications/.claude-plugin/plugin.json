@@ -1,0 +1,16 @@
+{
+  "name": "kokko-notifications",
+  "version": "1.4.1",
+  "description": "Sound notification hooks for Claude Code task completion events.",
+  "author": {
+    "name": "kokko-ng"
+  },
+  "repository": "https://github.com/kokko-ng/kokko-cmds",
+  "license": "MIT",
+  "keywords": [
+    "notifications",
+    "sounds",
+    "hooks",
+    "workflow"
+  ]
+}

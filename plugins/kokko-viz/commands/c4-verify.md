@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # C4 Architecture Verification
 
 Validate accuracy and completeness of the hierarchical C4 architecture map.

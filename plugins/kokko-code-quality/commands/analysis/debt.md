@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Technical Debt Analysis
 
 Perform deep manual analysis of the codebase to identify technical debt
