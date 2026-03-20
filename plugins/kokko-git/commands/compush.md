@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Commit and Push
 
 Generate commit message, commit changes, and push to remote.

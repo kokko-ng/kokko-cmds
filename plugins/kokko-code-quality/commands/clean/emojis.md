@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Remove Emojis
 
 Remove all emojis from the codebase while preserving code functionality.

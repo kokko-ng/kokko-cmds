@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Pre-commit Check
 
 Iteratively run `pre-commit run --all-files` and address every reported

@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # Split Large Files
 
 Identify and split large files across the codebase to improve maintainability.
