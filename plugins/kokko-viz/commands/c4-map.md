@@ -1,7 +1,3 @@
----
-disable-model-invocation: true
----
-
 # C4 Architecture Mapping
 
 Map the codebase architecture using a hierarchical C4 model
