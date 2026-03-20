@@ -13,6 +13,7 @@ Then install the plugins you want:
 
 ```bash
 /plugin install kokko-safety@kokko-ng-kokko-cmds
+/plugin install kokko-notifications@kokko-ng-kokko-cmds
 /plugin install kokko-git@kokko-ng-kokko-cmds
 /plugin install kokko-code-quality@kokko-ng-kokko-cmds
 /plugin install kokko-viz@kokko-ng-kokko-cmds
@@ -29,11 +30,18 @@ Safety hooks for all sessions.
 | Hook | Purpose |
 | ---- | ------- |
 | `session-start-context` | Detects project type and git status |
-| `stop-notification` | Plays sounds on task completion |
 | `pre-tool-cloud-ops` | Prompts before destructive cloud operations |
 | `pre-tool-branch-protection` | Prompts before commits to protected branches |
 | `pre-tool-destructive-git` | Prompts before force push, hard reset |
 | `pre-tool-destructive-bash` | Prompts before rm -rf, mkfs, chmod 777 |
+
+### kokko-notifications
+
+Sound notifications for task completion events.
+
+| Hook | Purpose |
+| ---- | ------- |
+| `stop-notification` | Plays sounds on task completion |
 
 ### kokko-git
 
