@@ -19,7 +19,7 @@ play_sound() {
                 completion) sound_file="/System/Library/Sounds/Hero.aiff" ;;
                 *)          sound_file="/System/Library/Sounds/Pop.aiff" ;;
             esac
-            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-2.0}" "$sound_file"
+            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-10.0}" "$sound_file"
             ;;
 
         Linux)
