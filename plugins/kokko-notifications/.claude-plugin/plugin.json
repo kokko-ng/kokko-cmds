@@ -1,6 +1,6 @@
 {
   "name": "kokko-notifications",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Sound notification hooks for Claude Code task completion events.",
   "author": {
     "name": "kokko-ng"
