@@ -1,0 +1,20 @@
+{
+  "name": "kokko-sandbox",
+  "version": "1.0.0",
+  "description": "Devcontainer-based sandboxing skill for running Claude Code in an isolated container with access only to the current project workspace.",
+  "author": {
+    "name": "kokko-ng"
+  },
+  "repository": "https://github.com/kokko-ng/kokko-cmds",
+  "license": "MIT",
+  "keywords": [
+    "sandbox",
+    "devcontainer",
+    "isolation",
+    "docker",
+    "colima"
+  ],
+  "skills": [
+    "./skills/sandbox/"
+  ]
+}
