@@ -66,6 +66,15 @@
       "author": {
         "name": "kokko-ng"
       }
+    },
+    {
+      "name": "kokko-sandbox",
+      "source": "./plugins/kokko-sandbox/",
+      "description": "Devcontainer-based sandbox skill for running Claude Code in an isolated container with access only to the current project workspace.",
+      "version": "1.0.0",
+      "author": {
+        "name": "kokko-ng"
+      }
     }
   ]
 }
