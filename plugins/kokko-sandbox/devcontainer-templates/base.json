@@ -1,0 +1,25 @@
+{
+  "name": "kokko-sandbox",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.13",
+      "installTools": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "nodeGypDependencies": false
+    }
+  },
+  "postCreateCommand": "cp /tmp/host-claude.json /home/vscode/.claude.json && chmod 600 /home/vscode/.claude.json && curl -LsSf https://astral.sh/uv/install.sh | sh && npm install -g @anthropic-ai/claude-code",
+  "mounts": [
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude.json,target=/tmp/host-claude.json,type=bind,readonly=true"
+  ],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+  "remoteEnv": {
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
+    "PATH": "${containerEnv:PATH}:/home/vscode/.local/bin"
+  }
+}
