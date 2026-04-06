@@ -1,6 +1,6 @@
 #!/bin/bash
 # play-sound.sh - Cross-platform sound utility for Claude Code hooks
-# Supports: macOS (afplay), Linux (paplay/aplay/speaker-test), Windows/WSL (PowerShell)
+# Supports: macOS (afplay), Linux (paplay/aplay/speaker-test/bell), Windows/WSL (PowerShell)
 
 play_sound() {
     local sound_type="${1:-info}"
@@ -66,6 +66,9 @@ play_sound() {
                     # ALSA: Generate tone
                     (speaker-test -t sine -f "$freq" -l 1 >/dev/null 2>&1 &
                      sleep "$duration" && pkill -f "speaker-test.*-f $freq" 2>/dev/null) &
+                elif [ -e /dev/tty ]; then
+                    # Fallback (containers): terminal bell via host TTY
+                    printf '\a' > /dev/tty 2>/dev/null
                 fi
             fi
             ;;
