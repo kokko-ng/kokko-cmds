@@ -1,191 +1,75 @@
+---
+description: Bump version across all files, open/merge a PR, and publish a GitHub release.
+argument-hint: [patch|minor|major] [--version x.y.z]
+allowed-tools: Bash(git:*), Read, Edit, Grep, Glob
+---
+
 # Version Bump and Release
 
-Increment version, create PR, merge, and publish release.
-
-## When to Use
-
-- When ready to release new version
-- After features/fixes merged to main
-- For scheduled releases
-
-## Arguments
-
-Usage: `/git/release [bump-type] [--version x.y.z]`
-
-- `bump-type` - Type of bump: patch, minor, major (default: patch)
-- `--version` - Explicit version to set (overrides bump-type)
-
-If `$ARGUMENTS` is provided, use it as bump type or version.
+Increment version, open and merge a PR, then publish a GitHub release. `$ARGUMENTS` sets the bump type (patch/minor/major, default patch) or an explicit `--version x.y.z`.
 
 ## Steps
 
-### 1. Detect Current Version
+### 1. Detect current version
 
-Find version in common locations:
-
-- `pyproject.toml` (version field)
-- `package.json` (version field)
-- `src/__init__.py` or `<package>/__init__.py` (`__version__`)
-- `.claude-plugin/plugin.json` (version field)
-- `.claude-plugin/marketplace.json` (version field)
-- `Cargo.toml` (version field)
-- `version.txt` or `VERSION`
-- Other files with version strings
+Check common locations: `pyproject.toml`, `package.json`, `*/__init__.py` (`__version__`), `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `Cargo.toml`, `version.txt`/`VERSION`.
 
 ```bash
-# Search for version patterns
 grep -r '"version"' . --include="*.json" 2>/dev/null | head -20
 grep -E "^version\s*=" pyproject.toml Cargo.toml 2>/dev/null
 grep "__version__" **/__init__.py 2>/dev/null
-```
-
-Also check git tags:
-
-```bash
 git describe --tags --abbrev=0
 ```
 
-### 2. Calculate New Version
+### 2. Calculate new version
 
-Based on semantic versioning (vX.Y.Z):
+Semantic versioning: patch = Z+1 (fixes), minor = Y+1/Z=0 (features), major = X+1/Y=0/Z=0 (breaking).
 
-- **patch** (Z+1): Bug fixes, minor changes
-- **minor** (Y+1, Z=0): New features, backward compatible
-- **major** (X+1, Y=0, Z=0): Breaking changes
+### 3. Update ALL version references
 
-Example: v0.2.7 -> v0.2.8 (patch)
-
-### 3. Update All Version References
-
-Replace old version with new in ALL files identified in step 1. Common files include:
-
-- `pyproject.toml`
-- `package.json`
-- `__init__.py` files
-- `.claude-plugin/plugin.json`
-- `.claude-plugin/marketplace.json`
-- `Cargo.toml`
-- Any other files containing version strings
-
-**Important**: Version in files must match the git tag (without 'v' prefix
-in files, with 'v' prefix in tags).
-
-### 4. Verify Changes
+Replace the old version in every file from step 1. Keep formats consistent — no `v` prefix in files, `v` prefix on the git tag. Then verify:
 
 ```bash
 git diff
 ```
 
-Confirm all version references updated correctly and consistently.
+### 4. Create the version-bump PR
 
-### 5. Create Version Bump PR
+Branch, commit, and push:
 
 ```bash
 git checkout -b version-bump-vX.Y.Z
 git add .
 git commit -m "chore: bump version to vX.Y.Z"
 git push -u origin version-bump-vX.Y.Z
-
-gh pr create --base main \
-  --title "Bump version to vX.Y.Z" \
-  --body "Update version from vX.Y.Z to vX.Y.Z across all files"
 ```
 
-### 6. Merge PR
+Open the PR with the GitHub MCP tool `mcp__github__create_pull_request` (base `main`, title "Bump version to vX.Y.Z"). Fallback: `gh pr create` if the MCP server is unavailable.
 
-Run quality checks and merge:
+### 5. Merge the PR
 
-```bash
-gh pr merge --merge --admin
-```
+Run quality checks, then merge via `mcp__github__merge_pull_request`. Fallback: `gh pr merge --merge`.
 
-### 7. Prepare Release Notes
-
-Analyze changes since last release:
+### 6. Prepare release notes
 
 ```bash
-# Find previous version tag
 git describe --tags --abbrev=0
-
-# See commits since last release
 git log <previous-tag>..HEAD --oneline
-
-# See changed files
 git diff <previous-tag>..HEAD --stat
 ```
 
-Categorize into:
+Categorize commits into Features, Improvements, Bug Fixes, Documentation, Internal, and note Breaking Changes.
 
-- Features
-- Improvements
-- Bug Fixes
-- Documentation
-- Internal changes
+### 7. Publish the GitHub release
 
-### 8. Create GitHub Release
+Create tag `vX.Y.Z` targeting `main` with the categorized notes using the GitHub MCP release-creation tool (e.g. `mcp__github__create_release`). Fallback: `gh release create vX.Y.Z --target main`.
 
-```bash
-gh release create vX.Y.Z \
-  --title "Release vX.Y.Z" \
-  --notes "$(cat <<'EOF'
-## Summary
-<Brief overview>
+### 8. Verify
 
-## Changes
+Confirm the release exists and monitor any triggered CI (`mcp__github__actions_list` / `mcp__github__get_job_logs`, or `gh run list`).
 
-### Features
-- <feature>
+## Notes
 
-### Improvements
-- <improvement>
-
-### Bug Fixes
-- <fix>
-
-### Documentation
-- <doc change>
-
-### Internal
-- <internal change>
-
-## Breaking Changes
-<Note any breaking changes or "None">
-EOF
-)" \
-  --target main
-```
-
-### 9. Verify Release
-
-```bash
-# Check release created
-gh release view vX.Y.Z
-
-# Monitor CI/CD if applicable
-gh run list --limit 1
-gh run watch
-```
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-| ----- | ----- | ---------- |
-| Version not found | Unusual location | Search manually, add to version files |
-| Quality checks fail | Test/lint issues | Fix before proceeding to release |
-| Release workflow fails | CI/CD issue | Check workflow logs |
-
-## Guidelines
-
-- Update ALL version references consistently
-- Maintain version format (with/without 'v' prefix)
-- No emojis in commits or release notes
-- No attribution footers
-- Verify quality before release
-
-## Success Criteria
-
-- All version references updated
-- PR created and merged
-- GitHub release published
-- Release notes comprehensive
-- CI/CD completed successfully
+- Update ALL version refs consistently; keep the with/without `v` convention.
+- No emojis or attribution footers in commits or release notes.
+- Version not found → search manually and add the file to the update set.
