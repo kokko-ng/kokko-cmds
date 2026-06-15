@@ -1,20 +1,13 @@
+---
+description: Generate a hierarchical C4 architecture map (context/containers/components) from a codebase.
+argument-hint: [target-directory]
+allowed-tools: Agent, Bash, Read, Write, Glob, Grep
+---
+
 # C4 Architecture Mapping
 
-Map the codebase architecture using a hierarchical C4 model
-(Context -> Containers -> Components).
-
-## Arguments
-
-Usage: `/c4-map [target-directory]`
-
-- `target-directory` - Directory to analyze (default: current working directory)
-
-If `$ARGUMENTS` is provided, use it as the target directory to analyze.
-
-## Prerequisites
-
-A codebase to analyze. No existing C4 model required - this command
-generates the initial map.
+Map the codebase architecture as a hierarchical C4 model
+(Context -> Containers -> Components). No existing model required.
 
 ## Orchestration
 
@@ -23,17 +16,15 @@ Phase 1: Context -> Phase 2: Containers -> Phase 3: Components ->
 Phase 4: Synthesis -> Phase 5: Files
 ```
 
-Each level depends on outputs from the previous level. Execute sequentially,
-passing outputs forward.
-
-**Output structure:** See [c4-templates.md](./c4-templates.md#output-structure)
+Each level depends on the previous. Execute sequentially, passing outputs
+forward. Output structure: see [c4-templates.md](./c4-templates.md#output-structure).
 
 ---
 
 ## Phase 1: System Context
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Map C4 system context"
@@ -56,16 +47,14 @@ Parameters:
     Include C4-PlantUML context diagram
 ```
 
-**WAIT for Phase 1 to complete.**
-
-Store: `SYSTEM_ID`, `EXTERNAL_SYSTEMS`, `PRELIMINARY_CONTAINERS`
+Wait for Phase 1. Store: `SYSTEM_ID`, `EXTERNAL_SYSTEMS`, `PRELIMINARY_CONTAINERS`.
 
 ---
 
 ## Phase 2: Containers
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Map C4 containers"
@@ -94,16 +83,15 @@ Parameters:
     Include C4-PlantUML container diagram
 ```
 
-**WAIT for Phase 2 to complete.**
-
-Store: `CONTAINERS` with `PRELIMINARY_COMPONENTS`, `CONTAINER_RELATIONSHIPS`
+Wait for Phase 2. Store: `CONTAINERS` (with `PRELIMINARY_COMPONENTS`),
+`CONTAINER_RELATIONSHIPS`.
 
 ---
 
 ## Phase 3: Components
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Map C4 components"
@@ -130,16 +118,14 @@ Parameters:
     Include C4-PlantUML component diagrams (one per container)
 ```
 
-**WAIT for Phase 3 to complete.**
-
-Store: `COMPONENTS_BY_CONTAINER`
+Wait for Phase 3. Store: `COMPONENTS_BY_CONTAINER`.
 
 ---
 
 ## Phase 4: Synthesis
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Synthesize C4 model"
@@ -166,31 +152,23 @@ Parameters:
     }
 ```
 
-**If validation fails with errors, report to user before proceeding.**
+If validation fails with errors, report to user before proceeding.
 
 ---
 
 ## Phase 5: File Generation
 
-Using `FINAL_STRUCTURE` from Phase 4:
+Using `FINAL_STRUCTURE` from Phase 4.
 
 ### Step 0: Download C4-PlantUML Library
-
-Download the C4-PlantUML library files if not already present:
 
 ```bash
 mkdir -p codemap/.c4-plantuml
 BASE_URL="https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master"
-
-# Download only if files don't exist
-[ -f codemap/.c4-plantuml/C4.puml ] || \
-  curl -sL -o codemap/.c4-plantuml/C4.puml "$BASE_URL/C4.puml"
-[ -f codemap/.c4-plantuml/C4_Context.puml ] || \
-  curl -sL -o codemap/.c4-plantuml/C4_Context.puml "$BASE_URL/C4_Context.puml"
-[ -f codemap/.c4-plantuml/C4_Container.puml ] || \
-  curl -sL -o codemap/.c4-plantuml/C4_Container.puml "$BASE_URL/C4_Container.puml"
-[ -f codemap/.c4-plantuml/C4_Component.puml ] || \
-  curl -sL -o codemap/.c4-plantuml/C4_Component.puml "$BASE_URL/C4_Component.puml"
+for f in C4 C4_Context C4_Container C4_Component; do
+  [ -f codemap/.c4-plantuml/$f.puml ] || \
+    curl -sL -o codemap/.c4-plantuml/$f.puml "$BASE_URL/$f.puml"
+done
 ```
 
 ### Step 1: Create Folders
@@ -198,7 +176,6 @@ BASE_URL="https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master"
 ```bash
 SYSTEM_ID="<from FINAL_STRUCTURE>"
 mkdir -p codemap/$SYSTEM_ID/containers
-
 for CONTAINER_ID in <containers>; do
   mkdir -p codemap/$SYSTEM_ID/containers/$CONTAINER_ID/components
   for COMPONENT_ID in <components>; do
@@ -217,11 +194,8 @@ Use templates from [c4-templates.md](./c4-templates.md#markdown-templates):
 | Container | `container.puml`, `container.md` |
 | Component | `component.puml`, `component.md` |
 
-Each markdown file must include:
-
-- Parent navigation link
-- Drill-down table to children
-- `<!-- Last updated: YYYY-MM-DD -->` timestamp
+Each markdown file must include a parent navigation link, a drill-down table
+to children, and a `<!-- Last updated: YYYY-MM-DD -->` timestamp.
 
 ### Step 3: Generate PNGs
 
@@ -255,10 +229,7 @@ find codemap -type f | sort
 - Components: Y components
 
 ## Files Created
-- Total files: N
-- PlantUML diagrams: X
-- Markdown docs: Y
-- PNG images: Z
+- Total files: N (PlantUML: X, Markdown: Y, PNG: Z)
 
 ## Entry Point
 `codemap/<system-id>/context.md`
@@ -268,11 +239,4 @@ find codemap -type f | sort
 - Issues: [list if any]
 ```
 
----
-
-## Error Handling
-
-See [c4-templates.md](./c4-templates.md#error-handling)
-
-- If any phase fails: Report failure, do not proceed to dependent phases
-- If Phase 4 validation fails: List errors, ask user to proceed or fix
+If any phase fails, report it and do not proceed to dependent phases.

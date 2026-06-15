@@ -1,103 +1,32 @@
+---
+description: Deep-read a target to identify technical debt and build a remediation roadmap.
+argument-hint: [target]
+allowed-tools: Read, Grep, Glob, Bash, Agent
+model: opus
+---
+
 # Technical Debt Analysis
 
-Perform deep manual analysis of the codebase to identify technical debt
-through comprehensive code reading.
+Deep-read `$1` (default: entire project) to surface technical debt and produce
+a prioritized remediation roadmap. For large targets, fan out with the Agent
+tool (subagent_type: Explore) per module and synthesize results.
 
-## When to Use
+## Read Systematically
 
-- During planning for major refactoring
-- Before taking on new team members
-- To create a technical roadmap
-- When code quality is declining
+Trace logic flow, data transformations, and dependency relationships across
+the target. Review like a senior developer: question every design decision,
+missing edge case, and scaling assumption.
 
-## Arguments
+## What to Identify
 
-Usage: `/analysis/debt [target]`
+- **Architecture/design**: pattern inconsistencies, SOLID violations, abstraction leaks, missing abstractions, layering violations
+- **Code quality**: overly complex functions, poor naming, duplication, magic numbers/strings, inconsistent solutions to the same problem
+- **Maintainability**: commented-out/dead code, TODO/FIXME, brittle code, over- and under-engineering
+- **Business logic**: domain-model inconsistencies, missing error handling, half-implemented features, algorithmic anti-patterns
+- **Testing/docs gaps**: untestable code, missing edge cases, undocumented complex logic, inconsistent error messages
+- **Security/data**: input-validation gaps, information leakage, auth inconsistencies, data-integrity problems
 
-- `target` - Directory or module to analyze (default: entire project)
-
-If `$ARGUMENTS` is provided, use it as the target path.
-
-## Steps
-
-### 1. Spawn Opus Subagents for Deep Analysis
-
-Use the Task tool with `model: "opus"` to spawn subagents for thorough
-analysis. Opus excels at:
-
-- Complex reasoning about code architecture
-- Identifying subtle design flaws
-- Understanding nuanced business logic
-
-Spawn parallel Opus agents per module or domain area for comprehensive coverage.
-
-### 2. Deep Code Reading (delegate to Opus)
-
-**Read every source file systematically:**
-
-- Understand complete codebase structure
-- Trace logic flow and execution paths
-- Analyze data flow and transformations
-- Map dependency relationships between modules
-
-### 3. Architecture and Design Debt
-
-**Identify:**
-
-- Architectural inconsistencies (patterns not followed)
-- SOLID principle violations (multiple responsibilities, tight coupling)
-- Abstraction leaks (implementation details exposed)
-- Missing abstractions (repeated patterns not extracted)
-- Layering violations (inappropriate cross-layer dependencies)
-
-### 4. Code Quality Issues
-
-**Look for:**
-
-- Complex functions/methods (hard to understand)
-- Poor naming (confusing variable, function, class names)
-- Code duplication (repeated logic to consolidate)
-- Inconsistent patterns (similar problems solved differently)
-- Magic numbers/strings (hardcoded values needing constants)
-
-### 5. Maintainability Problems
-
-**Find:**
-
-- Commented-out code (dead code in comments)
-- TODO/FIXME comments (deferred work, shortcuts)
-- Brittle code (fragile implementations)
-- Over-engineering (unnecessary complexity)
-- Under-engineering (oversimplified, will break under load)
-
-### 6. Business Logic Issues
-
-**Identify:**
-
-- Domain model inconsistencies
-- Missing error handling
-- Incomplete features (half-implemented functionality)
-- Performance anti-patterns (inefficient algorithms)
-
-### 7. Testing and Documentation Gaps
-
-**Find:**
-
-- Untestable code (tightly coupled, hard to test)
-- Missing edge case handling
-- Undocumented complex logic
-- Inconsistent error messages
-
-### 8. Security and Data Handling
-
-**Check for:**
-
-- Input validation gaps
-- Information leakage
-- Authentication/authorization inconsistencies
-- Data integrity problems
-
-### 9. Output Format
+## Output Format
 
 ```markdown
 # Technical Debt Analysis Report
@@ -106,59 +35,33 @@ Spawn parallel Opus agents per module or domain area for comprehensive coverage.
 [High-level findings and recommendations]
 
 ## Codebase Overview
-[System architecture and main components]
+[Architecture and main components]
 
 ## Critical Issues
-[Most severe debt posing immediate risks]
-
 | Issue | Location | Severity | Impact |
 | ----- | -------- | -------- | ------ |
 | [Description] | file:line | High/Medium/Low | [Business impact] |
 
 ## Systemic Problems
-[Patterns of debt appearing throughout codebase]
+[Debt patterns recurring across the codebase]
 
 ## Module-by-Module Analysis
-
 ### [Module Name]
-- Issues found
-- Recommended fixes
-- Effort estimate
+- Issues found / Recommended fixes / Effort estimate
 
 ## Refactoring Opportunities
-[Concrete suggestions for improvement]
+[Concrete improvements]
 
 ## Risk Assessment
-[Impact analysis of identified debt]
+[Impact of identified debt]
 
 ## Recommended Roadmap
-1. [Highest priority - address immediately]
-2. [High priority - address soon]
-3. [Medium priority - plan for]
-4. [Low priority - address opportunistically]
+1. Address immediately
+2. Address soon
+3. Plan for
+4. Address opportunistically
 ```
 
-### 10. Review Like a Senior Developer
-
-Question every design decision:
-
-- Why was this done this way?
-- What edge cases are missing?
-- How will this scale?
-- Is this maintainable long-term?
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-| ----- | ----- | ---------- |
-| Too much to analyze | Large codebase | Focus on core modules first |
-| Unclear original intent | Missing documentation | Document assumptions, flag |
-| Conflicting patterns | Multiple developers | Identify dominant pattern |
-
-## Success Criteria
-
-- All major technical debt identified
-- Issues prioritized by business impact
-- Clear remediation roadmap provided
-- Risk assessment completed
-- Actionable recommendations given
+For large or multi-developer codebases, focus on core modules first, document
+assumptions where intent is unclear, and identify the dominant pattern when
+conventions conflict.
