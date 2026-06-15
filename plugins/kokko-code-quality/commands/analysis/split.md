@@ -1,127 +1,57 @@
+---
+description: Find oversized files and split them into focused, single-responsibility modules.
+argument-hint: [target] [--threshold lines]
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+---
+
 # Split Large Files
 
-Identify and split large files across the codebase to improve maintainability.
+Find and split large files in `$1` (default: current project) to improve
+maintainability. Threshold defaults to 500 lines (override with `--threshold`).
 
-## When to Use
+## 1. Identify Candidates
 
-- When files exceed 500 lines
-- When files have multiple unrelated responsibilities
-- Before major refactoring efforts
-- To reduce merge conflicts
-
-## Arguments
-
-Usage: `/analysis/split [target] [--threshold lines]`
-
-- `target` - Directory to analyze (default: current project)
-- `--threshold` - Line count threshold (default: 500)
-
-If `$ARGUMENTS` is provided, use it as the target path or threshold.
-
-## Steps
-
-### 1. Identify Candidates
-
-Find files meeting any of these criteria:
-
-- Files > 500 lines
-- Files with > 5 distinct classes/functions handling different concerns
-- Files with multiple unrelated responsibilities
-- Files violating Single Responsibility Principle
+Files over the threshold, with many distinct concerns, or violating SRP.
 
 ```bash
-# Find large Python files
+# Python
 find . -name "*.py" -not -path "./.venv/*" -exec wc -l {} + | sort -rn | head -20
-
-# Find large TypeScript/JavaScript files
+# TS/JS
 find . \( -name "*.ts" -o -name "*.js" \) \
   | grep -v node_modules | xargs wc -l | sort -rn | head -20
 ```
 
-### 2. Analyze File Contents
+## 2. Plan the Split
 
-For each large file:
+For each candidate, count distinct classes/functions, identify separate
+concerns, and choose natural split points. Separate by domain (models,
+services, utils, validators), cohesion, dependencies (avoid cycles), or feature.
 
-- Count distinct classes/functions
-- Identify separate concerns
-- Map dependencies between components
-- Determine natural split points
+## 3. Execute
 
-### 3. Plan Split Strategy
-
-Separate by:
-
-- **Domain/functionality** - Models, services, utils, validators
-- **Cohesion** - Group related classes/functions together
-- **Dependencies** - Minimize circular dependencies
-- **Feature** - Component-based or feature-based organization
-
-### 4. Execute Split
-
-For each file to split:
-
-1. Create new module structure:
-
+1. Create module structure (`mkdir -p module_name/`, add `__init__.py` /
+   `index.ts`).
+2. Move related code into new files.
+3. Update imports across the codebase:
    ```bash
-   mkdir -p module_name/
-   touch module_name/__init__.py  # Python
-   touch module_name/index.ts     # TypeScript
-   ```
-
-2. Move related code to new files
-
-3. Update imports across codebase:
-
-   ```bash
-   # Find files importing the old module
    grep -r "from old_module import" --include="*.py"
    grep -r "import.*from.*old_module" --include="*.ts"
    ```
+4. Create an index file exposing a clean public API.
+5. Maintain backward compatibility where useful: re-export from the original
+   location, add deprecation warnings.
 
-4. Create index file for clean public API
-
-### 5. Quality Checks
-
-After each split:
-
-```bash
-# Verify no circular dependencies (Python)
-uv run pytest --collect-only
-
-# Verify no import errors (TypeScript)
-npx tsc --noEmit
-
-# Run tests
-uv run pytest  # or npm test
-```
-
-### 6. Maintain Backward Compatibility
-
-Where possible:
-
-- Re-export from original location
-- Add deprecation warnings for old imports
-- Update documentation
-
-### 7. Commit Incrementally
+## 4. Verify
 
 ```bash
-git add <new_files> <modified_files>
-git commit -m "refactor(<module>): split <file> into <components>"
+uv run pytest --collect-only   # Python: no circular deps
+npx tsc --noEmit               # TS: no import errors
+uv run pytest                  # or npm test
 ```
 
-## Error Handling
+Commit incrementally: `git commit -m "refactor(<module>): split <file> into <components>"`.
 
-| Issue | Cause | Resolution |
-| ----- | ----- | ---------- |
-| Circular imports | Interdependent modules | Extract shared code to module |
-| Import errors | Missing re-exports | Update index file |
-| Test failures | Broken imports | Update test imports |
+## Notes
 
-## Success Criteria
-
-- No files exceed threshold (500 lines default)
-- Each file has single, clear responsibility
-- No circular dependencies
-- All tests pass
-- Imports updated across codebase
+- Circular imports: extract shared code into its own module.
+- Broken imports after a move: update the index file and test imports.

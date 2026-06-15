@@ -1,39 +1,35 @@
+---
+description: Break down Azure subscription costs with anomaly and optimization analysis.
+argument-hint: [daily|weekly|<resource-group>]
+allowed-tools: Bash(az:*), AskUserQuestion
+---
+
 # Azure Cost Analysis
 
-Generate a comprehensive cost breakdown of Azure subscription resources.
+Generate a cost breakdown of Azure subscription resources. `$ARGUMENTS` selects `daily`/`weekly` granularity or filters to a resource group.
 
-## Prerequisites
+## CRITICAL — Safety
 
-Ensure Azure CLI is authenticated: `az account show`
-
-## Process
-
-### 1. Confirm Target Subscription
-
-ALWAYS use AskUserQuestion to confirm:
-
-- Which subscription to analyze
-- Specific resource group to focus on (or all)
-- Time period (default: MonthToDate)
-
-Never assume subscription or resource group. List available options if needed:
+ALWAYS use AskUserQuestion to confirm the subscription and resource group before proceeding. Never assume defaults. List options if needed:
 
 ```bash
 az account list --query "[].{Name:name, Id:id}" -o table
 az group list --query "[].name" -o tsv
 ```
 
-### 2. Get Cost Data
+Also confirm the time period (default: MonthToDate).
 
-Fetch cost data for the specified period (default: last 30 days):
+## Steps
+
+1. Get cost data:
 
 ```bash
-# Current billing period costs by resource group
+# Costs by resource group
 az cost query --type ActualCost \
   --dataset-grouping name=ResourceGroup type=Dimension \
   --timeframe MonthToDate
 
-# Daily cost trend
+# Daily cost trend by service
 az cost query --type ActualCost \
   --dataset-grouping name=ServiceName type=Dimension \
   --timeframe MonthToDate --dataset-aggregation totalCost=Sum
@@ -42,42 +38,10 @@ az cost query --type ActualCost \
 az cost query --type AmortizedCost --timeframe MonthToDate
 ```
 
-### 3. Resource Group Breakdown
-
-For each resource group, show:
-
-- Total cost MTD
-- Top 3 cost drivers (specific resources)
-- Cost trend (increasing/decreasing/stable)
-- Percentage of total spend
-
-### 4. Service Category Analysis
-
-Break down by service type:
-
-- Compute (VMs, Container Apps, Functions)
-- Storage (Blob, Cosmos DB, SQL)
-- AI Services (OpenAI, Cognitive Services)
-- Networking (Bandwidth, Load Balancers)
-- Other
-
-### 5. Anomaly Detection
-
-Flag any of these conditions:
-
-- Daily cost spike > 20% above 7-day average
-- New resources appearing that weren't present last week
-- Resources with zero usage but ongoing cost (idle resources)
-- Resources approaching quota limits
-
-### 6. Optimization Suggestions
-
-Based on usage patterns, suggest:
-
-- Underutilized resources that could be downsized
-- Reserved instance opportunities for consistent workloads
-- Dev/test resources that could use B-series VMs
-- Storage tier optimizations (hot vs cool vs archive)
+2. Per resource group: total MTD, top 3 cost drivers, trend, % of total spend.
+3. Break down by service category: Compute (VMs, Container Apps, Functions), Storage (Blob, Cosmos, SQL), AI Services (OpenAI, Cognitive), Networking, Other.
+4. Flag anomalies: daily spike >20% above 7-day average; new resources since last week; idle resources with cost but zero usage; resources near quota limits.
+5. Suggest optimizations: downsize underutilized resources, reserved-instance opportunities, B-series for dev/test, storage tier changes (hot/cool/archive).
 
 ## Output Format
 
@@ -104,7 +68,5 @@ vs Last Month: +/- XX%
 - [Specific actionable suggestions]
 ```
 
-## Arguments
-
-- `$ARGUMENTS` - Optional: "daily" for daily breakdown, "weekly" for weekly,
-  or resource group name to filter
+- Not logged in → `az login`.
+- Cost data requires Cost Management permissions.

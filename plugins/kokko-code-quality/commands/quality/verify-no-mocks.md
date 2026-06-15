@@ -1,137 +1,43 @@
+---
+description: Scan production code for mock/stub/dummy data and unconfigured integrations.
+argument-hint: [target]
+allowed-tools: Grep, Glob, Read, Bash
+---
+
 # Verify No Mocks in Production Code
 
-Scan codebase to ensure production code does not rely on mock, stub, or dummy
-data. Verify that all features use real integrations.
+Scan `$1` (default: project root) to confirm production code uses real
+integrations, not mock/stub/dummy data. Exclude test paths: `test/`, `tests/`,
+`__tests__/`, `spec/`, `*_test.*`, `*.test.*`, `*.spec.*`.
 
-## When to Use
+## Patterns to flag (in non-test files)
 
-- Before deploying to production
-- After implementing new features
-- During code reviews
-- To verify feature completeness
-
-## Arguments
-
-Usage: `/quality/verify-no-mocks [target]`
-
-- `target` - Directory to scan (default: current project root)
-
-If `$ARGUMENTS` is provided, use it as the target path.
-
-## Steps
-
-### 1. Scan for Mock Patterns
-
-Search for common mock/stub indicators in non-test files:
-
-**File name patterns to flag:**
-
-- `*mock*`, `*stub*`, `*fake*`, `*dummy*`
-- Exclude: `test/`, `tests/`, `__tests__/`, `spec/`, `*_test.*`, `*.test.*`, `*.spec.*`
-
-**Code patterns to flag:**
-
-```text
-# Python
-mock_data, stub_data, dummy_data, fake_data
-MOCK_, STUB_, DUMMY_, FAKE_
-"TODO: replace with real"
-"placeholder", "hardcoded"
-unittest.mock (outside test files)
-
-# JavaScript/TypeScript
-mockData, stubData, dummyData, fakeData
-MOCK_, STUB_, DUMMY_, FAKE_
-// TODO: replace with real
-"placeholder", "hardcoded"
-jest.mock, jest.fn (outside test files)
-```
-
-### 2. Check for Hardcoded Test Values
-
-Look for suspicious patterns:
-
-- Hardcoded API keys or tokens (even fake ones)
-- Lorem ipsum or sample text in production code
-- Static UUIDs used as identifiers
-- Hardcoded dates far in past/future
-- Email addresses like `test@example.com` in non-test code
-- Phone numbers like `555-` patterns
-
-### 3. Verify External Integrations
-
-For each external service the project uses:
-
-**API Clients:**
-
-- Check if real API endpoints are configured
-- Verify no localhost/mock URLs in production configs
-- Ensure environment variables are used (not hardcoded values)
-
-**Databases:**
-
-- Check connection strings point to real databases
-- Verify no in-memory or SQLite fallbacks in production mode
-
-**Third-party Services:**
-
-- Ensure SDK clients are properly initialized
-- Check for conditional mock returns
-
-### 4. Review Environment Configuration
-
-Check configuration files:
+- **Filenames**: `*mock*`, `*stub*`, `*fake*`, `*dummy*`
+- **Code**: `mock_data`/`mockData` (+ stub/dummy/fake variants), `MOCK_`/`STUB_`/
+  `DUMMY_`/`FAKE_`, `unittest.mock` / `jest.mock` / `jest.fn`, `"TODO: replace
+  with real"`, `placeholder`, `hardcoded`
+- **Hardcoded test values**: fake API keys/tokens, lorem ipsum, static UUIDs as
+  ids, far-past/future dates, `test@example.com`, `555-` phone numbers
+- **Integrations**: localhost/mock URLs in prod config, in-memory/SQLite
+  fallbacks in prod mode, conditional mock returns, secrets hardcoded instead of
+  env vars
 
 ```bash
-# Look for mock indicators in config
 grep -r "mock\|stub\|fake\|dummy" .env* config/ \
   --include="*.json" --include="*.yaml" --include="*.toml" 2>/dev/null
+# exclude .env.example and .env.test from violations
 ```
 
-Exclude `.env.example` and `.env.test` from violations.
+## Report (by severity)
 
-### 5. Generate Report
+- **Critical (must fix)**: mock data returned to users, hardcoded credentials,
+  fake external responses.
+- **Warning (review)**: suspicious names, placeholder comments, conditional mock
+  logic.
+- **Info (likely OK)**: test utilities, dev-only fallbacks with proper env guards.
 
-Categorize findings by severity:
+For each finding: implement the real integration, add an environment guard, or —
+if intentional — a comment explaining why (e.g. `# Not a mock: actual default`).
 
-**Critical (must fix):**
-
-- Mock data returned to users
-- Hardcoded credentials
-- Fake external service responses
-
-**Warning (review needed):**
-
-- Suspicious variable names
-- Placeholder comments
-- Conditional mock logic
-
-**Info (likely acceptable):**
-
-- Test utilities
-- Development-only fallbacks with proper guards
-
-### 6. Fix or Document Exceptions
-
-For each finding:
-
-1. If mock data: implement real integration
-2. If development fallback: ensure proper environment guards
-3. If intentional: add comment explaining why
-   (e.g., `# Not a mock: this is the actual default value`)
-
-## Error Handling
-
-| Issue | Cause | Resolution |
-| ----- | ----- | ---------- |
-| False positive | Test not excluded | Check path matches test patterns |
-| Mock in shared util | Used by prod/test | Split into separate modules |
-| Environment mock | Dev fallback leaking | Add environment checks |
-
-## Success Criteria
-
-- No mock/stub/dummy data in production code
-- All external integrations use real endpoints
-- Environment variables used for all secrets/endpoints
-- Any exceptions are documented with justification
-- Report shows zero critical findings
+Watch for false positives: a flagged file may just be a mis-excluded test, or a
+shared util used by both prod and test (split it).

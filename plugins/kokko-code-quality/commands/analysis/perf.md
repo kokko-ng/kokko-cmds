@@ -1,146 +1,36 @@
+---
+description: Identify performance bottlenecks across a target and recommend prioritized fixes.
+argument-hint: [target] [--focus database|api|frontend|backend|memory]
+allowed-tools: Read, Grep, Glob, Bash, Agent
+model: opus
+---
+
 # Performance Bottleneck Analysis
 
-Perform deep analysis to identify performance bottlenecks across the codebase.
+Analyze `$1` (default: entire project) for performance bottlenecks, optionally
+scoped by `--focus`. Prioritize hot paths (request handlers, background jobs,
+query-heavy operations, external integrations) and measure before optimizing —
+check existing metrics/logging and TODO comments about performance. For large
+targets, fan out with the Agent tool (subagent_type: Explore) per focus area
+and synthesize results.
 
-## When to Use
+## What to Search For
 
-- When application is slow
-- Before scaling or optimization work
-- During performance review cycles
-
-## Arguments
-
-Usage: `/analysis/perf [target] [--focus area]`
-
-- `target` - Directory or module to analyze (default: entire project)
-- `--focus` - Specific area: database, api, frontend, backend, memory
-
-If `$ARGUMENTS` is provided, use it as the target or focus area.
-
-## Steps
-
-### 1. Spawn Opus Subagents for Deep Analysis
-
-Use the Task tool with `model: "opus"` to spawn subagents for thorough
-analysis. Opus excels at:
-
-- Tracing complex execution paths
-- Identifying subtle performance anti-patterns
-- Understanding system-wide bottleneck interactions
-
-Spawn parallel Opus agents per focus area (database, api, frontend, backend,
-memory) for comprehensive coverage.
-
-### 2. Database and Query Performance
-
-**Search for:**
-
-- N+1 query patterns (loops containing database queries)
-- Missing indexes on frequently queried columns
-- `SELECT *` queries instead of specific columns
-- Lack of query result caching
-- Missing pagination on large result sets
-- Synchronous database calls in loops
-- Missing connection pooling
-
-**Check:** ORM models, database queries, migration files
+- **Database**: N+1 queries, missing indexes, `SELECT *`, no result caching, missing pagination, sync DB calls in loops, no connection pooling
+- **API/network**: serial calls that could parallelize, missing request/response caching, uncompressed large payloads, blocking external calls, missing timeouts, repeated calls for same data, no rate limiting/circuit breakers
+- **Frontend**: large inline data, no lazy loading, DOM churn in loops, missing debounce/throttle, large reactive objects, no code splitting, unnecessary re-renders
+- **Backend**: sync processing of large datasets, missing async/await, blocking I/O, inefficient/nested loops, no streaming for large files, no worker queues, heavy compute in handlers
+- **Memory**: leaks (unclosed connections/resources), large objects retained, missing context managers, unbounded caches, circular references, no pooling
+- **Concurrency**: serial I/O-bound ops, thread-safety issues, lock contention/deadlock risk, sync code in async contexts
 
 ```bash
-# Find potential N+1 patterns (Python)
+# N+1 patterns (Python)
 grep -rn "for.*in.*:" --include="*.py" -A5 | grep -E "\.get\(|\.filter\(|\.query\("
-
-# Find SELECT * (SQL files or raw queries)
+# SELECT *
 grep -rn "SELECT \*" --include="*.py" --include="*.sql"
 ```
 
-### 3. API and Network Performance
-
-**Search for:**
-
-- Sequential API calls that could be parallelized
-- Missing request/response caching
-- Large payloads without compression
-- Synchronous external API calls blocking handlers
-- Missing timeout configurations
-- Repeated API calls for same data
-- No rate limiting or circuit breakers
-
-**Check:** API routes, HTTP clients, service layers
-
-### 4. Frontend Performance
-
-**Search for:**
-
-- Large inline scripts/data in templates
-- Missing lazy loading for images/components
-- Excessive DOM manipulation in loops
-- No debouncing/throttling on frequent events
-- Large reactive data objects
-- Missing code splitting
-- Synchronous operations blocking UI
-- Unnecessary re-renders
-
-**Check:** Components, templates, event handlers
-
-### 5. Backend Processing Performance
-
-**Search for:**
-
-- Synchronous processing of large datasets
-- Missing async/await patterns
-- Blocking I/O operations
-- Inefficient loops (nested, repeated operations)
-- Large file operations without streaming
-- Missing worker queues for background tasks
-- Heavy computation in request handlers
-- No caching of expensive operations
-
-**Check:** Service classes, background jobs, data processing
-
-### 6. Memory and Resource Management
-
-**Search for:**
-
-- Memory leaks (unclosed connections, unreleased resources)
-- Large objects kept in memory unnecessarily
-- Missing context managers for file/connection handling
-- Unbounded collections or caches
-- Circular references preventing garbage collection
-- Missing resource pooling
-- Large log statements in hot paths
-
-**Check:** Connection handling, cache implementations
-
-### 7. Concurrency and Parallelization
-
-**Search for:**
-
-- Sequential operations that could run in parallel
-- Missing async patterns for I/O-bound operations
-- Thread-safety issues in shared resources
-- Lock contention or deadlock risks
-- Synchronous code in async contexts
-
-**Check:** Batch operations, workflow orchestration
-
-### 8. Analysis Approach
-
-**Prioritize hot paths:**
-
-1. User-facing request handlers
-2. Background job processing
-3. Database query-heavy operations
-4. External API integrations
-
-**Measure before optimizing:**
-
-- Check for existing performance metrics/logging
-- Identify actual bottlenecks vs perceived issues
-- Look for TODO comments mentioning performance
-
-### 9. Output Format
-
-Provide actionable recommendations:
+## Output Format
 
 ```markdown
 ## Performance Findings
@@ -158,21 +48,8 @@ Provide actionable recommendations:
 
 ## Recommended Actions
 1. [Highest priority fix]
-2. [Second priority fix]
 ...
 ```
 
-## Error Handling
-
-| Issue | Cause | Resolution |
-| ----- | ----- | ---------- |
-| Can't reproduce slowness | Environment diff | Profile in prod-like setup |
-| Too many findings | Large codebase | Focus on hot paths first |
-| Unclear impact | No metrics | Add timing/profiling first |
-
-## Success Criteria
-
-- All performance hotspots identified
-- Issues prioritized by impact
-- Concrete fix recommendations provided
-- Trade-offs documented (complexity vs speed)
+Document trade-offs (complexity vs. speed). If impact is unclear, recommend
+adding timing/profiling before changing code.

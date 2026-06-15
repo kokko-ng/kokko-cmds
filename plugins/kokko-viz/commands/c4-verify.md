@@ -1,28 +1,21 @@
+---
+description: Verify C4 diagrams against the codebase and auto-fix discrepancies.
+argument-hint: [system-id]
+allowed-tools: Agent, Bash, Read, Write, Glob, Grep
+---
+
 # C4 Architecture Verification
 
-Validate accuracy and completeness of the hierarchical C4 architecture map.
-
-## Arguments
-
-Usage: `/c4-verify [system-id]`
-
-- `system-id` - System ID to verify (default: auto-detected from codemap/)
-
-If `$ARGUMENTS` is provided, use it as the system-id to verify.
-
-## Prerequisites
-
-Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` first.
+Validate accuracy and completeness of the C4 map in `codemap/<system-id>/`
+against the actual codebase, then apply fixes. Run `/viz/c4-map` first if no
+model exists.
 
 ## Orchestration
 
 ```text
-Phase 1: Preparation -> Phase 2: Parallel Verification -> Phase 3: Synthesis
--> Phase 4: Apply Fixes -> Phase 5: Re-Verification -> Phase 6: Finalization
+Phase 1: Prep -> Phase 2: Parallel Verification (5 checks) -> Phase 3: Synthesis
+-> Phase 4: Apply Fixes -> Phase 5: Re-Verify -> Phase 6: Finalize
 ```
-
-Phase 2 runs five checks in parallel: Completeness, Accuracy, Hierarchy,
-Diagram Quality, and Image Pairing.
 
 ---
 
@@ -33,191 +26,49 @@ SYSTEM_ID=$(ls codemap/ | head -1)
 echo "System ID: $SYSTEM_ID"
 find codemap/$SYSTEM_ID -type f \
   \( -name "*.md" -o -name "*.puml" -o -name "*.png" \) | sort
-echo "Containers: $(find codemap/$SYSTEM_ID/containers \
-  -maxdepth 1 -type d | wc -l)"
-echo "Components: $(find codemap/$SYSTEM_ID -type d -name components \
-  -exec ls {} \; | wc -l)"
 ```
 
 ---
 
 ## Phase 2: Parallel Verification
 
-Launch ALL FIVE subagents IN PARALLEL in a single message.
+Launch ALL FIVE subagents in parallel in a single message. Each is
+`Tool: Agent`, `subagent_type: "Explore"`. Each receives `SYSTEM_ID` and the
+Phase 1 file listing, and outputs JSON with `check_type`, a score, `findings`,
+and `issues` (per c4-templates.md#validation-issue-schema).
 
-### Subagent 1: Completeness Check
+**1. Completeness** (`score: X/3`): All deployable units have folders; all
+major modules documented; all integrations in context.puml.
+Search: Glob `**/Dockerfile`, `**/docker-compose.yml`; Grep `class \w+`,
+`import.*azure`.
 
-```yaml
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Verify C4 completeness"
-  prompt: |
-    Verify COMPLETENESS against actual codebase.
+**2. Accuracy** (`score: X% verified`): Documented deps match code imports;
+tech labels match pyproject.toml/package.json; elements in correct parent
+folders; names match actual module/class names.
+Search: read .puml relationships, Grep imports, verify file paths exist.
 
-    SYSTEM_ID: <from Phase 0>
-    HIERARCHY: <file listing>
+**3. Hierarchy** (`score: X/5`): Each level has .puml + .md; no orphans/empty
+containers; diagram elements match folders; navigation links resolve; folder
+names match diagram IDs.
 
-    CHECKS:
-    1. Container Completeness: All deployable units have folders
-    2. Component Completeness: All major modules documented
-    3. External System Completeness: All integrations in context.puml
+**4. Diagram Quality** (`score: X/5`): Valid `@startuml/@enduml`; correct C4
+include per level; correct macros per level (see c4-templates.md); not
+overloaded (>15) or sparse; no orphan elements.
 
-    SEARCH:
-    - Glob: **/Dockerfile, **/docker-compose.yml (containers)
-    - Grep: "class \w+", "import.*azure" (components, externals)
+**5. Image Pairing**: Each md image ref `![...](./file.png)` has an existing,
+fresh PNG. Expected pairings: `context.md->context.png`,
+`container.md->container.png`, `component.md->component.png`. A PNG is stale if
+its .puml was modified later (`find codemap -name "*.puml" -newer <png>`).
+Output findings: `missing_pngs`, `orphan_pngs`, `stale_pngs`.
 
-    OUTPUT:
-    {
-      "check_type": "completeness",
-      "score": "X/3",
-      "findings": {containers, components, external_systems},
-      "issues": [<per c4-templates.md#validation-issue-schema>]
-    }
-```
-
-### Subagent 2: Accuracy Check
-
-```yaml
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Verify C4 accuracy"
-  prompt: |
-    Verify ACCURACY against actual codebase.
-
-    SYSTEM_ID: <from Phase 0>
-    HIERARCHY: <file listing>
-
-    CHECKS:
-    1. Relationship Accuracy: Documented deps match code imports
-    2. Technology Labels: Versions match pyproject.toml/package.json
-    3. Hierarchy Placement: Elements in correct parent folders
-    4. Naming Accuracy: Names match actual module/class names
-
-    SEARCH:
-    - Read .puml files, extract relationships
-    - Grep for imports to verify deps
-    - Check file paths exist
-
-    OUTPUT:
-    {
-      "check_type": "accuracy",
-      "score": "X% verified",
-      "findings": {relationships, technology_labels, hierarchy_placement, naming},
-      "issues": [...]
-    }
-```
-
-### Subagent 3: Hierarchy Validation
-
-```yaml
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Validate C4 hierarchy"
-  prompt: |
-    Verify STRUCTURAL INTEGRITY of folder hierarchy.
-
-    SYSTEM_ID: <from Phase 0>
-    HIERARCHY: <file listing>
-
-    CHECKS:
-    1. Required Files: Each level has .puml and .md
-    2. Folder Structure: No orphans, no empty containers
-    3. Cross-Level Consistency: Diagram elements match folders
-    4. Navigation Links: All parent/child links resolve
-    5. ID Consistency: Folder names match diagram IDs
-
-    OUTPUT:
-    {
-      "check_type": "hierarchy",
-      "score": "X/5",
-      "findings": {required_files, folder_structure, cross_level, navigation, ids},
-      "issues": [...]
-    }
-```
-
-### Subagent 4: Diagram Quality Check
-
-```yaml
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Validate C4 diagrams"
-  prompt: |
-    Verify DIAGRAM QUALITY of all PlantUML files.
-
-    SYSTEM_ID: <from Phase 0>
-    HIERARCHY: <file listing>
-
-    CHECKS:
-    1. PlantUML Syntax: Valid @startuml/@enduml blocks
-    2. Correct Includes: Right C4 include per level (see c4-templates.md)
-    3. Correct Macros: Right macros per level (see c4-templates.md)
-    4. Element Coverage: Not overloaded (>15), not sparse
-    5. Relationship Completeness: No orphan elements
-
-    OUTPUT:
-    {
-      "check_type": "diagram_quality",
-      "score": "X/5",
-      "findings": {syntax, includes, macros, coverage, relationships},
-      "issues": [...]
-    }
-```
-
-### Subagent 5: Image Pairing Check
-
-```yaml
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Validate image pairing"
-  prompt: |
-    Verify every markdown diagram reference has corresponding PNG.
-
-    SYSTEM_ID: <from Phase 0>
-    HIERARCHY: <file listing>
-
-    CHECKS:
-    1. Extract image refs from .md files: ![...](./filename.png)
-    2. Verify referenced PNG exists at path
-    3. Check PNG freshness: PNG modified after PUML (not stale)
-    4. Find orphan PNGs: Exist but not referenced in any .md
-    5. Find missing PNGs: Referenced but don't exist
-
-    EXPECTED PAIRINGS:
-    - context.md -> context.png
-    - container.md -> container.png
-    - component.md -> component.png
-
-    FRESHNESS CHECK:
-    ```bash
-    # PNG is stale if PUML modified after PNG
-    find codemap -name "*.puml" -newer <corresponding .png>
-    ```
-
-    OUTPUT:
-    {
-      "check_type": "image_pairing",
-      "findings": {
-        "missing_pngs": [{"md_file": "...", "expected_png": "...", "line": N}],
-        "orphan_pngs": [{"png_file": "...", "last_modified": "..."}],
-        "stale_pngs": [{"png": "...", "puml_mtime": "...", "png_mtime": "..."}]
-      },
-      "issues": [...]
-    }
-```
-
-**WAIT for ALL FIVE subagents to complete.**
+Wait for ALL FIVE to complete.
 
 ---
 
 ## Phase 3: Synthesis
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "general-purpose"
   model: "opus"
@@ -226,37 +77,25 @@ Parameters:
     Synthesize findings from all five verification checks.
 
     OUTPUTS:
-    - Completeness: <insert>
-    - Accuracy: <insert>
-    - Hierarchy: <insert>
-    - Diagram Quality: <insert>
-    - Image Pairing: <insert>
+    - Completeness / Accuracy / Hierarchy / Diagram Quality / Image Pairing: <insert each>
 
     GOALS:
-    1. Find INTERSECTIONS: Same issue from multiple checks = higher confidence
-    2. Identify CONFLICTS: Contradictory findings
-    3. ROOT CAUSE analysis: Multiple issues from one cause
+    1. INTERSECTIONS: same issue from multiple checks = higher confidence
+    2. CONFLICTS: contradictory findings
+    3. ROOT CAUSE: multiple issues from one cause
     4. PRIORITIZE: severity, frequency, cascade impact, structural first
 
-    FIX ORDER:
-    1. Structural (create/delete folders)
-    2. Diagrams (fix puml files)
-    3. Documentation (fix md files)
-    4. Navigation (fix links)
-    5. Images (regenerate stale PNGs)
+    FIX ORDER: structural (folders) -> diagrams (puml) -> docs (md) ->
+    navigation (links) -> images (regenerate PNGs)
 
     OUTPUT:
     {
       "synthesis_summary": {total_issues, intersections, conflicts, root_causes},
-      "intersections": [...],
-      "conflicts": [...],
-      "root_causes": [...],
+      "intersections": [...], "conflicts": [...], "root_causes": [...],
       "prioritized_issues": [...],
       "correction_plan": {
-        "phase_1_structural": [...],
-        "phase_2_diagrams": [...],
-        "phase_3_documentation": [...],
-        "phase_4_navigation": [...],
+        "phase_1_structural": [...], "phase_2_diagrams": [...],
+        "phase_3_documentation": [...], "phase_4_navigation": [...],
         "phase_5_images": [...]
       }
     }
@@ -266,52 +105,25 @@ Parameters:
 
 ## Phase 4: Apply Fixes
 
-Execute fixes in order from correction_plan.
+Execute `correction_plan` in order.
 
-### Step 4A: Structural Fixes
+**4A. Structural:** `mkdir -p <paths>` for missing folders; `rm -rf <paths>`
+for orphans.
 
-```bash
-# Create missing folders
-mkdir -p <paths>
+**4B. Diagrams:** for each fix, spawn a focused subagent
+(`Tool: Agent`, `subagent_type: "Explore"`, `model: "haiku"`) given the file
+path, current content, and fixes from the plan; it returns the complete
+updated file.
 
-# Remove orphan folders
-rm -rf <paths>
-```
+**4C. Documentation:** for missing docs, spawn an analysis subagent (like
+c4-map); for link fixes, edit markdown directly.
 
-### Step 4B: Diagram Fixes
+**4D. Navigation:** fix broken links and drill-down tables.
 
-For each diagram fix, spawn focused subagent:
-
-```yaml
-Tool: Task
-Parameters:
-  subagent_type: "Explore"
-  description: "Fix C4 diagram"
-  model: "haiku"
-  prompt: |
-    Fix issues in PlantUML file.
-
-    FILE: <path>
-    CURRENT: <content>
-    FIXES: <from correction_plan>
-
-    OUTPUT: Complete updated file
-```
-
-### Step 4C: Documentation Fixes
-
-For missing docs, spawn analysis subagent (like c4-map).
-For link fixes, update markdown files directly.
-
-### Step 4D: Navigation Fixes
-
-Fix broken links, update drill-down tables.
-
-### Step 4E: Image Fixes
+**4E. Images:** regenerate stale/missing PNGs:
 
 ```bash
-# Regenerate stale/missing PNGs (with local C4-PlantUML library)
-for puml in <stale_pngs sources>; do
+for puml in <stale/missing sources>; do
   plantuml -DRELATIVE_INCLUDE="." -tpng $puml
 done
 ```
@@ -321,27 +133,26 @@ done
 ## Phase 5: Re-Verification
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
-  description: "Re-verify fixes"
   model: "haiku"
+  description: "Re-verify fixes"
   prompt: |
     Verify fixes were applied correctly.
 
     FIXES APPLIED: <list>
 
     CHECKS:
-    1. Structural: Folders exist, required files present
-    2. Diagrams: Syntax valid, includes correct
-    3. Navigation: Links resolve
+    1. Structural: folders exist, required files present
+    2. Diagrams: syntax valid, includes correct
+    3. Navigation: links resolve
     4. Images: PNGs exist, not stale
 
     OUTPUT:
     {
       "verification_passed": true/false,
-      "fixes_confirmed": [...],
-      "fixes_failed": [...],
+      "fixes_confirmed": [...], "fixes_failed": [...],
       "overall_status": "PASS|PARTIAL|FAIL"
     }
 ```
@@ -350,16 +161,14 @@ Parameters:
 
 ## Phase 6: Finalization
 
-### Step 6A: Regenerate All PNGs
+**6A. Regenerate all PNGs:**
 
 ```bash
 find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" \
   -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 ```
 
-### Step 6B: Write Verification Report
-
-Create `codemap/VERIFICATION.md`:
+**6B. Write `codemap/VERIFICATION.md`:**
 
 ```markdown
 # C4 Verification Report
@@ -370,26 +179,21 @@ Create `codemap/VERIFICATION.md`:
 
 | Metric | Value |
 | ------ | ----- |
-| Completeness | X/4 |
+| Completeness | X/3 |
 | Accuracy | X% |
 | Hierarchy | X/5 |
 | Diagram Quality | X/5 |
 | Image Pairing | X missing, Y stale |
-| Issues Found | N |
-| Issues Fixed | M |
+| Issues Found / Fixed | N / M |
 
 ## Corrections Applied
-
 [List by phase]
 
 ## Remaining Issues
-
 [List any unfixed issues]
 ```
 
-### Step 6C: Update README
-
-Update `codemap/README.md` with verification timestamp.
+**6C.** Update `codemap/README.md` with the verification timestamp.
 
 ---
 
@@ -401,32 +205,18 @@ Update `codemap/README.md` with verification timestamp.
 ## Status: PASS/PARTIAL/FAIL
 
 ## Scores
-- Completeness: X/4
-- Accuracy: X%
-- Hierarchy: X/5
-- Diagram Quality: X/5
+- Completeness: X/3 | Accuracy: X% | Hierarchy: X/5 | Diagram Quality: X/5
 - Image Pairing: X missing, Y stale, Z orphan
 
 ## Synthesis
-- Issues found: X
-- Intersections: Y
-- Root causes: Z
+- Issues found: X | Intersections: Y | Root causes: Z
 
 ## Fixes Applied
-- Structural: X
-- Diagrams: Y
-- Documentation: Z
-- Navigation: W
-- Images: V regenerated
+- Structural / Diagrams / Documentation / Navigation / Images: [counts]
 
 ## Report: codemap/VERIFICATION.md
 ```
 
----
-
-## Error Handling
-
-- **Subagent failure:** Continue with other checks, note incomplete verification
-- **Irreconcilable conflicts:** List for human decision, skip auto-fix
-- **Fix failure:** Log, continue with independent fixes, report partial success
-- **Re-verification failure:** List failed fixes, suggest manual intervention
+Notes: on subagent failure, continue other checks and note incomplete
+verification; list irreconcilable conflicts for human decision; on fix failure,
+continue independent fixes and report partial success.

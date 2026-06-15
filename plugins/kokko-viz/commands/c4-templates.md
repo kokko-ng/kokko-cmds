@@ -1,3 +1,8 @@
+---
+description: Shared C4 diagram templates and schemas referenced by the c4-* commands.
+allowed-tools: Read
+---
+
 # C4 Architecture Templates Reference
 
 Shared templates and patterns for c4-map, c4-update, and c4-verify commands.

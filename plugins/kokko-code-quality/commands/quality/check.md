@@ -1,3 +1,8 @@
+---
+description: Run pre-commit until it passes, fixing every issue without skipping hooks.
+allowed-tools: Bash(pre-commit:*), Read, Edit
+---
+
 # Pre-commit Check
 
 Iteratively run `pre-commit run --all-files` and address every reported
