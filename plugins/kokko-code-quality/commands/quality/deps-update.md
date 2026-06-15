@@ -1,70 +1,49 @@
+---
+description: Interactively update outdated dependencies with validation between each.
+argument-hint: [package|critical|major|minor]
+allowed-tools: Bash, AskUserQuestion
+---
+
 # Interactive Dependency Update
 
-Update outdated dependencies safely with validation between updates.
+Update outdated dependencies safely, validating after each. `$1` filters scope:
+a package name, or `critical` (security only), `major`, or `minor`. No arg =
+interactive over all outdated packages.
 
-## Arguments
+## 1. Audit (in parallel)
 
-Usage: `/quality/deps-update [package-name|category]`
+```bash
+uv pip list --outdated   # Python
+npm outdated             # JS (per package.json dir)
+pip-audit                # Python vulns
+npm audit                # JS vulns
+```
 
-- `package-name` - Update specific package only
-- `critical` - Update only critical security vulnerabilities
-- `major` - Include major version updates
-- `minor` - Include minor updates only
-- No argument - Interactive mode for all outdated packages
+## 2. Categorize by risk
 
-If `$ARGUMENTS` is provided, use it as a package name filter or category.
+Critical (security) → Major (x.0.0) → Minor (0.x.0) → Patch (0.0.x). Update in
+that order.
 
-## Process
+## 3. Interactive loop
 
-### 1. Audit Current State
+For each package (critical first):
 
-Run in parallel:
+1. Show current/latest version and changelog summary if available.
+2. Ask whether to update (AskUserQuestion).
+3. If yes: `uv add package@latest` or `npm install package@latest`, then validate
+   (`uv run python -c "import package_name"` / `npm run build`). On failure,
+   rollback and report.
 
-- `uv pip list --outdated` for Python packages
-- `npm outdated` in any directory with package.json
-- `pip-audit` for Python security vulnerabilities
-- `npm audit` for JS security vulnerabilities
+## 4. Final validation
 
-### 2. Categorize Updates
+`uv run pytest` (or `uv run mypy .`) for Python; `npm test`/`npm run build` for JS.
 
-Group packages by risk level:
+## 5. Summary
 
-- **Critical**: Security vulnerabilities (update first)
-- **Major**: Breaking version changes (x.0.0)
-- **Minor**: Feature additions (0.x.0)
-- **Patch**: Bug fixes (0.0.x)
+| Package | Old | New | Status |
+| ------- | --- | --- | ------ |
+| ... | ... | ... | Updated/Skipped/Failed |
 
-### 3. Interactive Update Loop
-
-For each package, starting with critical:
-
-1. Show current version, latest version, and changelog summary if available
-2. Ask user whether to update (use AskUserQuestion tool)
-3. If yes:
-   - Update the package (`uv add package@latest` or `npm install package@latest`)
-   - Run quick validation:
-     - Python: `uv run python -c "import package_name"`
-     - JS: `npm run build` if available
-   - If validation fails, rollback and report
-
-### 4. Final Validation
-
-After all updates:
-
-- Run `uv run pytest` (if tests exist) or type check with `uv run mypy .`
-- Run `npm test` or `npm run build` for JS projects
-- Report summary of what was updated
-
-## Output
-
-Provide a summary table:
-
-| Package | Old | New | Status                 |
-| ------- | --- | --- | ---------------------- |
-| ...     | ... | ... | Updated/Skipped/Failed |
-
-## Notes
-
-- Never force update if tests fail
-- Commit lock file changes separately from code changes
-- For major version bumps, warn about potential breaking changes
+- Never force an update when tests fail.
+- Commit lock-file changes separately from code changes.
+- Warn about breaking changes on major bumps.

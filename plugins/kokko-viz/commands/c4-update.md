@@ -1,18 +1,13 @@
+---
+description: Update an existing C4 model to match current code changes.
+argument-hint: [system-id]
+allowed-tools: Agent, Bash, Read, Write, Glob, Grep
+---
+
 # C4 Architecture Update
 
-Update the existing hierarchical C4 model based on code changes.
-
-## Arguments
-
-Usage: `/c4-update [system-id]`
-
-- `system-id` - System ID to update (default: auto-detected from codemap/)
-
-If `$ARGUMENTS` is provided, use it as the system-id to update.
-
-## Prerequisites
-
-Existing model in `codemap/<system-id>/`. If not present, run `/viz/c4-map` first.
+Update the existing hierarchical C4 model in `codemap/<system-id>/` based on
+code changes. If no model exists, run `/viz/c4-map` first.
 
 ## Orchestration
 
@@ -21,7 +16,7 @@ Phase 1: Detect Changes -> Phase 2: Plan Updates -> Phase 3: Apply ->
 Phase 4: Verify -> Phase 5: Finalize
 ```
 
-**Update order:**
+Update order:
 
 - Deletions: Component -> Container -> Context (bottom-up)
 - Additions: Context -> Container -> Component (top-down)
@@ -49,7 +44,7 @@ git diff --name-status $LAST_UPDATE..HEAD -- . ':!codemap' ':!*.md' | head -50
 ### Step 1C: Categorize Changes
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Detect C4 changes"
@@ -78,14 +73,14 @@ Parameters:
     }
 ```
 
-**WAIT for Phase 1 to complete.**
+Wait for Phase 1. If no changes detected, report and exit.
 
 ---
 
 ## Phase 2: Impact Analysis
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Plan C4 updates"
@@ -117,18 +112,17 @@ Parameters:
 ### Step 3A: Deletions (Bottom-Up)
 
 ```bash
-# Remove folders in order: component -> container
-rm -rf <paths from execution plan>
+rm -rf <paths from execution plan>  # component -> container order
 ```
 
 Update navigation links in parent files after deletions.
 
 ### Step 3B: Modifications
 
-For each modified element, spawn level-specific subagent:
+For each modified element, spawn a level-specific subagent:
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Update C4 <level>"
@@ -150,17 +144,13 @@ Parameters:
 
 ### Step 3C: Additions (Top-Down)
 
-For new elements:
-
-1. Create folder structure
-2. Spawn analysis subagent (similar to c4-map phases)
-3. Update parent's drill-down table
+For new elements: create folder structure, spawn an analysis subagent
+(like c4-map phases), then update the parent's drill-down table.
 
 ```bash
-# Create new container
+# New container
 mkdir -p codemap/$SYSTEM_ID/containers/<new-id>/components
-
-# Create new component
+# New component
 mkdir -p codemap/$SYSTEM_ID/containers/<container>/components/<new-id>
 ```
 
@@ -169,7 +159,7 @@ mkdir -p codemap/$SYSTEM_ID/containers/<container>/components/<new-id>
 ## Phase 4: Cross-Level Consistency
 
 ```yaml
-Tool: Task
+Tool: Agent
 Parameters:
   subagent_type: "Explore"
   description: "Verify C4 consistency"
@@ -192,32 +182,23 @@ Parameters:
     }
 ```
 
-**Apply fixes if issues found.**
-
 ---
 
 ## Phase 5: Finalization
 
-### Step 5A: Apply Consistency Fixes
+1. **Apply consistency fixes:** Fix navigation links, remove orphan entries,
+   add missing entries.
+2. **Update timestamps:** Update `<!-- Last updated: YYYY-MM-DD -->` in
+   modified files.
+3. **Regenerate PNGs** for modified diagrams:
 
-Fix navigation links, remove orphan entries, add missing entries.
+   ```bash
+   plantuml -DRELATIVE_INCLUDE="." -tpng codemap/$SYSTEM_ID/context.puml
+   plantuml -DRELATIVE_INCLUDE="." -tpng codemap/$SYSTEM_ID/containers/<id>/container.puml
+   ```
 
-### Step 5B: Update Timestamps
-
-Update `<!-- Last updated: YYYY-MM-DD -->` in modified files.
-
-### Step 5C: Regenerate PNGs
-
-```bash
-# Regenerate modified diagrams (with local C4-PlantUML library)
-plantuml -DRELATIVE_INCLUDE="." -tpng codemap/$SYSTEM_ID/context.puml
-plantuml -DRELATIVE_INCLUDE="." -tpng codemap/$SYSTEM_ID/containers/<id>/container.puml
-# etc.
-```
-
-### Step 5D: Update README
-
-Update `codemap/README.md` with timestamp and change summary.
+4. **Update README:** Update `codemap/README.md` with timestamp and change
+   summary.
 
 ---
 
@@ -237,17 +218,9 @@ Update `codemap/README.md` with timestamp and change summary.
 | DELETION | component:legacy | Removed folder |
 
 ## Files Modified
-- Deletions: [list]
-- Modifications: [list]
-- Additions: [list]
+- Deletions / Modifications / Additions: [lists]
 
 ## Verification: PASSED/FAILED
 ```
 
----
-
-## Error Handling
-
-- **No changes detected:** Report and exit
-- **Subagent failure:** Report which update failed, skip dependent updates
-- **Consistency issues:** List issues, apply automatic fixes where possible
+On subagent failure, report which update failed and skip dependent updates.
