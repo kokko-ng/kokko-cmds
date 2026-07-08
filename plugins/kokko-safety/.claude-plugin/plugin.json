@@ -1,6 +1,6 @@
 {
   "name": "kokko-safety",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context.",
   "author": {
     "name": "kokko-ng"
