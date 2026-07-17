@@ -1,7 +1,8 @@
 ---
 description: Find and remove repository cruft not covered by .gitignore, with confirmation.
-argument-hint: [dry-run|auto|gitignore-only|<pattern>]
+argument-hint: '[dry-run|auto|gitignore-only|<pattern>]'
 allowed-tools: Bash, AskUserQuestion, Edit
+disable-model-invocation: true
 ---
 
 # Remove Unnecessary Files
@@ -15,8 +16,12 @@ cruft without asking; still confirm tracked files), `gitignore-only` (suggest
 
 ## 1. Scan (Excluding Gitignored)
 
-Run the category searches in [cruft-patterns.md](./references/cruft-patterns.md).
-Each pipes results through `git check-ignore -q "$f" || echo "$f"` to drop
+Run the category searches from the bundled patterns reference at:
+!`echo "${CLAUDE_SKILL_DIR}/references/cruft-patterns.md"`
+
+Read that file for the search commands (if the path above is empty, locate it
+with Glob: `**/commands/clean/references/cruft-patterns.md` under
+`~/.claude/plugins/`). Each search pipes results through `git check-ignore -q "$f" || echo "$f"` to drop
 ignored files. Categories: AI-generated reports, temp/dev files, stray logs,
 test/coverage artifacts, orphaned drafts, and misplaced database files.
 

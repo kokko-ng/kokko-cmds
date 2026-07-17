@@ -1,7 +1,8 @@
 ---
 description: Find oversized files and split them into focused, single-responsibility modules.
-argument-hint: [target] [--threshold lines]
+argument-hint: '[target] [--threshold lines]'
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+disable-model-invocation: true
 ---
 
 # Split Large Files
@@ -33,10 +34,12 @@ services, utils, validators), cohesion, dependencies (avoid cycles), or feature.
    `index.ts`).
 2. Move related code into new files.
 3. Update imports across the codebase:
+
    ```bash
    grep -r "from old_module import" --include="*.py"
    grep -r "import.*from.*old_module" --include="*.ts"
    ```
+
 4. Create an index file exposing a clean public API.
 5. Maintain backward compatibility where useful: re-export from the original
    location, add deprecation warnings.

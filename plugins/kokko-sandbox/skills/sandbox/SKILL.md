@@ -23,11 +23,13 @@ Parse `$ARGUMENTS` for:
 ### 1. Resolve Workspace
 
 Determine the workspace directory:
+
 - If `--workspace <path>` provided, use that path
 - Otherwise use the current working directory from context
 
 Verify the workspace is under `$HOME`. If not, stop and explain:
-```
+
+```text
 The workspace must be under your home directory because colima only mounts ~/
 into the container VM. Move the project under ~/Documents/ or similar.
 ```
@@ -37,22 +39,29 @@ into the container VM. Move the project under ~/Documents/ or similar.
 Run the following checks in parallel:
 
 **devcontainer CLI:**
+
 ```bash
 which devcontainer 2>/dev/null
 ```
+
 If missing, install it:
+
 ```bash
 npm install -g @devcontainers/cli
 ```
 
 **Docker / colima:**
+
 ```bash
 docker info 2>/dev/null | grep "Server Version"
 ```
+
 If Docker is not running:
+
 ```bash
 colima start
 ```
+
 Wait up to 30 seconds for Docker to become available, checking every 3 seconds.
 
 ### 3. Find or Create devcontainer.json
@@ -65,12 +74,14 @@ Do NOT overwrite or modify the existing file.
 
 **If it does not exist:**
 Use AskUserQuestion to ask:
+
 - Which runtimes to include (multiSelect):
   - "Python 3.13 + uv" (always pre-selected, recommended)
   - "Node 20 / npm" (always pre-selected, recommended)
   - ".NET 8 SDK" (optional)
 
 Based on the selection:
+
 - If .NET is selected: use the template at `${CLAUDE_PLUGIN_ROOT}/devcontainer-templates/with-dotnet.json`
 - Otherwise: use `${CLAUDE_PLUGIN_ROOT}/devcontainer-templates/base.json`
 
@@ -82,12 +93,13 @@ Confirm: "Created .devcontainer/devcontainer.json with [selected runtimes]."
 Read `references/auth-guide.md` for full auth details.
 
 Check in order:
+
 1. `[ -n "$ANTHROPIC_API_KEY" ]` — API key auth (immediate, no setup needed)
 2. `[ -f "$HOME/.claude/.credentials.json" ]` — OAuth credentials already exist
 
 If **neither** is true, warn the user:
 
-```
+```text
 First-time login required inside the sandbox.
 
 After the container starts, open a NEW terminal tab and run:
@@ -113,6 +125,7 @@ devcontainer up --workspace-folder <workspace> [--config <workspace>/.devcontain
 Include `--rebuild-image` only if `--rebuild` argument was passed.
 
 This command:
+
 - Builds the image if not cached (slow: ~5 min first time, cached thereafter)
 - Runs `postCreateCommand` (installs uv + Claude Code npm package, copies ~/.claude.json)
 - Mounts `~/.claude/` and the workspace
@@ -120,6 +133,7 @@ This command:
 Parse the JSON output to extract `containerId`.
 
 If the command fails, check for common issues:
+
 - "bind source path does not exist" → workspace is not under `$HOME`
 - "Cannot connect to Docker" → run `colima start` and retry
 - Build errors → show the full output to the user
@@ -128,7 +142,7 @@ If the command fails, check for common issues:
 
 Once the container is up, output clear instructions:
 
-```
+```text
 Sandbox container ready.
 
 Container ID: <containerId>

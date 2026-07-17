@@ -1,7 +1,8 @@
 ---
 description: Interactively update outdated dependencies with validation between each.
-argument-hint: [package|critical|major|minor]
+argument-hint: '[package|critical|major|minor]'
 allowed-tools: Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Interactive Dependency Update
