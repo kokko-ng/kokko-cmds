@@ -6,16 +6,19 @@ The sandbox uses the npm `@anthropic-ai/claude-code` package inside the containe
 This version reads OAuth credentials from `~/.claude/.credentials.json`.
 
 The `~/.claude/` directory is bind-mounted from the host, so:
+
 - Credentials written inside the container persist to the host's `~/.claude/`
 - A **one-time login** inside the container makes all future container starts automatic
 
 ## Checking Auth Status
 
 Auth is ready if either of these exist:
+
 1. `~/.claude/.credentials.json` (OAuth) - created by running `/login` in the container once
 2. `ANTHROPIC_API_KEY` env var set in the shell (API key auth)
 
 Check command:
+
 ```bash
 [ -f "$HOME/.claude/.credentials.json" ] && echo "OAuth ready" || echo "Login required"
 [ -n "$ANTHROPIC_API_KEY" ] && echo "API key set" || echo "No API key"

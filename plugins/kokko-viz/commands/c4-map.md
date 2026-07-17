@@ -1,6 +1,6 @@
 ---
 description: Generate a hierarchical C4 architecture map (context/containers/components) from a codebase.
-argument-hint: [target-directory]
+argument-hint: '[target-directory]'
 allowed-tools: Agent, Bash, Read, Write, Glob, Grep
 ---
 
@@ -17,7 +17,15 @@ Phase 4: Synthesis -> Phase 5: Files
 ```
 
 Each level depends on the previous. Execute sequentially, passing outputs
-forward. Output structure: see [c4-templates.md](./c4-templates.md#output-structure).
+forward.
+
+Shared templates and schemas live in the bundled reference file at:
+!`echo "${CLAUDE_SKILL_DIR}/references/c4-templates.md"`
+
+Read the relevant section of that file whenever a step below cites a
+`c4-templates.md#...` anchor (if the path above is empty, locate the file with
+Glob: `**/kokko-viz/commands/references/c4-templates.md` under
+`~/.claude/plugins/`). Output structure: see `c4-templates.md#output-structure`.
 
 ---
 
@@ -186,7 +194,7 @@ done
 
 ### Step 2: Write Files
 
-Use templates from [c4-templates.md](./c4-templates.md#markdown-templates):
+Use templates from the reference file's `#markdown-templates` section:
 
 | Level | Files |
 | ----- | ----- |

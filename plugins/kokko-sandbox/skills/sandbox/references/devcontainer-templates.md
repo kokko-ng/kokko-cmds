@@ -5,6 +5,7 @@ Templates live in `${CLAUDE_PLUGIN_ROOT}/devcontainer-templates/`.
 ## base.json — Python 3.13 + Node 20 + uv
 
 Always included. Provides:
+
 - Python 3.13 via `ghcr.io/devcontainers/features/python:1`
 - Node 20 via `ghcr.io/devcontainers/features/node:1`
 - uv (fast Python package manager) via `postCreateCommand`
@@ -17,11 +18,13 @@ Always included. Provides:
 ## with-dotnet.json — adds .NET 8 SDK
 
 Everything from base.json plus:
+
 - .NET 8 SDK via `ghcr.io/devcontainers/features/dotnet:2`
 
 ## How the Skill Generates a devcontainer.json
 
 When the project has no `.devcontainer/devcontainer.json`, the skill:
+
 1. Asks user which runtimes they want via AskUserQuestion
 2. Reads the appropriate template from this directory
 3. Writes it to `<project>/.devcontainer/devcontainer.json`

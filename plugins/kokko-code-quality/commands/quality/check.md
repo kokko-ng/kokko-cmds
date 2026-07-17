@@ -1,6 +1,6 @@
 ---
 description: Run pre-commit until it passes, fixing every issue without skipping hooks.
-allowed-tools: Bash(pre-commit:*), Read, Edit
+allowed-tools: Bash(pre-commit:*), Bash(uv run pre-commit:*), Read, Edit
 ---
 
 # Pre-commit Check

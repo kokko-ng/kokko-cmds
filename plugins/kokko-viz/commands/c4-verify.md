@@ -1,14 +1,23 @@
 ---
 description: Verify C4 diagrams against the codebase and auto-fix discrepancies.
-argument-hint: [system-id]
+argument-hint: '[system-id]'
 allowed-tools: Agent, Bash, Read, Write, Glob, Grep
+context: fork
+agent: general-purpose
 ---
 
 # C4 Architecture Verification
 
 Validate accuracy and completeness of the C4 map in `codemap/<system-id>/`
-against the actual codebase, then apply fixes. Run `/viz/c4-map` first if no
-model exists.
+against the actual codebase, then apply fixes. Run `/kokko-viz:c4-map` first if
+no model exists.
+
+Shared templates and schemas live in the bundled reference file at:
+!`echo "${CLAUDE_SKILL_DIR}/references/c4-templates.md"`
+
+Read the relevant section whenever a check cites a `c4-templates.md#...` anchor
+(if the path above is empty, locate the file with Glob:
+`**/kokko-viz/commands/references/c4-templates.md` under `~/.claude/plugins/`).
 
 ## Orchestration
 

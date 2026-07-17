@@ -1,7 +1,8 @@
 ---
 description: Break down Azure subscription costs with anomaly and optimization analysis.
-argument-hint: [daily|weekly|<resource-group>]
+argument-hint: '[daily|weekly|<resource-group>]'
 allowed-tools: Bash(az:*), AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Azure Cost Analysis
@@ -21,27 +22,35 @@ Also confirm the time period (default: MonthToDate).
 
 ## Steps
 
-1. Get cost data:
+1. Get cost data. Cost queries use the `costmanagement` extension (`az extension add --name costmanagement` if missing; it is not part of core az):
 
 ```bash
+SCOPE="/subscriptions/<subscription-id>"
+
 # Costs by resource group
-az cost query --type ActualCost \
+az costmanagement query --type ActualCost --scope "$SCOPE" \
+  --timeframe MonthToDate \
   --dataset-grouping name=ResourceGroup type=Dimension \
-  --timeframe MonthToDate
+  --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}'
 
-# Daily cost trend by service
-az cost query --type ActualCost \
+# Cost trend by service
+az costmanagement query --type ActualCost --scope "$SCOPE" \
+  --timeframe MonthToDate \
   --dataset-grouping name=ServiceName type=Dimension \
-  --timeframe MonthToDate --dataset-aggregation totalCost=Sum
+  --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}'
 
-# Forecast for current month
-az cost query --type AmortizedCost --timeframe MonthToDate
+# Amortized view (reservations spread over usage)
+az costmanagement query --type AmortizedCost --scope "$SCOPE" \
+  --timeframe MonthToDate \
+  --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}'
 ```
 
-2. Per resource group: total MTD, top 3 cost drivers, trend, % of total spend.
-3. Break down by service category: Compute (VMs, Container Apps, Functions), Storage (Blob, Cosmos, SQL), AI Services (OpenAI, Cognitive), Networking, Other.
-4. Flag anomalies: daily spike >20% above 7-day average; new resources since last week; idle resources with cost but zero usage; resources near quota limits.
-5. Suggest optimizations: downsize underutilized resources, reserved-instance opportunities, B-series for dev/test, storage tier changes (hot/cool/archive).
+Fallback if the extension cannot be installed: `az consumption usage list` with a date range.
+
+1. Per resource group: total MTD, top 3 cost drivers, trend, % of total spend.
+2. Break down by service category: Compute (VMs, Container Apps, Functions), Storage (Blob, Cosmos, SQL), AI Services (OpenAI, Cognitive), Networking, Other.
+3. Flag anomalies: daily spike >20% above 7-day average; new resources since last week; idle resources with cost but zero usage; resources near quota limits.
+4. Suggest optimizations: downsize underutilized resources, reserved-instance opportunities, B-series for dev/test, storage tier changes (hot/cool/archive).
 
 ## Output Format
 

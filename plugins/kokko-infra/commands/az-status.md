@@ -1,12 +1,13 @@
 ---
 description: Generate a daily Azure subscription activity and health summary.
-argument-hint: [subscription-id] [--days N]
+argument-hint: '[subscription-id] [--days N]'
 allowed-tools: Bash(az:*), AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Azure Daily Summary
 
-Generate a daily summary of Azure subscription activity and health. `$1` is the subscription to analyze; `--days N` sets the lookback window (default: 1).
+Generate a daily summary of Azure subscription activity and health. `$1` is the subscription to analyze; `--days N` sets the lookback window (default: 1). Use the chosen lookback as `<days>` in every command below.
 
 ## CRITICAL — Safety
 
@@ -21,7 +22,7 @@ az account list --query "[].{Name:name, Id:id}" -o table
 az account set --subscription "<confirmed-subscription-id>"
 ```
 
-2. Inventory resources:
+1. Inventory resources:
 
 ```bash
 az group list --output table
@@ -30,7 +31,7 @@ az resource list \
   --output table
 ```
 
-3. Check key services:
+1. Check key services:
 
 ```bash
 az webapp list --output table        # App Services
@@ -39,24 +40,24 @@ az functionapp list --output table   # Functions
 az vm list -d --output table         # Virtual Machines
 ```
 
-4. Review recent activity:
+1. Review recent activity over the lookback window:
 
 ```bash
-az monitor activity-log list --offset 1d --output table
+az monitor activity-log list --offset <days>d --output table
 ```
 
-5. Security and access review:
+1. Security and access review:
 
 ```bash
 az network nsg rule list --resource-group <rg> --nsg-name <nsg> --output table 2>/dev/null
 az keyvault certificate list --vault-name <vault> --output table 2>/dev/null
 ```
 
-6. Cost summary (if enabled):
+1. Cost summary (if enabled), covering the same lookback window (minimum 7 days for a useful trend):
 
 ```bash
 az consumption usage list \
-  --start-date $(date -d "7 days ago" +%Y-%m-%d) \
+  --start-date $(date -d "<days> days ago" +%Y-%m-%d) \
   --end-date $(date +%Y-%m-%d) \
   --output table 2>/dev/null \
   || echo "Cost data requires Cost Management permissions"

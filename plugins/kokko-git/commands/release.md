@@ -1,7 +1,8 @@
 ---
 description: Bump version across all files, open/merge a PR, and publish a GitHub release.
-argument-hint: [patch|minor|major] [--version x.y.z]
-allowed-tools: Bash(git:*), Read, Edit, Grep, Glob
+argument-hint: '[patch|minor|major] [--version x.y.z]'
+allowed-tools: Bash(git:*), Bash(gh:*), Read, Edit, Grep, Glob, AskUserQuestion, mcp__github__create_pull_request, mcp__github__merge_pull_request, mcp__github__pull_request_read, mcp__github__list_releases, mcp__github__actions_list, mcp__github__get_job_logs
+disable-model-invocation: true
 ---
 
 # Version Bump and Release
@@ -46,9 +47,9 @@ git push -u origin version-bump-vX.Y.Z
 
 Open the PR with the GitHub MCP tool `mcp__github__create_pull_request` (base `main`, title "Bump version to vX.Y.Z"). Fallback: `gh pr create` if the MCP server is unavailable.
 
-### 5. Merge the PR
+### 5. Confirm and merge the PR
 
-Run quality checks, then merge via `mcp__github__merge_pull_request`. Fallback: `gh pr merge --merge`.
+Run quality checks and wait for CI. Then **confirm with AskUserQuestion before merging** — show the PR number, title, and CI status, with options "Merge", "Wait", "Abort". Only after approval, merge via `mcp__github__merge_pull_request` (fallback: `gh pr merge --merge`).
 
 ### 6. Prepare release notes
 
@@ -62,11 +63,20 @@ Categorize commits into Features, Improvements, Bug Fixes, Documentation, Intern
 
 ### 7. Publish the GitHub release
 
-Create tag `vX.Y.Z` targeting `main` with the categorized notes using the GitHub MCP release-creation tool (e.g. `mcp__github__create_release`). Fallback: `gh release create vX.Y.Z --target main`.
+**Confirm with AskUserQuestion before publishing** — show the version, target, and drafted notes. Then tag and publish:
+
+```bash
+git checkout main && git pull origin main
+git tag -a vX.Y.Z -m "vX.Y.Z"
+git push origin vX.Y.Z
+gh release create vX.Y.Z --target main --title "vX.Y.Z" --notes "<categorized notes>"
+```
+
+If `gh` is unavailable, the pushed annotated tag still marks the release; note to the user that the GitHub Release object must be created from the tag in the web UI (the GitHub MCP server currently has no release-creation tool).
 
 ### 8. Verify
 
-Confirm the release exists and monitor any triggered CI (`mcp__github__actions_list` / `mcp__github__get_job_logs`, or `gh run list`).
+Confirm the release exists (`mcp__github__list_releases` or `gh release view vX.Y.Z`) and monitor any triggered CI (`mcp__github__actions_list` / `mcp__github__get_job_logs`, or `gh run list`).
 
 ## Notes
 
