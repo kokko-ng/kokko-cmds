@@ -66,13 +66,15 @@ deny() {
 
 matches() { echo "$command" | grep -qE "$1"; }
 
-# `git` at a COMMAND position: start of a line, after a shell operator, or quoted
-# behind `sh -c`. Without this anchor a bare `git` matches inside string literals
+# `git` at a COMMAND position, plus the global options that may precede a
+# subcommand. Without the anchor a bare `git` matches inside string literals
 # (`echo "never git reset --hard"`) and inside other words -- `digit restore`
 # contains the substring "git restore". A hook that cries wolf on documentation
 # is a hook that gets disabled.
-CMDPOS='(^|[;&|(){}]|[[:space:]]-c[[:space:]]+["'"'"']?)[[:space:]]*'
-G="${CMDPOS}"'git[[:space:]]+((-C[[:space:]]+[^[:space:]]+|-c[[:space:]]+[^[:space:]]+|--git-dir=[^[:space:]]+|--work-tree=[^[:space:]]+)[[:space:]]+)*'
+#
+# _CMD_START/_CMD_RUN come from utils/load-patterns.sh so every hook shares ONE
+# definition of "at a command position" and they cannot drift apart.
+G="${_CMD_START}${_CMD_RUN}"'\bgit[[:space:]]+((-C[[:space:]]+[^[:space:]]+|-c[[:space:]]+[^[:space:]]+|--git-dir=[^[:space:]]+|--work-tree=[^[:space:]]+)[[:space:]]+)*'
 
 RECOVER='git-snapshot.sh has checkpointed the tree (git for-each-ref refs/snapshots/), but do not rely on that: commit the work instead, then retry.'
 
@@ -133,13 +135,11 @@ if [ -n "$(git status --porcelain --untracked-files=no 2>/dev/null | head -1)" ]
 fi
 
 # --- Everything else in git.txt: ask ---------------------------------------
-# Anchored at a command position, unlike the shared check_dangerous_pattern.
-# Safe to do here because every git.txt pattern begins with `git[[:space:]]`.
+# check_dangerous_pattern anchors and combines the patterns itself.
 load_patterns "git"
-for pattern in "${DANGEROUS_PATTERNS[@]}"; do
-    if echo "$command" | grep -qiE "${CMDPOS}${pattern}"; then
-        play_sound "warning"
-        cat << EOF
+if check_dangerous_pattern "$command"; then
+    play_sound "warning"
+    cat << EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -148,8 +148,7 @@ for pattern in "${DANGEROUS_PATTERNS[@]}"; do
   "systemMessage": "Destructive git operation detected. This could rewrite history or delete branches. Allow Claude to proceed?"
 }
 EOF
-        exit 0
-    fi
-done
+    exit 0
+fi
 
 exit 0

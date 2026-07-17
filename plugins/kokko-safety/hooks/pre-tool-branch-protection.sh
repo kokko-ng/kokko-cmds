@@ -13,6 +13,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
+source "$SCRIPT_DIR/utils/load-patterns.sh"
 
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command // ""')
@@ -20,9 +21,11 @@ command=$(echo "$input" | jq -r '.tool_input.command // ""')
 # Protected branch names
 protected_branches=("main" "master" "production" "prod" "release")
 
-# Check if this is a git command we care about
-# Note: no ^ anchor so we catch git commands anywhere in the string (e.g., "cd /path && git push")
-if ! echo "$command" | grep -qE 'git[[:space:]]+(push|reset|rebase)'; then
+# Check if this is a git command we care about.
+# cmd_matches anchors to a command position, so `cd /path && git push` and
+# `sudo git push` still match while `echo "git push --force"` does not. The
+# previous unanchored grep fired on any mention of these words in a string.
+if ! cmd_matches "$command" 'git[[:space:]]+(push|reset|rebase)'; then
     exit 0
 fi
 
@@ -36,7 +39,7 @@ fi
 
 # Check if force pushing to a protected branch (regardless of current branch)
 for branch in "${protected_branches[@]}"; do
-    if echo "$command" | grep -qE "git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(--force|-f)[[:space:]]+(origin|upstream)[[:space:]]+${branch}([[:space:]]|$)"; then
+    if cmd_matches "$command" "git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(--force|-f)[[:space:]]+(origin|upstream)[[:space:]]+${branch}([[:space:]]|$)"; then
         play_sound "warning"
         cat << EOF
 {
@@ -51,7 +54,7 @@ EOF
     fi
 
     # Also check: git push origin main --force (flag at end)
-    if echo "$command" | grep -qE "git[[:space:]]+push[[:space:]]+(origin|upstream)[[:space:]]+${branch}[[:space:]]+(--force|-f)"; then
+    if cmd_matches "$command" "git[[:space:]]+push[[:space:]]+(origin|upstream)[[:space:]]+${branch}[[:space:]]+(--force|-f)"; then
         play_sound "warning"
         cat << EOF
 {
@@ -79,7 +82,7 @@ if [ "$is_protected" = true ]; then
     # Warn about pushes, resets and rebases on protected branches -- but never
     # about `git commit`, which is local, reversible, and the thing that keeps
     # work recoverable in the first place.
-    if echo "$command" | grep -qE 'git[[:space:]]+(push|reset|rebase)'; then
+    if cmd_matches "$command" 'git[[:space:]]+(push|reset|rebase)'; then
         play_sound "warning"
         cat << EOF
 {
