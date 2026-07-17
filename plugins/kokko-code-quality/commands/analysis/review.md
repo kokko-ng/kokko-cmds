@@ -1,13 +1,14 @@
 ---
 description: Perform a direct, no-nonsense code review with a clear merge verdict.
-argument-hint: [target]
+argument-hint: '[target]'
+arguments: [target]
 allowed-tools: Bash(git:*), Read, Grep, Agent
 model: opus
 ---
 
 # Honest Code Review
 
-Review `$1` (default: uncommitted changes) directly, without diplomatic
+Review `$target` (default: uncommitted changes) directly, without diplomatic
 softening. For large changes, fan out with the Agent tool
 (subagent_type: Explore) per file or module and synthesize results.
 

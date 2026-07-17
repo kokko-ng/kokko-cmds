@@ -1,12 +1,14 @@
 ---
 description: Remove emojis from source files while preserving code functionality.
-argument-hint: [target]
+argument-hint: '[target]'
+arguments: [target]
 allowed-tools: Bash, Grep, Read, Edit
+disable-model-invocation: true
 ---
 
 # Remove Emojis
 
-Remove emojis from `$1` (default: current project root) without changing
+Remove emojis from `$target` (default: current project root) without changing
 behavior.
 
 ## 1. Find

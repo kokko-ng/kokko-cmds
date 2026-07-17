@@ -1,7 +1,8 @@
 ---
 description: Stage, commit (Conventional Commits), and push one logical change.
-argument-hint: [files] [--message "msg"]
-allowed-tools: Bash(git:*), Bash(detect-secrets:*)
+argument-hint: '[files] [--message "msg"]'
+allowed-tools: Bash(git:*), Bash(detect-secrets:*), Bash(pre-commit:*), Bash(uv run pre-commit:*)
+disable-model-invocation: true
 ---
 
 # Commit and Push
@@ -10,15 +11,7 @@ Stage, commit, and push a single logical change. Honor `$ARGUMENTS` as files to 
 
 ## Steps
 
-### 1. Scan for secrets
-
-```bash
-git diff --cached --name-only | xargs detect-secrets scan --list-all-secrets 2>/dev/null
-```
-
-If anything is flagged, remove it (use env vars / secret management). NEVER commit secrets.
-
-### 2. Assess scope and stage
+### 1. Assess scope and stage
 
 ```bash
 git status
@@ -29,7 +22,29 @@ Keep commits small and modular — ONE logical change each. Split unrelated work
 
 Stage only the files for this change. Use `git add -p` for partial staging when a file mixes concerns; avoid `git add .` unless everything belongs together.
 
-### 3. Commit
+### 2. Scan staged files for secrets
+
+```bash
+if command -v detect-secrets >/dev/null 2>&1; then
+  git diff --cached --name-only --diff-filter=d | xargs -r detect-secrets scan --list-all-secrets
+else
+  echo "detect-secrets not installed - review the staged diff manually"
+  git diff --cached
+fi
+```
+
+If anything is flagged, unstage and remove it (use env vars / secret management). NEVER commit secrets. When detect-secrets is unavailable, review the staged diff for keys, tokens, passwords, and connection strings before continuing.
+
+### 3. Run quality checks
+
+If the repo has a `.pre-commit-config.yaml`, run the hooks on the staged files and fix failures before committing:
+
+```bash
+pre-commit run --files $(git diff --cached --name-only --diff-filter=d)
+# uv projects: uv run pre-commit run --files ...
+```
+
+### 4. Commit
 
 Write a Conventional Commits message: `type(scope): subject`
 
@@ -39,7 +54,7 @@ Write a Conventional Commits message: `type(scope): subject`
 
 Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.
 
-### 4. Push
+### 5. Push
 
 ```bash
 git push

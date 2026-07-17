@@ -1,6 +1,6 @@
 ---
 description: Scan production code for mock/stub/dummy data and unconfigured integrations.
-argument-hint: [target]
+argument-hint: '[target]'
 allowed-tools: Grep, Glob, Read, Bash
 ---
 

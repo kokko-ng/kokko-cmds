@@ -1,6 +1,6 @@
 ---
 description: Generate a test specification documenting all testable user stories.
-argument-hint: [target] [--output filename]
+argument-hint: '[target] [--output filename]'
 allowed-tools: Read, Write, Glob, Grep
 ---
 
