@@ -1,6 +1,15 @@
 #!/bin/bash
 # pre-tool-branch-protection.sh - Protect production branches
-# PreToolUse on Bash - Warns on commits/pushes on main, master, production, prod, release
+# PreToolUse on Bash - Warns on pushes/resets/rebases on main, master, production, prod, release
+#
+# NOTE: `git commit` is deliberately NOT prompted for, on a protected branch or
+# anywhere else. It used to be. That was backwards: a local commit is trivially
+# reversible and touches nothing shared, while committing is the single most
+# effective defence against the silent loss of uncommitted work (see
+# git-snapshot.sh). Putting friction on the safe action taught people to avoid
+# it and left the tree dirty for longer -- which is precisely the state in which
+# a later rebase destroys everything. Prompt on what leaves the machine or
+# rewrites history; never on the checkpoint.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/play-sound.sh"
@@ -13,7 +22,7 @@ protected_branches=("main" "master" "production" "prod" "release")
 
 # Check if this is a git command we care about
 # Note: no ^ anchor so we catch git commands anywhere in the string (e.g., "cd /path && git push")
-if ! echo "$command" | grep -qE 'git[[:space:]]+(commit|push|reset|rebase)'; then
+if ! echo "$command" | grep -qE 'git[[:space:]]+(push|reset|rebase)'; then
     exit 0
 fi
 
@@ -67,8 +76,10 @@ for branch in "${protected_branches[@]}"; do
 done
 
 if [ "$is_protected" = true ]; then
-    # Warn about commits, pushes, resets, and rebases on protected branches
-    if echo "$command" | grep -qE 'git[[:space:]]+(commit|push|reset|rebase)'; then
+    # Warn about pushes, resets and rebases on protected branches -- but never
+    # about `git commit`, which is local, reversible, and the thing that keeps
+    # work recoverable in the first place.
+    if echo "$command" | grep -qE 'git[[:space:]]+(push|reset|rebase)'; then
         play_sound "warning"
         cat << EOF
 {
