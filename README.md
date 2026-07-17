@@ -29,11 +29,49 @@ Safety hooks for all sessions.
 
 | Hook | Purpose |
 | ---- | ------- |
+| `git-snapshot` | Checkpoints uncommitted tracked changes to `refs/snapshots/` |
 | `session-start-context` | Detects project type and git status |
 | `pre-tool-cloud-ops` | Prompts before destructive cloud operations |
-| `pre-tool-branch-protection` | Prompts before commits to protected branches |
-| `pre-tool-destructive-git` | Prompts before force push, hard reset |
+| `pre-tool-branch-protection` | Prompts before pushes/resets/rebases on protected branches |
+| `pre-tool-destructive-git` | Blocks git that destroys uncommitted work; prompts on the ambiguous rest |
 | `pre-tool-destructive-bash` | Prompts before rm -rf, mkfs, chmod 777 |
+
+#### Protecting uncommitted work
+
+Uncommitted changes to **tracked** files are the most fragile thing in a repo.
+`rebase`/`reset`/`checkout <ref> -- <path>`/`restore`/`stash` overwrite them with no
+prompt, and they are unrecoverable: work that was never committed was never a git object,
+so there is no reflog entry, no dangling blob, and `git fsck` will not find it.
+
+Two layers:
+
+**`git-snapshot`** checkpoints the tree to `refs/snapshots/<timestamp>` before every git
+command and on every prompt, using `git stash create` — which builds a commit *without*
+touching the tree, index, or stash ref. Once the work is a real git object it survives
+everything. Unlike every other hook here, it does not have to recognise a dangerous
+command first, so it also covers git run from a script or subprocess.
+
+```bash
+git for-each-ref refs/snapshots/     # list
+git stash apply refs/snapshots/<ts>  # restore
+```
+
+**`pre-tool-destructive-git`** denies tree-destroying commands **while the tree is dirty**
+and allows them while it is clean, where the reflog has you covered. It denies `git clean`,
+`git add .`, force-push and anything that eats the reflog regardless of tree state.
+
+Two deliberate choices: **deny rather than ask**, because agents run unattended and a
+confident agent following a workflow that says "now rebase" will answer yes; and
+**dirty-gated rather than blanket**, because a hook that fires on every routine rebase is
+noise, and noise gets switched off — which is exactly what had happened to this plugin.
+
+Override: `CLAUDE_GIT_GUARD=off git rebase ...` (for humans, not agents).
+
+#### Sounds
+
+All hook sounds honour `KOKKO_SOUNDS=off`, and default to unity gain
+(`KOKKO_SOUND_VOLUME`, previously a 10x amplification). Denials are silent — they return a
+written reason instead.
 
 ### kokko-notifications
 

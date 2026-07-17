@@ -7,8 +7,8 @@
     {
       "name": "kokko-safety",
       "source": "./plugins/kokko-safety/",
-      "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context.",
-      "version": "1.5.2",
+      "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context. Snapshots uncommitted work and blocks git that would destroy it.",
+      "version": "1.6.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -62,7 +62,7 @@
       "name": "kokko-notifications",
       "source": "./plugins/kokko-notifications/",
       "description": "Sound notification hooks for Claude Code task completion events.",
-      "version": "1.5.2",
+      "version": "1.5.3",
       "author": {
         "name": "kokko-ng"
       }
