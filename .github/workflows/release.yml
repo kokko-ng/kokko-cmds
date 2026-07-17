@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. v1.6.0); created at the dispatched ref if it does not exist"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,6 +22,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            --title "${GITHUB_REF_NAME}" \
+          TAG="${{ inputs.tag || github.ref_name }}"
+          gh release create "$TAG" \
+            --target "${GITHUB_SHA}" \
+            --title "$TAG" \
             --generate-notes
