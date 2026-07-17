@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run pre-commit on all files
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure
+
+  validate-plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate every plugin manifest
+        run: |
+          status=0
+          for dir in plugins/*/; do
+            echo "::group::claude plugin validate $dir"
+            claude plugin validate "$dir" || status=1
+            echo "::endgroup::"
+          done
+          exit "$status"
+      - name: Check marketplace.json is in sync with plugin manifests
+        run: bash scripts/check-marketplace-sync.sh
