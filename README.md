@@ -19,6 +19,7 @@ Then install the plugins you want:
 /plugin install kokko-viz@kokko-ng-kokko-cmds
 /plugin install kokko-infra@kokko-ng-kokko-cmds
 /plugin install kokko-ai-config@kokko-ng-kokko-cmds
+/plugin install kokko-sandbox@kokko-ng-kokko-cmds
 ```
 
 ## Plugins
@@ -56,7 +57,7 @@ Git workflow commands and the janitor skill.
 | `/compush` | Commit and push in one step |
 | `/prune` | Prune stale local and remote branches |
 | `/release` | Cut a versioned release |
-| `/sync` | Sync fork with upstream |
+| `/sync` | Merge or rebase the latest base branch into the current branch |
 
 | Skill | Purpose |
 | ----- | ------- |
@@ -73,10 +74,10 @@ Code analysis commands and quality skills.
 | `/review` | Code review |
 | `/spec` | Generate specs from code |
 | `/split` | Split large files or modules |
-| `/verify-spec` | Verify code matches spec |
+| `/verify-spec` | Verify the spec matches the codebase |
 | `/check` | Run quality checks |
 | `/deps-update` | Update dependencies |
-| `/verify-no-mocks` | Detect test mocks |
+| `/verify-no-mocks` | Detect mock/stub/dummy data left in production code |
 | `/cruft` | Remove cruft and dead files |
 | `/emojis` | Strip emojis from codebase |
 
@@ -96,9 +97,10 @@ C4 architecture diagram commands.
 | Commands | Purpose |
 | -------- | ------- |
 | `/c4-map` | Generate C4 architecture map |
-| `/c4-templates` | Show C4 diagram templates |
 | `/c4-update` | Update existing C4 diagrams |
 | `/c4-verify` | Verify C4 diagrams against code |
+
+Shared templates live in `commands/references/c4-templates.md` (bundled reference, not a command).
 
 ### kokko-infra
 
@@ -115,10 +117,17 @@ AI/Claude configuration management commands.
 
 | Commands | Purpose |
 | -------- | ------- |
-| `/prune-claude-md` | Remove stale entries from CLAUDE.md |
-| `/prune-readme` | Prune outdated sections from README |
-| `/verify-claude-md` | Verify CLAUDE.md is accurate |
-| `/verify-readme` | Verify README is accurate |
+| `/prune-docs` | Trim CLAUDE.md or README.md to the essentials under a line target |
+| `/verify-docs` | Audit CLAUDE.md or README.md against the codebase and fix inaccuracies |
+
+### kokko-sandbox
+
+Devcontainer-based sandboxing for running Claude Code in an isolated container
+with access only to the current project workspace.
+
+| Skill | Purpose |
+| ----- | ------- |
+| `sandbox` | Set up and run Claude Code inside a devcontainer sandbox |
 
 ## License
 
