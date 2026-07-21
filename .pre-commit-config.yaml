@@ -13,6 +13,7 @@ repos:
     hooks:
       - id: markdownlint
         args: [--fix]
+        exclude: ^plugins/kokko-validation/skills/tailor/references/
 
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.11.0
