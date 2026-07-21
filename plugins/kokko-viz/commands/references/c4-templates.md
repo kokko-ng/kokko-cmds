@@ -299,6 +299,27 @@ Check: Package/module structure under each container
 
 ---
 
+## Source File Links
+
+Every source file, module, or code element mentioned in a generated `.md`
+document MUST be a markdown hyperlink to the actual file it refers to — never
+bare text like `market_research_agent/db.py`. Use repo-relative paths from the
+document's own location, so the links resolve when browsing the repo on
+GitHub:
+
+```markdown
+<!-- from codemap/<system-id>/containers/<container>/component.md -->
+| Component | Source |
+|-----------|--------|
+| Database layer | [`db.py`](../../../../market_research_agent/db.py) |
+```
+
+Compute the relative prefix from the document's depth. Verify every link
+target exists on disk before writing it. To point at a specific line, use an
+absolute GitHub blob URL derived from `git remote get-url origin` and the
+default branch (`https://github.com/<owner>/<repo>/blob/<branch>/<path>#L<n>`)
+— only for line anchors; plain file references stay repo-relative.
+
 ## Navigation Link Patterns
 
 | From Level | Parent Link | Example |

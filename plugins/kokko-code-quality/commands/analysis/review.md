@@ -8,18 +8,12 @@ model: opus
 
 # Honest Code Review
 
-Review `$target` (default: uncommitted changes) directly, without diplomatic
-softening. For large changes, fan out with the Agent tool
-(subagent_type: Explore) per file or module and synthesize results.
-
-## Scope
-
-```bash
-git diff              # uncommitted
-git diff --cached     # staged
-git diff <base>..<head>
-git diff <file>
-```
+Review `$target` (default: the ENTIRE codebase) directly, without diplomatic
+softening. The review covers the whole codebase as it exists on disk — never
+just a diff, a commit, a PR, or a branch. `$target` may narrow the scope to a
+directory or file path, but never to a revision range. For large targets, fan
+out with the Agent tool (subagent_type: Explore) per file or module and
+synthesize results.
 
 ## Evaluate Against
 
@@ -51,4 +45,4 @@ VERDICT: APPROVE | NEEDS CHANGES | REJECT
 State facts, not feelings ("This function is 200 lines", not "feels too long").
 Do not invent issues to look thorough — if the code is genuinely good, say so
 briefly and APPROVE. For specialized domains, note uncertainty and focus on
-quality. For oversized diffs, focus on changed files and suggest a split.
+quality.
