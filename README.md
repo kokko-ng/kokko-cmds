@@ -45,7 +45,8 @@ Sound notifications for task completion events.
 
 | Environment Variable | Default | Purpose |
 | -------------------- | ------- | ------- |
-| `KOKKO_SOUND_VOLUME` | `10.0` | afplay volume (macOS); `1.0` = system default |
+| `KOKKO_SOUND_VOLUME` | `1.0` | afplay gain multiplier (macOS); `1.0` = system default |
+| `KOKKO_SOUNDS` | `on` | Set to `off` to mute all notification sounds |
 
 ### kokko-git
 
