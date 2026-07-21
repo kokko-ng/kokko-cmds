@@ -60,6 +60,15 @@ Git workflow commands. The janitor skill moved to its own repo:
 | `/release` | Cut a versioned release |
 | `/sync` | Merge or rebase the latest base branch into the current branch |
 
+### kokko-validation
+
+Generic master-prompt templates (local validation, deployed validation,
+Azure deployment, aesthetics) and a skill that tailors them to the repo.
+
+| Skill | Purpose |
+| ----- | ------- |
+| `tailor` | Fill a generic template's placeholders from the repo and save it to `prompts/` |
+
 ### kokko-code-quality
 
 Code analysis commands and quality skills.
