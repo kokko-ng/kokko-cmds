@@ -93,10 +93,13 @@ If merge conflicts occur:
 1. **Understand both changes** - Read the conflicting hunks
 2. **Determine intent** - What was each fix trying to accomplish?
 3. **Resolve preserving both** - Usually both fixes are valid
-4. **Complete merge**:
+4. **Complete merge** - stage ONLY the conflicted files, by explicit
+   path. Never `git add .` and never a directory add: untracked files
+   living beside tracked ones get swept in silently.
 
    ```bash
-   git add .
+   git diff --name-only --diff-filter=U   # list conflicted files
+   git add -- <each-conflicted-file>
    git commit -m "chore(quality): resolve merge conflict in <file>"
    ```
 
@@ -140,16 +143,27 @@ npm run build
 dotnet build -warnaserror
 ```
 
+If no `.pre-commit-config.yaml` exists, fall back to running the
+individual quality tools directly (the same ones the check subagents
+used) plus the test suite, and note the substitution in the report.
+
+Running tests may regenerate build artifacts (compiled SQL, dbt
+`target/`, bundler output). If any of those artifacts are TRACKED, the
+tree will be dirty afterward with machine-generated diffs — often
+polluted with ephemeral test values (temp schema names, timestamps).
+Do NOT commit them. Report them to the user and suggest gitignoring
+the artifact directories as the durable fix.
+
 ## Error Recovery
 
 ### Worktree Creation Fails
 
-```bash
-# If dirty working tree
-git stash
-# Create worktrees
-git stash pop
-```
+If the working tree is dirty, STOP and report to the user. Do NOT run
+`git stash`, `git reset`, `git restore`, or `git checkout -- <path>` to
+clear it — uncommitted tracked changes overwritten by those commands are
+unrecoverable, and environments with git safety hooks will block them
+anyway. The user decides whether to commit the work (explicit file
+paths, never `git add .` or a directory add) or abort the run.
 
 ### Subagent Fails
 
@@ -163,12 +177,13 @@ git stash pop
 # Abort merge
 git merge --abort
 
-# Try rebasing instead
-git rebase janitor/py-security
-
-# Or cherry-pick specific commits
+# Cherry-pick specific commits instead
 git cherry-pick <commit-sha>
 ```
+
+Do NOT fall back to `git rebase` — it rewrites history and destroys
+uncommitted tracked changes without prompting. If cherry-picking also
+fails, stop and report the state to the user.
 
 ## Optimization Tips
 
