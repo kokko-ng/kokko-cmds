@@ -58,7 +58,9 @@ Search: read .puml relationships, Grep imports, verify file paths exist.
 
 **3. Hierarchy** (`score: X/5`): Each level has .puml + .md; no orphans/empty
 containers; diagram elements match folders; navigation links resolve; folder
-names match diagram IDs.
+names match diagram IDs; every source file or code element named in a `.md`
+is a hyperlink to the actual file that resolves on GitHub (per
+`c4-templates.md#source-file-links`) — bare-text file references are issues.
 
 **4. Diagram Quality** (`score: X/5`): Valid `@startuml/@enduml`; correct C4
 include per level; correct macros per level (see c4-templates.md); not
@@ -177,14 +179,12 @@ find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" \
   -exec plantuml -DRELATIVE_INCLUDE="." -tpng {} \;
 ```
 
-**6B. Write `codemap/VERIFICATION.md`:**
+**6B. Report the results IN YOUR REPLY — do NOT write a verification
+document.** Never create `VERIFICATION.md`, a report file, or any other
+validation artifact in the repo. Deliver the summary as a message:
 
 ```markdown
-# C4 Verification Report
-
-<!-- Verified: YYYY-MM-DD -->
-
-## Summary
+## C4 Verification
 
 | Metric | Value |
 | ------ | ----- |
@@ -195,14 +195,12 @@ find codemap -name "*.puml" ! -path "*/\.c4-plantuml/*" \
 | Image Pairing | X missing, Y stale |
 | Issues Found / Fixed | N / M |
 
-## Corrections Applied
-[List by phase]
-
-## Remaining Issues
-[List any unfixed issues]
+Corrections applied: [list by phase]
+Remaining issues: [list any unfixed]
 ```
 
-**6C.** Update `codemap/README.md` with the verification timestamp.
+**6C.** Update `codemap/README.md` with the verification timestamp (this is
+the only file 6B–6C may touch).
 
 ---
 
