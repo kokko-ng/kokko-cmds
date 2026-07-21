@@ -1,6 +1,6 @@
 {
   "name": "kokko-sandbox",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Devcontainer-based sandboxing skill for running Claude Code in an isolated container with access only to the current project workspace.",
   "author": {
     "name": "kokko-ng"
