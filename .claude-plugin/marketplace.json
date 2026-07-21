@@ -8,7 +8,7 @@
       "name": "kokko-safety",
       "source": "./plugins/kokko-safety/",
       "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -17,7 +17,7 @@
       "name": "kokko-git",
       "source": "./plugins/kokko-git/",
       "description": "Git workflow commands for commit+push, branch pruning, releases, and syncing.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -26,7 +26,7 @@
       "name": "kokko-code-quality",
       "source": "./plugins/kokko-code-quality/",
       "description": "Code quality commands and skills covering analysis, technical debt, performance review, type checking, dead code detection, security scanning, documentation coverage, complexity analysis, and architecture enforcement.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -35,7 +35,7 @@
       "name": "kokko-viz",
       "source": "./plugins/kokko-viz/",
       "description": "C4 architecture visualization commands for generating, updating, and verifying C4 model diagrams.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -44,7 +44,7 @@
       "name": "kokko-infra",
       "source": "./plugins/kokko-infra/",
       "description": "Azure infrastructure commands for checking resource costs and service status.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -53,7 +53,7 @@
       "name": "kokko-ai-config",
       "source": "./plugins/kokko-ai-config/",
       "description": "AI configuration management commands for pruning and verifying CLAUDE.md and README files.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -62,7 +62,7 @@
       "name": "kokko-notifications",
       "source": "./plugins/kokko-notifications/",
       "description": "Sound notification hooks for Claude Code task completion events.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }
@@ -71,7 +71,16 @@
       "name": "kokko-sandbox",
       "source": "./plugins/kokko-sandbox/",
       "description": "Devcontainer-based sandboxing skill for running Claude Code in an isolated container with access only to the current project workspace.",
-      "version": "2.0.0",
+      "version": "2.1.0",
+      "author": {
+        "name": "kokko-ng"
+      }
+    },
+    {
+      "name": "kokko-validation",
+      "source": "./plugins/kokko-validation/",
+      "description": "Generic validation and deployment master-prompt templates plus a tailor skill that instantiates them for the current repo.",
+      "version": "2.1.0",
       "author": {
         "name": "kokko-ng"
       }

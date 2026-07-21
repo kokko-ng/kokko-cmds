@@ -1,6 +1,6 @@
 {
   "name": "kokko-viz",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "C4 architecture visualization commands for generating, updating, and verifying C4 model diagrams.",
   "author": {
     "name": "kokko-ng"
