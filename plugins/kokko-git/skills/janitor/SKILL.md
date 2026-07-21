@@ -32,7 +32,9 @@ Read `references/worktree-workflow.md` for detailed orchestration steps.
 
 ### 1. Preparation
 
-1. Verify clean working tree (`git status`)
+1. Verify clean working tree (`git status`). If the tree is dirty,
+   STOP and report — never `git stash`, `git reset`, or `git restore`
+   to clear it; uncommitted work destroyed that way is unrecoverable
 2. Detect languages present in codebase
 3. Create worktree base directory: `WORKTREE_BASE=$(mktemp -d)`
 
@@ -59,7 +61,8 @@ Each subagent:
 1. Navigates to its worktree
 2. Runs `/<check> <lang>`
 3. Fixes ALL issues found (not just reports)
-4. Groups fixes into small, logical commits
+4. Groups fixes into small, logical commits, staging explicit file
+   paths only (never `git add .` or a directory add)
 5. Uses commit format: `fix(<check>): <description>`
 
 ### 4. Monitor Completion
