@@ -207,6 +207,11 @@ Parameters:
 4. **Update README:** Update `codemap/README.md` with timestamp and change
    summary.
 
+5. **Source links:** any `.md` touched must hyperlink every source file or
+   code element it names to the actual file, per
+   `c4-templates.md#source-file-links` (repo-relative, resolves on GitHub).
+   Fix bare-text file references in the sections you touch.
+
 ---
 
 ## Output Summary

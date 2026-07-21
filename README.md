@@ -19,7 +19,6 @@ Then install the plugins you want:
 /plugin install kokko-viz@kokko-ng-kokko-cmds
 /plugin install kokko-infra@kokko-ng-kokko-cmds
 /plugin install kokko-ai-config@kokko-ng-kokko-cmds
-/plugin install kokko-sandbox@kokko-ng-kokko-cmds
 ```
 
 ## Plugins
@@ -125,16 +124,3 @@ AI/Claude configuration management commands.
 | -------- | ------- |
 | `/prune-docs` | Trim CLAUDE.md or README.md to the essentials under a line target |
 | `/verify-docs` | Audit CLAUDE.md or README.md against the codebase and fix inaccuracies |
-
-### kokko-sandbox
-
-Devcontainer-based sandboxing for running Claude Code in an isolated container
-with access only to the current project workspace.
-
-| Skill | Purpose |
-| ----- | ------- |
-| `sandbox` | Set up and run Claude Code inside a devcontainer sandbox |
-
-## License
-
-MIT
