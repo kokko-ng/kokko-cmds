@@ -50,7 +50,8 @@ Sound notifications for task completion events.
 
 ### kokko-git
 
-Git workflow commands and the janitor skill.
+Git workflow commands. The janitor skill moved to its own repo:
+[kokko-ng/kokko-janitor](https://github.com/kokko-ng/kokko-janitor).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -58,10 +59,6 @@ Git workflow commands and the janitor skill.
 | `/prune` | Prune stale local and remote branches |
 | `/release` | Cut a versioned release |
 | `/sync` | Merge or rebase the latest base branch into the current branch |
-
-| Skill | Purpose |
-| ----- | ------- |
-| `janitor` | Worktree-based code cleanup workflows |
 
 ### kokko-code-quality
 
