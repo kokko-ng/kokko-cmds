@@ -1,6 +1,6 @@
 {
   "name": "kokko-code-quality",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Code quality commands and skills covering analysis, technical debt, performance review, type checking, dead code detection, security scanning, documentation coverage, complexity analysis, and architecture enforcement.",
   "author": {
     "name": "kokko-ng"

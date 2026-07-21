@@ -168,6 +168,11 @@ If validation fails with errors, report to user before proceeding.
 
 Using `FINAL_STRUCTURE` from Phase 4.
 
+**Source links are mandatory:** every source file, module, or code element
+named in any generated `.md` must be a markdown hyperlink to the actual file,
+per `c4-templates.md#source-file-links` — repo-relative so it resolves on
+GitHub. Verify each link target exists before writing it.
+
 ### Step 0: Download C4-PlantUML Library
 
 ```bash
