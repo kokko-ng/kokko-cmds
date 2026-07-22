@@ -15,6 +15,7 @@ Then install the plugins you want:
 /plugin install kokko-safety@kokko-ng-kokko-cmds
 /plugin install kokko-notifications@kokko-ng-kokko-cmds
 /plugin install kokko-git@kokko-ng-kokko-cmds
+/plugin install kokko-validation@kokko-ng-kokko-cmds
 /plugin install kokko-code-quality@kokko-ng-kokko-cmds
 /plugin install kokko-viz@kokko-ng-kokko-cmds
 /plugin install kokko-infra@kokko-ng-kokko-cmds
