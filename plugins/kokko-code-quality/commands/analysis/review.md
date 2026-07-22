@@ -1,9 +1,7 @@
 ---
 description: Perform a direct, no-nonsense code review with a clear merge verdict.
 argument-hint: '[target]'
-arguments: [target]
 allowed-tools: Bash(git:*), Read, Grep, Agent
-model: opus
 ---
 
 # Honest Code Review

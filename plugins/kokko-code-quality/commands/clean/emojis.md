@@ -1,7 +1,6 @@
 ---
 description: Remove emojis from source files while preserving code functionality.
 argument-hint: '[target]'
-arguments: [target]
 allowed-tools: Bash, Grep, Read, Edit
 disable-model-invocation: true
 ---
