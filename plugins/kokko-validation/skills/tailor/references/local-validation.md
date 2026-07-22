@@ -1,119 +1,129 @@
+<!--
+TAILORING NOTES (for the /tailor skill -- delete this entire comment in the tailored output)
+
+Placeholders. Every {{...}} must be resolved. Sources, in order: user hints,
+repo inspection, read-only `az cli`, then ask the user. Never invent values.
+
+  APP_NAME                    Application name
+  PROGRESS_FILE               Progress checklist path, e.g. prompts/local-validation-progress.md
+  BROWSER_TOOL                Browser automation tool actually available (e.g. playwright-cli, Playwright MCP)
+  BACKEND_DIR / FRONTEND_DIR  Repo-relative app directories (e.g. backend, frontend)
+  BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
+  BACKEND_START_COMMAND / FRONTEND_START_COMMAND
+  BACKEND_URL / FRONTEND_URL  Local URLs including ports
+  BACKEND_INSTALL_COMMANDS / FRONTEND_INSTALL_COMMANDS
+  LOCAL_DB_TYPE / LOCAL_DB_DETAILS
+  LOCAL_STORAGE_PATH          Local file-storage root (drop storage rows if the app stores no files)
+  LOCAL_AUTH_DESCRIPTION      How local auth works: mechanism, token type, seeded users
+  HEALTH_ENDPOINT             Unauthenticated health route, e.g. /api/health
+  API_ENDPOINTS_TABLE         Real endpoint rows: | METHOD | path | auth? | purpose |
+  TYPE_CHECK_COMMAND          Command(s) that must pass with zero errors
+  ADDITIONAL_ENV_VARS         Other required backend env vars (drop the line if none)
+  azure-ai block only:        RESOURCE_GROUP, AZURE_REGION, AI_ACCOUNT_NAME,
+                              DEPLOYMENT_NAME, MODEL_NAME, TPM, API_ENDPOINT_BASE
+
+Optional blocks. Delete the whole block -- plus every line elsewhere that
+starts with the block name in brackets, e.g. "[azure-ai]" -- when it does not
+apply. Strip the bracket tags from lines you keep.
+
+  azure-ai      App calls a pre-provisioned Azure AI model. Delete if there is no AI integration.
+  websocket     App uses WebSockets.
+  registration  App has self-service user registration.
+  theming       App has more than one theme.
+
+No {{...}} token, no [tag] marker, and none of these notes may remain in the
+tailored output.
+-->
 
 # {{APP_NAME}} -- Local Validation & Testing Prompt
 
 ## Core Definitions
 
+| ID             | Value                                        |
+| -------------- | -------------------------------------------- |
+| `user_stories` | All User Stories in `spec.md`                |
+| `backend`      | {{BACKEND_FRAMEWORK}} on `{{BACKEND_URL}}`   |
+| `frontend`     | {{FRONTEND_FRAMEWORK}} on `{{FRONTEND_URL}}` |
+| `database`     | {{LOCAL_DB_TYPE}} (local)                    |
+| `storage`      | Local filesystem (`{{LOCAL_STORAGE_PATH}}`)  |
+| `browser_tool` | {{BROWSER_TOOL}}                             |
+| `progress`     | `{{PROGRESS_FILE}}`                          |
+
+<!-- OPTIONAL: azure-ai -->
+
 | ID               | Value                                                                                              |
 | ---------------- | -------------------------------------------------------------------------------------------------- |
-| `user_stories`   | All User Stories in `spec.md`                                                                      |
-| `resource_group` | `{{RESOURCE_GROUP}}` (East US 2) -- **already provisioned**                                        |
+| `resource_group` | `{{RESOURCE_GROUP}}` ({{AZURE_REGION}}) -- **already provisioned**                                 |
 | `ai_account`     | `{{AI_ACCOUNT_NAME}}` -- Azure AI Services account -- **already provisioned**                      |
 | `deployment`     | `{{DEPLOYMENT_NAME}}` (model: {{MODEL_NAME}}, {{TPM}} TPM, GlobalStandard) -- **already deployed** |
-| `model`          | `{{MODEL_NAME}}` via Azure AI Services                                                             |
-| `api_endpoint`   | `{{API_ENDPOINT}}`                                                                                 |
-| `database`       | {{LOCAL_DB_TYPE}} (local)                                                                          |
-| `backend`        | {{BACKEND_FRAMEWORK}} on `{{BACKEND_URL}}`                                                         |
-| `frontend`       | {{FRONTEND_FRAMEWORK}} on `{{FRONTEND_URL}}`                                                       |
-| `storage`        | Local filesystem (`{{LOCAL_STORAGE_PATH}}`)                                                        |
+| `api_endpoint`   | `{{API_ENDPOINT_BASE}}`                                                                            |
+
+<!-- END OPTIONAL: azure-ai -->
 
 ---
 
 ## Primary Goal
 
-Work autonomously to validate the application end-to-end per all features and requirements in `spec.md`. The application runs **locally** -- {{BACKEND_FRAMEWORK}} backend + {{FRONTEND_FRAMEWORK}} frontend -- with `{{MODEL_NAME}}` accessed via a **pre-provisioned** Azure AI Services endpoint in the `{{RESOURCE_GROUP}}` resource group. Resolve all remaining issues and validate until fully functional.
+Work autonomously to validate the application end-to-end against every feature
+and requirement in `spec.md`, running entirely locally ({{BACKEND_FRAMEWORK}}
+backend + {{FRONTEND_FRAMEWORK}} frontend). Implement what is missing, fix what
+is broken, and re-validate until everything passes.
 
-**YOU CANNOT STOP UNTIL EVERYTHING IN `spec.md` IS IMPLEMENTED AND VALIDATED.**
+`spec.md` is the authoritative source of scope. If a requirement is ambiguous,
+refine it to be explicit and testable while preserving its intent.
 
----
-
-## Azure Resources -- Pre-Provisioned
-
-**Principle:** The `{{RESOURCE_GROUP}}` resource group and all required Azure AI resources are **already provisioned**. Do NOT re-create them. Verify connectivity and use as-is.
-
-### Provisioned Resources
-
-| Resource           | Name                       | Details                                            |
-| ------------------ | -------------------------- | -------------------------------------------------- |
-| Resource Group     | `{{RESOURCE_GROUP}}`       | East US 2                                          |
-| Azure AI Services  | `{{AI_ACCOUNT_NAME}}`      | Azure AI Services                                  |
-| Model Deployment   | `{{DEPLOYMENT_NAME}}`      | {{MODEL_NAME}}, {{TPM}} TPM, GlobalStandard        |
-| Endpoint           | `{{API_ENDPOINT_BASE}}`    | OpenAI-compatible                                  |
-
-### Credential Storage
-
-Credentials are stored in `backend/.env` (gitignored). The backend config loads `.env` automatically.
-
-```
-# backend/.env (gitignored -- already exists at backend root)
-AZURE_OPENAI_ENDPOINT={{API_ENDPOINT_BASE}}
-AZURE_OPENAI_API_KEY=<key>
-AZURE_OPENAI_DEPLOYMENT={{DEPLOYMENT_NAME}}
-```
-
-### Verification Commands
-
-If you need to verify the deployment is healthy:
-
-```bash
-az cognitiveservices account deployment show \
-  --deployment-name {{DEPLOYMENT_NAME}} \
-  -n {{AI_ACCOUNT_NAME}} \
-  -g {{RESOURCE_GROUP}} \
-| jq -r '.properties.provisioningState'
-# Expected: "Succeeded"
-```
-
-If you need to retrieve the API key (e.g., `.env` is missing):
-
-```bash
-az cognitiveservices account keys list \
-  -n {{AI_ACCOUNT_NAME}} \
-  -g {{RESOURCE_GROUP}} \
-| jq -r '.key1'
-```
-
-### Resource Group Constraint -- ABSOLUTE
-
-- You are **STRICTLY RESTRICTED** to the resource group `{{RESOURCE_GROUP}}`. **NO OTHER RESOURCE GROUP MAY BE USED, REFERENCED, OR CREATED UNDER ANY CIRCUMSTANCES.**
-- Every Azure resource you interact with MUST be inside `{{RESOURCE_GROUP}}`.
-- If you discover resources in other resource groups, IGNORE THEM -- they are out of scope.
-- All `az cli` commands MUST target `--resource-group {{RESOURCE_GROUP}}` or `-g {{RESOURCE_GROUP}}` explicitly.
-
-### CLI Restrictions -- MANDATORY
-
-- You MAY use `az cli` for inspection and read-only operations within `{{RESOURCE_GROUP}}`.
-- **NEVER** create, use, or reference any resource group other than `{{RESOURCE_GROUP}}`.
-- **NEVER** deploy application code to Azure -- the app runs locally only.
-- **NEVER** delete the resource group, AI account, or model deployment.
-
-### Troubleshooting
-
-- **401/403 on API call:** Verify the API key in `backend/.env` matches `az cognitiveservices account keys list`. Use the `api-key` header.
-- **Deployment shows non-`Succeeded` state:** Check provisioning status and wait. Do NOT delete and recreate.
-- **`.env` missing:** Recreate it using the verification commands above to retrieve endpoint and key.
+Completion is defined solely by the checklist in the "Completion, Blockers &
+Stopping" section at the end of this prompt -- nothing else.
 
 ---
 
-## Application Architecture -- Local Development
+## Progress Tracking -- Read First, Update Always
+
+`{{PROGRESS_FILE}}` is the single source of truth for progress. Conversation
+memory does not survive context compaction or fresh-context passes
+(multipass); this file does.
+
+- **On start:** if the file exists, read it and resume from the first item not
+  marked `passed`. If it does not exist, create it with one line per user
+  story in `spec.md` (plus a few setup lines), all `pending`.
+- **Line format:** `US-003 | pending / in-progress / passed / blocked | short note`
+  -- for `blocked`, the note states exactly what is missing and what was tried.
+- **Update immediately** whenever an item changes state -- never in batches,
+  never only at the end.
+- Append one line to a `## Session log` section at the bottom of the file at
+  the start of each pass.
+
+---
+
+## Architecture & Environment
 
 ### Local Stack
 
-- **Backend:** {{BACKEND_FRAMEWORK}} running locally via `{{BACKEND_START_COMMAND}}` on `{{BACKEND_URL}}`
-- **Frontend:** {{FRONTEND_FRAMEWORK}} dev server via `{{FRONTEND_START_COMMAND}}` on `{{FRONTEND_URL}}`
-- **Database:** {{LOCAL_DB_TYPE}} -- {{LOCAL_DB_DETAILS}}
-- **Storage:** Local filesystem -- `{{LOCAL_STORAGE_PATH}}`
-- **AI Model:** `{{MODEL_NAME}}` via Azure AI Services endpoint in `{{RESOURCE_GROUP}}` RG
-- **Proxy:** Dev server proxies `/api` requests to backend
+| Component           | Details                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| Backend             | {{BACKEND_FRAMEWORK}} in `{{BACKEND_DIR}}/` -- `{{BACKEND_START_COMMAND}}` -- `{{BACKEND_URL}}`        |
+| Frontend            | {{FRONTEND_FRAMEWORK}} in `{{FRONTEND_DIR}}/` -- `{{FRONTEND_START_COMMAND}}` -- `{{FRONTEND_URL}}`    |
+| Database            | {{LOCAL_DB_TYPE}} -- {{LOCAL_DB_DETAILS}}                                                              |
+| File storage        | Local filesystem -- `{{LOCAL_STORAGE_PATH}}`                                                           |
+| Dev proxy           | Frontend dev server proxies `/api` requests to the backend                                             |
+| [azure-ai] AI model | `{{MODEL_NAME}}` via Azure AI Services in `{{RESOURCE_GROUP}}` ({{AZURE_REGION}})                      |
 
-### Architecture Summary
+Both servers auto-reload on code changes; restart them only when a change
+requires it (new dependency, config change).
 
-| Component         | Location | Details                                                                            |
-| ----------------- | -------- | ---------------------------------------------------------------------------------- |
-| Backend           | Local    | `{{BACKEND_URL}}` -- {{BACKEND_START_COMMAND}}                                     |
-| Frontend          | Local    | `{{FRONTEND_URL}}` -- {{FRONTEND_START_COMMAND}}                                   |
-| Database          | Local    | {{LOCAL_DB_DETAILS}}                                                               |
-| File storage      | Local    | `{{LOCAL_STORAGE_PATH}}`                                                           |
-| AI Model          | Azure    | `{{RESOURCE_GROUP}}` RG, East US 2                                                 |
+### Dependencies
+
+Backend:
+
+```bash
+{{BACKEND_INSTALL_COMMANDS}}
+```
+
+Frontend:
+
+```bash
+{{FRONTEND_INSTALL_COMMANDS}}
+```
 
 ### Authentication
 
@@ -121,43 +131,25 @@ az cognitiveservices account keys list \
 
 ### Backend API Endpoints
 
-| Method | Endpoint                         | Auth Required | Purpose                                |
-| ------ | -------------------------------- | ------------- | -------------------------------------- |
-| GET    | `/api/health`                    | No            | Health check                           |
+| Method | Endpoint              | Auth Required | Purpose      |
+| ------ | --------------------- | ------------- | ------------ |
+| GET    | `{{HEALTH_ENDPOINT}}` | No            | Health check |
 {{API_ENDPOINTS_TABLE}}
 
----
+### Environment Variables
 
-## Environment Configuration
+`{{BACKEND_DIR}}/.env` (gitignored -- never commit it, never print its values
+into logs or files):
 
-### Dependencies
-
-**Backend:**
-
-```bash
-{{BACKEND_INSTALL_COMMANDS}}
-```
-
-**Frontend:**
-
-```bash
-{{FRONTEND_INSTALL_COMMANDS}}
-```
-
-### Backend `.env`
-
-`backend/.env` (gitignored, already exists):
-
-```
-AZURE_OPENAI_ENDPOINT={{API_ENDPOINT_BASE}}
-AZURE_OPENAI_API_KEY=<key>
-AZURE_OPENAI_DEPLOYMENT={{DEPLOYMENT_NAME}}
+```text
 {{ADDITIONAL_ENV_VARS}}
 ```
 
+[azure-ai] Plus the Azure AI variables listed in the Azure AI section below.
+
 ### Type Checking
 
-Both backend and frontend MUST pass type checking with zero errors:
+Backend and frontend MUST pass type checking with zero errors:
 
 ```bash
 {{TYPE_CHECK_COMMAND}}
@@ -165,228 +157,147 @@ Both backend and frontend MUST pass type checking with zero errors:
 
 ---
 
-## Autonomous Work Expectations -- CRITICAL
+<!-- OPTIONAL: azure-ai -->
 
-### Context Window Management
+## Azure AI -- Pre-Provisioned, Read-Only
 
-Your context window will be automatically compacted as it approaches its limit, allowing you to continue working indefinitely from where you left off.
+The `{{RESOURCE_GROUP}}` resource group ({{AZURE_REGION}}) and the Azure AI
+resources in it are **already provisioned**. Verify connectivity and use them
+as-is -- never create, recreate, or delete them.
 
-### Completion Mandate -- ABSOLUTE
+| Resource          | Name                  | Details                                            |
+| ----------------- | --------------------- | -------------------------------------------------- |
+| Resource group    | `{{RESOURCE_GROUP}}`  | {{AZURE_REGION}}                                   |
+| Azure AI Services | `{{AI_ACCOUNT_NAME}}` | OpenAI-compatible endpoint `{{API_ENDPOINT_BASE}}` |
+| Model deployment  | `{{DEPLOYMENT_NAME}}` | {{MODEL_NAME}}, {{TPM}} TPM, GlobalStandard        |
 
-- **YOU CANNOT STOP** until EVERYTHING in `spec.md` is implemented and validated.
-- **DO NOT** stop early -- work until EVERYTHING is FLESHED OUT COMPLETELY.
-- Do NOT stop tasks due to token budget concerns.
-- Complete tasks FULLY, even if end of budget is approaching.
-- NEVER artificially stop any task early regardless of context remaining.
+Credentials live in `{{BACKEND_DIR}}/.env`, loaded automatically by the
+backend config:
 
-### Work Cycle
+```text
+AZURE_OPENAI_ENDPOINT={{API_ENDPOINT_BASE}}
+AZURE_OPENAI_API_KEY=<key>
+AZURE_OPENAI_DEPLOYMENT={{DEPLOYMENT_NAME}}
+```
 
-For EACH and EVERY feature in `spec.md`:
+Verify deployment health, or retrieve the key if `.env` is missing:
 
-1. Validate against the LOCAL application using playwright-cli.
-2. Debug any issues found.
-3. Code and implement fixes/features as needed.
-4. Restart the local servers if code changes require it.
-5. Re-validate until feature is fully functional.
-6. Move to next feature -- repeat until ALL features complete.
+```bash
+az cognitiveservices account deployment show \
+  --deployment-name {{DEPLOYMENT_NAME}} -n {{AI_ACCOUNT_NAME}} -g {{RESOURCE_GROUP}} \
+  | jq -r '.properties.provisioningState'   # expected: "Succeeded"
 
-### Expectation
+az cognitiveservices account keys list -n {{AI_ACCOUNT_NAME}} -g {{RESOURCE_GROUP}} | jq -r '.key1'
+```
 
-CONTINUE and DO NOT STOP until the entire local app is validated end-to-end. You are expected to work autonomously for a VERY LONG PERIOD OF TIME to complete this task.
+Rules:
 
-The work is NOT complete until EVERY feature in `spec.md` is:
+- `az cli` is for inspection and read-only operations in `{{RESOURCE_GROUP}}`
+  ONLY. Every command targets `-g {{RESOURCE_GROUP}}` explicitly; no other
+  resource group may be used, referenced, or created; never deploy application
+  code to Azure -- the app runs locally.
+- Key material goes into `{{BACKEND_DIR}}/.env` only -- never into logs,
+  commits, or any other file.
 
-- Fully implemented in the local application
-- Thoroughly validated with playwright-cli against local URLs
-- Debugged and working correctly
-- Integrated and stable
+Troubleshooting: on 401/403, re-check the key in `.env` against
+`az cognitiveservices account keys list` (send it in the `api-key` header).
+On a non-`Succeeded` deployment state, wait and re-check -- do not recreate.
 
-### Planning Approach
-
-Be ambitious with task lists and planning -- context management allows for extensive work sessions. Break down ALL features comprehensively and work through EVERY SINGLE ONE without stopping.
+<!-- END OPTIONAL: azure-ai -->
 
 ---
 
-## Development Workflow
+## Workflow
 
-### Initial Setup
+### Setup (once per session)
 
-1. Verify `backend/.env` exists with Azure AI credentials. If missing, retrieve the API key using `az cognitiveservices account keys list -n {{AI_ACCOUNT_NAME}} -g {{RESOURCE_GROUP}}`.
-2. Install backend dependencies.
-3. Install frontend dependencies.
-4. Start the backend server.
-5. Start the frontend dev server.
-6. Verify both servers are running and the frontend can reach the backend API via `{{FRONTEND_URL}}/api/health`.
-7. Verify authentication works (register, login, access protected routes).
-8. Verify Azure AI connectivity by testing the AI integration.
-9. Begin systematic validation of features.
+1. Install backend and frontend dependencies.
+2. [azure-ai] Verify `{{BACKEND_DIR}}/.env` has the Azure AI credentials
+   (retrieve them per the Azure AI section if missing).
+3. Start the backend, then the frontend dev server.
+4. Confirm `{{FRONTEND_URL}}` loads and `{{FRONTEND_URL}}{{HEALTH_ENDPOINT}}`
+   reaches the backend through the dev proxy.
+5. Log in once to confirm auth works.
+6. [azure-ai] Exercise one AI feature to confirm model connectivity.
+7. Read or create `{{PROGRESS_FILE}}`, then start the work cycle.
 
-### Code Changes
+### Work Cycle (per user story)
 
-**Trigger:** After ANY code modification.
-
-1. Save changes -- backend auto-reloads; frontend hot-reloads.
-2. Re-test affected functionality against local application.
-3. Proceed only after verifying stability locally.
-4. Ensure type checking still passes after changes.
+1. Mark the story `in-progress` in `{{PROGRESS_FILE}}`.
+2. Validate it against the local app with {{BROWSER_TOOL}}.
+3. If it fails: debug, fix the code, let the servers reload, re-validate.
+4. When it fully passes -- UI, API, persistence, error handling, edge cases --
+   run `{{TYPE_CHECK_COMMAND}}`, then mark it `passed` with a short note.
+5. Move to the next story. Repeat until every story is `passed` or `blocked`.
 
 ### Debugging
 
-- **On failure:** Debug --> Fix --> Verify locally --> Confirm resolution
-- **Backend errors:** Check backend server logs in terminal.
-- **Frontend errors:** Check browser console and dev server output.
-- **AI errors:** Verify `backend/.env` credentials; check Azure AI endpoint health via `az cognitiveservices account deployment show`.
-- **Persistence:** Continue debugging and fixing until issue is COMPLETELY resolved.
+- Backend errors: backend terminal logs. Frontend errors: browser console and
+  dev-server output.
+- [azure-ai] AI errors: check `.env` credentials first, then deployment health
+  via `az cognitiveservices account deployment show`.
+- **Stuck rule:** after 3 failed fix attempts on the same issue, record what
+  you tried in `{{PROGRESS_FILE}}`, mark the item `blocked`, move on to the
+  next story, and revisit blocked items at the end.
 
 ---
 
-## Validation & Testing
+## Validation Standards
 
-### Scope
+Validate with {{BROWSER_TOOL}} against `{{FRONTEND_URL}}` -- real browser
+flows, not just curl.
 
-- **Source:** ALL features and requirements in `spec.md` -- EVERY SINGLE ONE must be validated
-- **Target:** LOCAL application (backend `{{BACKEND_URL}}`, frontend `{{FRONTEND_URL}}`)
-- **Aspects:** Functional correctness, authentication flows, data persistence, AI model integration, file handling, UI responsiveness
+Authentication:
 
-### Feature-Specific Validation
+- Valid credentials log in; invalid credentials are rejected with a visible error
+- Protected endpoints reject unauthenticated requests and succeed when authenticated
+- Logout clears auth state and returns to the login page
+- [registration] Registration creates an account that can immediately log in
 
-#### Authentication
+Every feature (per `spec.md`):
 
-- Verify login with valid credentials succeeds
-- Verify login with invalid credentials is rejected
-- Verify protected endpoints reject unauthenticated requests
-- Verify authenticated requests succeed
-- Verify logout clears auth state
+- The UI renders correctly
+- The backend API responds correctly
+- Data persists across reloads
+- Errors are handled appropriately
+- Edge cases behave sensibly
 
-#### Application Features -- per spec.md
+UI & responsiveness:
 
-Validate every feature defined in `spec.md` systematically. For each feature:
-
-- Verify the UI renders correctly
-- Verify the backend API responds correctly
-- Verify data persistence works
-- Verify error handling is appropriate
-- Verify edge cases are handled
-
-#### UI & Responsiveness
-
-- Navigation and layout render correctly
-- Interactive elements respond appropriately
-- Dark theme renders correctly (no white flashes, proper contrast) (if applicable)
-- Responsive: layout adapts to mobile viewports
-- Sign out clears auth state and redirects to login
-
-### Method
-
-**Tool:** playwright-cli against local application
-
-**Workflow:**
-
-1. Start local backend and frontend servers.
-2. Use playwright-cli to test each feature against `{{FRONTEND_URL}}`.
-3. If issues found: debug, fix code, servers auto-reload, re-validate.
-4. Repeat until feature is FULLY functional.
-5. Move to next feature.
-
-### Completion Criteria
-
-Work is **NOT** complete until:
-
-- Every feature in `spec.md` is implemented in the local app
-- Every feature passes playwright-cli validation against local URLs
-- Authentication protects all sensitive endpoints
-- AI model integration works end-to-end
-- Data persistence works correctly
-- UI renders properly on both large and small screens
-- Type checking passes with zero errors
-- No bugs or blockers remain
-- All flows work end-to-end locally
+- Navigation and layout render correctly; interactive elements respond
+- Layout adapts to mobile (375px) and desktop (1280px) viewports
+- [theming] Each theme renders without bleed from another theme (no hard-coded
+  colors, no white flashes on dark theme)
+- [websocket] WebSocket features connect and stream correctly
 
 ---
 
-## Specifications Compliance
+## Completion, Blockers & Stopping
 
-**Source:** `spec.md` is the authoritative source -- ALL items must be completed.
+**Definition of done -- every box checked:**
 
-**Refinement Guideline:** If specifications are unclear, refine them to be:
+- [ ] Every user story in `spec.md` is implemented and marked `passed` in
+      `{{PROGRESS_FILE}}` after {{BROWSER_TOOL}} validation
+- [ ] Authentication protects all sensitive endpoints
+- [ ] Data persistence and file handling work correctly
+- [ ] [azure-ai] AI integration works end-to-end through the app
+- [ ] UI renders properly at desktop and mobile widths
+- [ ] [theming] Every theme renders correctly at both widths
+- [ ] `{{TYPE_CHECK_COMMAND}}` passes with zero errors
+- [ ] `{{PROGRESS_FILE}}` is up to date with no `pending` or `in-progress` items
 
-- Explicit and structured
-- Consistent and agent-friendly
-- While preserving original intent
+Work autonomously and persistently toward this checklist. Do not stop because
+the task list is large or context is running low -- context is compacted
+automatically, and `{{PROGRESS_FILE}}` carries state across passes.
 
----
+**The only valid reasons to mark an item `blocked` instead of finishing it:**
 
-## Execution Plan
+- Credentials, permissions, or external resources you cannot obtain or create
+- A decision that belongs to a human: spending money, deleting data, changing scope
+- A contradiction in `spec.md` that cannot be resolved conservatively
+- The stuck rule (3 failed fix attempts) fired
 
-### Initial Steps
-
-1. Verify `backend/.env` exists with Azure credentials (retrieve key via `az cli` if missing).
-2. Verify local development environment setup.
-3. Install backend and frontend dependencies.
-4. Start backend and frontend servers.
-5. Verify application loads in browser at `{{FRONTEND_URL}}`.
-6. Verify authentication flow works.
-7. Test Azure AI connectivity through the application.
-8. Begin systematic validation of all features.
-
-### Approach
-
-Decompose ALL features in `spec.md` into a comprehensive, ambitious task list. Work through EVERY SINGLE task without stopping until complete. Context management supports extensive planning -- be thorough and complete.
-
-### Priorities
-
-| Level | Priority                                                                                                    |
-| ----- | ----------------------------------------------------------------------------------------------------------- |
-| 1     | Verify `backend/.env` and Azure AI connectivity (resources are pre-provisioned in `{{RESOURCE_GROUP}}` RG)  |
-| 2     | Verify local dev environment and server startup                                                             |
-| 3     | Complete EVERYTHING in `spec.md` -- no exceptions                                                           |
-| 4     | Validate each feature with playwright-cli against local app                                                 |
-| 5     | Verify AI integration works end-to-end                                                                      |
-| 6     | Verify data persistence and file handling                                                                   |
-| 7     | Ensure type checking passes with zero errors                                                                |
-| 8     | Debug and fix all issues immediately                                                                        |
-| 9     | DO NOT STOP until all features are done                                                                     |
-
-### Work Style
-
-AUTONOMOUS execution WITHOUT STOPPING until ALL features are:
-
-- Implemented completely in the local application
-- Validated end-to-end with playwright-cli against local URLs
-- Debugged and working correctly
-- Integrated and stable
-
-Work PERSISTENTLY for as long as needed. DO NOT stop early. EVERYTHING must be FLESHED OUT COMPLETELY before stopping.
-
----
-
-## Final Mandate -- ABSOLUTE
-
-**YOU CANNOT STOP WORKING UNTIL:**
-
-- Azure AI connectivity is verified (pre-provisioned `{{RESOURCE_GROUP}}` RG with `{{AI_ACCOUNT_NAME}}` account and `{{DEPLOYMENT_NAME}}` deployment)
-- `backend/.env` exists with valid Azure AI credentials
-- Local backend and frontend are running and accessible
-- Authentication works end-to-end
-- Database is created with all required tables
-- AI model integration works end-to-end
-- Data persistence works correctly
-- File handling works correctly
-- UI renders properly on both large and small screens
-- Type checking passes with zero errors
-- Every feature in `spec.md` is implemented and validated
-- Every bug is debugged and fixed
-- The entire local application works end-to-end
-- EVERYTHING is FLESHED OUT COMPLETELY
-
-| Concern             | Directive                                                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AZURE RESOURCES** | Pre-provisioned in `{{RESOURCE_GROUP}}` RG (`{{AI_ACCOUNT_NAME}}` + `{{DEPLOYMENT_NAME}}`). Verify connectivity only. **NEVER use any other RG.** |
-| **DATABASE**        | {{LOCAL_DB_TYPE}} -- ensure all CRUD and persistence work correctly                                                                               |
-| **AI MODEL**        | `{{MODEL_NAME}}` via Azure AI Services -- verify connectivity and model functionality                                                             |
-| **STORAGE**         | Local filesystem `{{LOCAL_STORAGE_PATH}}` -- ensure file operations work correctly                                                                |
-| **RESPONSIVE**      | UI must render properly on large screens and mobile viewports                                                                                     |
-| **TYPE CHECKING**   | Type checking MUST pass with zero errors                                                                                                          |
-| **CODE CHANGES**    | Apply locally -- servers auto-reload -- no deployment pipeline needed                                                                             |
-
-**DO NOT STOP EARLY. WORK CONTINUOUSLY UNTIL COMPLETE.**
+Stop only when every item is `passed`, or the only remaining items are
+`blocked`. Then report: what passed, and every blocker from
+`{{PROGRESS_FILE}}` with what was tried. Never claim success for anything not
+actually validated.
