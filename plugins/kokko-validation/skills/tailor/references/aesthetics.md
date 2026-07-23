@@ -12,6 +12,24 @@
 
 ---
 
+## Browser Automation -- Playwright CLI (NOT the MCP server)
+
+`playwright-cli` in this prompt means the Playwright **command-line interface**,
+driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
+
+- Drive the browser and capture screenshots with the Playwright CLI and the
+  `playwright` package: ad-hoc Node scripts, `.spec` files run with
+  `npx playwright test`, or `npx playwright screenshot <url> <out.png>`. Set the
+  viewport explicitly in the script for the 1280px (desktop) and 375px (mobile)
+  passes.
+- If Playwright is not installed, add it first
+  (`npm i -D @playwright/test && npx playwright install chromium`).
+- Do NOT use the Playwright MCP server or any `mcp__playwright__*` / `browser_*`
+  tool for navigation, snapshots, or screenshots. All browser interaction goes
+  through the Playwright CLI.
+
+---
+
 ## Primary Goal
 
 Work autonomously to identify and fix all visual and UI defects in the locally running application. Use playwright-cli to screenshot every page, state, and interactive component. Fix every issue found. Re-screenshot after each fix to confirm resolution.

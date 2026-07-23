@@ -20,6 +20,23 @@
 
 ---
 
+## Browser Automation -- Playwright CLI (NOT the MCP server)
+
+`playwright-cli` in this prompt means the Playwright **command-line interface**,
+driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
+
+- Drive the browser by writing and running Playwright scripts: ad-hoc Node
+  scripts using the `playwright` package, or `.spec` files run with
+  `npx playwright test`. Use `npx playwright screenshot <url> <out.png>` for
+  one-off captures. Point every script at the deployed URLs.
+- If Playwright is not installed, add it first
+  (`npm i -D @playwright/test && npx playwright install chromium`).
+- Do NOT use the Playwright MCP server or any `mcp__playwright__*` / `browser_*`
+  tool for navigation, snapshots, or screenshots. All browser interaction goes
+  through the Playwright CLI.
+
+---
+
 ## Primary Goal
 
 Deploy {{APP_NAME}} to Azure using Container Apps, {{AZURE_DB_TYPE}} (replacing {{LOCAL_DB_TYPE}}), {{AZURE_STORAGE_TYPE}} (replacing {{LOCAL_STORAGE_TYPE}}), and the existing `{{DEPLOYMENT_NAME}}` deployment. Secure the application with {{DEPLOYED_AUTH_TYPE}}. Use GitHub Actions (managed via `gh` CLI) for CI/CD. Validate the deployed application end-to-end per all features in `spec.md`.
