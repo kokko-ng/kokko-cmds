@@ -1,6 +1,6 @@
 {
   "name": "kokko-git",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Git workflow commands for commit+push, branch pruning, releases, and syncing.",
   "author": {
     "name": "kokko-ng"

@@ -18,6 +18,23 @@
 
 ---
 
+## Browser Automation -- Playwright CLI (NOT the MCP server)
+
+`playwright-cli` in this prompt means the Playwright **command-line interface**,
+driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
+
+- Drive the browser by writing and running Playwright scripts: ad-hoc Node
+  scripts using the `playwright` package, or `.spec` files run with
+  `npx playwright test`. Use `npx playwright screenshot <url> <out.png>` for
+  one-off captures.
+- If Playwright is not installed, add it first
+  (`npm i -D @playwright/test && npx playwright install chromium`).
+- Do NOT use the Playwright MCP server or any `mcp__playwright__*` / `browser_*`
+  tool for navigation, snapshots, or screenshots. All browser interaction goes
+  through the Playwright CLI.
+
+---
+
 ## Primary Goal
 
 Work autonomously to validate the application end-to-end per all features and requirements in `spec.md`. The application runs **locally** -- {{BACKEND_FRAMEWORK}} backend + {{FRONTEND_FRAMEWORK}} frontend -- with `{{MODEL_NAME}}` accessed via a **pre-provisioned** Azure AI Services endpoint in the `{{RESOURCE_GROUP}}` resource group. Resolve all remaining issues and validate until fully functional.
