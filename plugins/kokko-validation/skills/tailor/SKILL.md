@@ -57,6 +57,10 @@ No `{{...}}` token may remain in the output file.
 - Expand generics with repo detail: real endpoint tables, real protected
   route lists, real desktop/mobile page states for aesthetics passes
 - Keep the template's autonomous-work framing and completion criteria
+- Keep browser automation on the **Playwright CLI**, never the Playwright
+  MCP server: preserve each template's "Browser Automation -- Playwright CLI"
+  section and its `playwright-cli` references. Do not rewrite them to use
+  `mcp__playwright__*` / `browser_*` tools
 - Keep git usage safe: staging must name explicit file paths (never
   `git add .` or bare directory adds); no history rewrites; nothing force
 
