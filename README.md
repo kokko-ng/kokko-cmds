@@ -19,6 +19,7 @@ Then install the plugins you want:
 /plugin install kokko-viz@kokko-ng-kokko-cmds
 /plugin install kokko-infra@kokko-ng-kokko-cmds
 /plugin install kokko-ai-config@kokko-ng-kokko-cmds
+/plugin install kokko-env@kokko-ng-kokko-cmds
 ```
 
 ## Plugins
@@ -106,7 +107,12 @@ C4 architecture diagram commands.
 | `/c4-update` | Update existing C4 diagrams |
 | `/c4-verify` | Verify C4 diagrams against code |
 
-Shared templates live in `commands/references/c4-templates.md` (bundled reference, not a command).
+| Skill | Purpose |
+| ----- | ------- |
+| `c4` | Authoring rules for C4 documents (mandatory source-file hyperlinks, no validation report files) plus the shared templates |
+
+All three commands read the `c4` skill first. Templates live in
+`skills/c4/references/c4-templates.md`.
 
 ### kokko-infra
 
@@ -125,3 +131,16 @@ AI/Claude configuration management commands.
 | -------- | ------- |
 | `/prune-docs` | Trim CLAUDE.md or README.md to the essentials under a line target |
 | `/verify-docs` | Audit CLAUDE.md or README.md against the codebase and fix inaccuracies |
+
+### kokko-env
+
+Keep a running dev environment current without rebuilding it.
+
+| Commands | Purpose |
+| -------- | ------- |
+| `/devcontainer-update` | Pull the latest `.devcontainer/` from [kokko-ng/kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer) and apply it live, reporting what still needs a rebuild |
+| `/plugins-update` | Refresh the marketplaces, update installed plugins to the published versions, then prompt for `/reload-plugins` |
+
+`/devcontainer-update` applies the config by re-running the project's own
+`post-create.sh --config-only`. A `.devcontainer/` copied before that flag
+existed needs updating first — the command detects this and says so.
