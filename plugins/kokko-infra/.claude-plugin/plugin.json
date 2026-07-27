@@ -1,6 +1,6 @@
 {
   "name": "kokko-infra",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Azure infrastructure commands for checking resource costs and service status.",
   "author": {
     "name": "kokko-ng"
