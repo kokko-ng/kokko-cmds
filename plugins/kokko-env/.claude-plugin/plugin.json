@@ -1,6 +1,6 @@
 {
   "name": "kokko-env",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Dev environment maintenance commands: refresh the devcontainer config inside a running container and update Claude Code plugins to their latest marketplace versions.",
   "author": {
     "name": "kokko-ng"
