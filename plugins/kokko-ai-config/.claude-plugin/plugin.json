@@ -1,6 +1,6 @@
 {
   "name": "kokko-ai-config",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "AI configuration management commands for pruning and verifying CLAUDE.md and README files.",
   "author": {
     "name": "kokko-ng"
