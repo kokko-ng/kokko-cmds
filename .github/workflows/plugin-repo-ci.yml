@@ -112,8 +112,6 @@ jobs:
         run: npm install -g bats
       - name: Shared hook libraries are in sync across plugins
         run: bash scripts/check-shared-lib-sync.sh
-      - name: Dangerous-command patterns compile and are all wired up
-        run: bash scripts/check-patterns.sh
       - name: Run the hook suite
         env:
           KOKKO_SOUNDS: "off"

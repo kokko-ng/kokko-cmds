@@ -1,5 +1,5 @@
 {
-  "description": "Git working-tree safety net, destructive-command guards for git/cloud/shell, and session context",
+  "description": "Git working-tree snapshots and session context. No command blocking.",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,21 +9,6 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/git-snapshot.sh",
             "timeout": 15
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-git.sh",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-cloud.sh",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-bash.sh",
-            "timeout": 10
           }
         ]
       }

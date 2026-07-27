@@ -2,7 +2,58 @@
 
 All plugins in this marketplace share one version; see `scripts/bump.sh`.
 
-## 4.0.0 - unreleased
+## 5.0.0 - unreleased
+
+### kokko-safety - all deterministic command blocking removed
+
+The `PreToolUse` guards are gone: `guard-git.sh`, `guard-cloud.sh`,
+`guard-bash.sh`, the whole `hooks/dangerous-patterns/` tree (~1,300 regex
+patterns across 14 categories), and `hooks/lib/patterns.sh`. **No command is
+refused or prompted by this plugin any more.**
+
+A blocklist is the wrong shape for this problem. It has to enumerate every
+spelling of every dangerous command, which makes it simultaneously too broad and
+too narrow. Too broad: 4.0.0 had to un-block `rm -rf ./dist`,
+`sudo apt-get install`, `docker image prune -a`, `git worktree remove`,
+`pip uninstall` and `git stash create` — and that was after a test suite went
+looking. Too narrow: anything not on the list passes, including the same
+destructive operation invoked from a script, a Makefile or a Python subprocess.
+The first failure mode is the expensive one, because a guard that fires on
+routine work gets switched off, and switching it off takes the snapshot layer
+with it. That is exactly what had happened before 4.0.0.
+
+Kept, unchanged in behaviour:
+
+- **`git-snapshot.sh`** — the recovery layer, and the reason removing the guards
+  is survivable. It checkpoints uncommitted tracked changes to `refs/snapshots/`
+  before every git command and on every user turn, via `git stash create`, so the
+  work becomes a real git object that survives rebase/reset/checkout. It does not
+  need to predict which command will destroy the tree.
+- **`session-context.sh`** — project detection plus the work-loss briefing, now
+  rewritten to say plainly that nothing blocks and that the judgement is the
+  agent's: check the tree before the first edit, commit before anything that
+  rewrites history or packages the working tree, stage explicit paths, use `cp`
+  rather than `git checkout -- <path>`, and that `git clean` has no recovery path
+  because untracked files are not snapshotted.
+
+Also removed as a consequence:
+
+- `hooks/lib/play-sound.sh` from this plugin — only the guards played sounds.
+  `kokko-notifications` keeps its copy.
+- `deny()`, `ask()` and `guard_disabled()` from `hooks/lib/hook-io.sh`.
+- `CLAUDE_GIT_GUARD`, `CLAUDE_CLOUD_GUARD` and `CLAUDE_BASH_GUARD`. There is
+  nothing left to override.
+- `scripts/check-patterns.sh`, and the `tests/guard-*.bats` and
+  `tests/no-false-positives.bats` suites.
+
+Tests now assert the *absence* of blocking: neither hook may return a
+`permissionDecision`, `hooks.json` may wire only the two remaining hooks, and no
+guard file or pattern directory may exist. Reintroducing a guard is a failing
+change rather than a quiet hook edit. 48 cases remain, covering snapshot
+behaviour, the briefing's content, and a latency budget for the snapshot hook —
+which still runs on every Bash call.
+
+## 4.0.0
 
 ### kokko-safety - rebuilt
 

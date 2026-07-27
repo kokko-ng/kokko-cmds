@@ -90,13 +90,13 @@ context_for() {
 @test "outside a git repo no safety briefing is emitted" {
     out="$(context_for "$WORK")"
     printf '%s' "$out" | grep -q "not in a git repo"
-    ! printf '%s' "$out" | grep -q "Git safety"
+    ! printf '%s' "$out" | grep -q "Protecting uncommitted work"
 }
 
 @test "inside a git repo the safety briefing is emitted" {
     repo="$(new_repo)"
     out="$(context_for "$repo")"
-    printf '%s' "$out" | grep -q "Git safety"
+    printf '%s' "$out" | grep -q "Protecting uncommitted work"
     printf '%s' "$out" | grep -q "refs/snapshots/"
     rm -rf "$repo"
 }
@@ -138,4 +138,40 @@ context_for() {
 @test "empty stdin does not crash the hook" {
     run bash -c "printf '' | bash '$SAFETY_HOOKS/session-context.sh'"
     [ "$status" -eq 0 ]
+}
+
+@test "the briefing states plainly that nothing blocks" {
+    repo="$(new_repo)"
+    out="$(context_for "$repo")"
+    printf '%s' "$out" | grep -q "NOTHING BLOCKS YOU"
+    printf '%s' "$out" | grep -q "There is NO guard hook"
+    rm -rf "$repo"
+}
+
+@test "the briefing does not claim commands are blocked" {
+    repo="$(dirty_repo)"
+    out="$(context_for "$repo")"
+    ! printf '%s' "$out" | grep -q "are BLOCKED"
+    ! printf '%s' "$out" | grep -qi "the guard is right"
+    rm -rf "$repo"
+}
+
+@test "the briefing still carries the work-loss rules" {
+    repo="$(new_repo)"
+    out="$(context_for "$repo")"
+    printf '%s' "$out" | grep -q "git status --short --untracked-files=no"
+    printf '%s' "$out" | grep -q "never .git add ."
+    printf '%s' "$out" | grep -q "Commit before anything that rewrites history"
+    printf '%s' "$out" | grep -q "docker/az acr build ship what is"
+    rm -rf "$repo"
+}
+
+@test "the briefing warns that git clean has no recovery path" {
+    repo="$(new_repo)"
+    context_for "$repo" | grep -q "Untracked files are NOT snapshotted"
+    rm -rf "$repo"
+}
+
+@test "the session hook never returns a permission decision" {
+    assert_no_decision session-context.sh "git rebase main"
 }

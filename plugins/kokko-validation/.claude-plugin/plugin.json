@@ -1,6 +1,6 @@
 {
   "name": "kokko-validation",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "Generic validation and deployment master-prompt templates plus a tailor skill that instantiates them for the current repo.",
   "author": {
     "name": "kokko-ng"

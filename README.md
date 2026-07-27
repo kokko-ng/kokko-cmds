@@ -27,36 +27,40 @@ Then install the plugins you want:
 
 ### kokko-safety
 
-A working-tree safety net plus destructive-command guards, for all sessions.
+Recovery and context. **Nothing here blocks a command.**
 
 | Hook | Purpose |
 | ---- | ------- |
 | `git-snapshot` | Checkpoints uncommitted tracked changes to `refs/snapshots/` before every git command and on every turn |
-| `guard-git` | Blocks git commands that destroy uncommitted work, and prompts on protected branches |
-| `guard-cloud` | Blocks destructive cloud and IaC operations |
-| `guard-bash` | Blocks destructive shell operations |
-| `session-context` | Reports project type, git state and the safety contract at session start |
+| `session-context` | Reports project type, git state, and the rules for not losing uncommitted work, at session start |
 
-The guards **deny** rather than prompt. Under `defaultMode: acceptEdits` an
-"ask" either stalls an unattended agent or gets clicked through unread — and an
-agent that planned `git rebase` as step 4 of its own workflow will confirm it
-with total confidence. Each guard has an override for humans:
+#### Why there are no guards
 
-| Environment Variable | Guard | Purpose |
-| -------------------- | ----- | ------- |
-| `CLAUDE_GIT_GUARD` | `guard-git` | Set to `off`, or prefix a single command, to bypass |
-| `CLAUDE_CLOUD_GUARD` | `guard-cloud` | Same |
-| `CLAUDE_BASH_GUARD` | `guard-bash` | Same |
+Earlier versions shipped `PreToolUse` hooks that denied destructive git, cloud
+and shell commands from a list of ~1,300 regex patterns. They are gone, on
+purpose.
 
-Guards fire rarely by design. A destructive git command is blocked only while
-the tree is *dirty* — on a clean tree a rebase is fully reflog-recoverable and
-passes through silently. The command patterns are anchored to a shell command
-position, so prose and documentation never trip them.
+A blocklist is the wrong shape for this problem. It has to enumerate every
+spelling of every dangerous command, so it is simultaneously too broad — it
+denied `rm -rf ./dist`, `sudo apt-get install`, `docker image prune -a`, and
+`git worktree remove` — and too narrow, because anything not on the list sails
+straight through, including the same operation invoked from a script, a
+Makefile, or a Python subprocess. Both failure modes are bad, and the first one
+is worse: a guard that fires on routine work gets switched off, and switching it
+off takes the snapshot layer with it. That is not hypothetical — the previous
+version of this plugin was disabled in the reference devcontainer roster and
+protecting nothing at all.
+
+What replaces it is a recovery mechanism that does not need to predict anything,
+plus an explicit briefing so the judgement call is made with the facts in hand.
 
 #### Recovering work
 
-`git-snapshot` makes uncommitted changes real git objects, which survive
-`rebase`, `reset` and `checkout`. If work seems lost:
+`git-snapshot` turns uncommitted changes into real git objects before every git
+command, which is what makes them survive `rebase`, `reset` and `checkout` — the
+reason uncommitted work is normally unrecoverable is that it was never an object
+at all. The mechanism is `git stash create`, which builds a commit **without**
+touching the working tree, the index or the stash ref.
 
 ```bash
 git for-each-ref refs/snapshots/     # list checkpoints, newest last
@@ -64,16 +68,12 @@ git stash show -p <ref>              # inspect one
 git stash apply <ref>                # restore it
 ```
 
-[kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer) wraps
-those three as `snaps` / `snaps show` / `snaps restore`.
+[kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer) wraps those
+three as `snaps` / `snaps show` / `snaps restore`.
 
-#### Adding command patterns
-
-Patterns live in `plugins/kokko-safety/hooks/dangerous-patterns/*.txt`, one
-extended regex per line, written to start at the command name — `lib/patterns.sh`
-supplies the command-position anchor. Adding a pattern must leave
-`tests/no-false-positives.bats` green: blocking `uv sync` costs the whole safety
-layer, because a guard that fires on routine work gets switched off.
+**Scope: tracked changes only.** Untracked files are not captured, so `git clean`
+has no recovery path — the one case the old guard did usefully cover, and now a
+matter of judgement like everything else.
 
 ### kokko-notifications
 
@@ -187,11 +187,10 @@ existed needs updating first — the command detects this and says so.
 ## Development
 
 ```bash
-bats tests/                          # the hook test suite
-bash scripts/check-patterns.sh       # every pattern compiles and is wired up
+bats tests/                           # the hook test suite
 bash scripts/check-shared-lib-sync.sh # duplicated hook libraries are identical
 bash scripts/check-marketplace-sync.sh
-bash scripts/bump.sh patch           # lockstep version bump across all plugins
+bash scripts/bump.sh patch            # lockstep version bump across all plugins
 pre-commit run --all-files
 ```
 

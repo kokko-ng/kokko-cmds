@@ -102,20 +102,31 @@ fi
 safety_note=""
 if [[ "$in_git" == true ]]; then
     safety_note="
-Git safety (enforced by the kokko-safety hooks):
+Protecting uncommitted work — NOTHING BLOCKS YOU, so this is on your judgement:
 
 - Uncommitted changes to TRACKED files are unrecoverable if destroyed: they were never git
   objects, so no reflog entry, no dangling blob, no fsck recovery. rebase/reset/checkout/
-  restore/stash/clean overwrite them with no prompt. This has destroyed hours of real work.
-- Destructive git commands are BLOCKED while the tree is dirty, and allowed while it is
-  clean. If you are blocked, the guard is right: commit the work and retry, or ask the
-  user. Do not look for a way around it.
-- Uncommitted tracked changes are auto-snapshotted to refs/snapshots/. If work seems lost,
-  list them FIRST, before any archaeology and before telling the user it is gone:
-  \`git for-each-ref refs/snapshots/\`, then \`git stash show -p <ref>\` to inspect and
-  \`git stash apply <ref>\` to restore. The kokko devcontainer wraps all three as \`snaps\`.
-- Commit before any build that packages the working tree (docker/az acr build ship what is
-  on disk, not HEAD). Stage explicit paths, never \`git add .\`. Push only when asked.${dirty_note}
+  restore/stash/clean overwrite them with no prompt and no confirmation. This has destroyed
+  hours of real work on projects using this setup, more than once, always the same way: an
+  agent rewrote history while uncommitted work sat in the tree.
+- There is NO guard hook. No command will be refused. The snapshot below is a recovery
+  mechanism, not a control — it cannot stop you, only give you something to recover from.
+- Before your first edit, check the tree: \`git status --short --untracked-files=no\`.
+  Not empty and not yours? STOP and ask the user. Never tidy it, stash it, or assume it is
+  junk.
+- Commit before anything that rewrites history, and before any build that packages the
+  working tree (docker/az acr build ship what is on disk, not HEAD). Commits are cheap,
+  reversible and visible; a rebase over a dirty tree is none of those.
+- Stage explicit paths, never \`git add .\`. Push only when asked. Use \`cp\` to back up
+  files, never \`git checkout -- <path>\`.
+- If you catch yourself reasoning toward \"I'll just rebase quickly\" or \"I'll stash this
+  first\" — that is the exact thought that preceded every incident. Commit, or ask.
+
+Recovery: uncommitted tracked changes are auto-snapshotted to refs/snapshots/. If work
+seems lost, list them FIRST, before any archaeology and before telling the user it is gone:
+\`git for-each-ref refs/snapshots/\`, then \`git stash show -p <ref>\` to inspect and
+\`git stash apply <ref>\` to restore. The kokko devcontainer wraps all three as \`snaps\`.
+Untracked files are NOT snapshotted, so \`git clean\` has no recovery path at all.${dirty_note}
 "
 fi
 

@@ -1,18 +1,17 @@
 #!/usr/bin/env bats
-# Latency budget for the PreToolUse guards.
+# Latency budget for the hooks that run in the interactive path.
 #
-# These run on EVERY Bash tool call, in the interactive path, before the command
-# executes. The previous matcher ran one `echo | grep` per pattern -- about
-# 2,600 processes per invocation, measured at ~1.65s of added latency per Bash
-# call. lib/patterns.sh composes one grep -f instead: ~63ms, a 26x improvement.
+# git-snapshot.sh runs on EVERY Bash tool call and on every user turn, before the
+# command executes. Its cost is paid by the user on every single action, so it
+# has a budget.
 #
-# The budget below is deliberately loose (10x the measured figure) so this fails
-# on an architectural regression -- someone reintroducing a per-pattern loop --
+# The budget is deliberately loose so this fails on an architectural regression
+# -- someone adding a subprocess-per-something loop, or a full `git log` walk --
 # and not on a slow CI runner.
 
 load helpers/hook
 
-BUDGET_MS=650
+BUDGET_MS=400
 
 elapsed_ms() {
     local start end
@@ -22,27 +21,42 @@ elapsed_ms() {
     echo $(( (end - start) / 1000000 ))
 }
 
-@test "guard-bash.sh stays inside the latency budget on a benign command" {
-    ms="$(elapsed_ms run_hook guard-bash.sh "ls -la")"
-    echo "guard-bash.sh: ${ms}ms (budget ${BUDGET_MS}ms)" >&2
+setup() {
+    ORIG_PWD="$PWD"
+}
+
+teardown() {
+    cd "$ORIG_PWD" || true
+    if [[ -n "${REPO:-}" && "$REPO" == /tmp/* ]]; then
+        rm -rf "$REPO"
+    fi
+    return 0
+}
+
+@test "git-snapshot.sh exits fast on a non-git command" {
+    REPO="$(dirty_repo)"; cd "$REPO"
+    ms="$(elapsed_ms run_hook git-snapshot.sh "ls -la")"
+    echo "git-snapshot.sh (non-git command): ${ms}ms (budget ${BUDGET_MS}ms)" >&2
     [ "$ms" -lt "$BUDGET_MS" ]
 }
 
-@test "guard-cloud.sh stays inside the latency budget on a benign command" {
-    ms="$(elapsed_ms run_hook guard-cloud.sh "ls -la")"
-    echo "guard-cloud.sh: ${ms}ms (budget ${BUDGET_MS}ms)" >&2
+@test "git-snapshot.sh exits fast on a clean tree" {
+    REPO="$(new_repo)"; cd "$REPO"
+    ms="$(elapsed_ms run_hook git-snapshot.sh "git status")"
+    echo "git-snapshot.sh (clean tree): ${ms}ms (budget ${BUDGET_MS}ms)" >&2
     [ "$ms" -lt "$BUDGET_MS" ]
 }
 
-@test "guard-git.sh stays inside the latency budget on a non-git command" {
-    ms="$(elapsed_ms run_hook guard-git.sh "ls -la")"
-    echo "guard-git.sh: ${ms}ms (budget ${BUDGET_MS}ms)" >&2
+@test "git-snapshot.sh stays inside budget when it actually checkpoints" {
+    REPO="$(dirty_repo)"; cd "$REPO"
+    ms="$(elapsed_ms run_hook git-snapshot.sh "git rebase main")"
+    echo "git-snapshot.sh (checkpointing): ${ms}ms (budget ${BUDGET_MS}ms)" >&2
     [ "$ms" -lt "$BUDGET_MS" ]
 }
 
-@test "the matcher composes exactly one grep invocation per guard" {
-    # Structural assertion, not a timing one: a loop calling grep per pattern is
-    # the regression this whole file exists to prevent.
-    ! grep -qE 'for[[:space:]]+pattern' "$SAFETY_HOOKS/lib/patterns.sh"
-    grep -q 'grep -qE -f' "$SAFETY_HOOKS/lib/patterns.sh"
+@test "the snapshot hook short-circuits before touching git on a non-git command" {
+    # Structural, not timed: the early bail is what keeps `ls` off the git path.
+    # Losing it would put a git invocation in front of every Bash call.
+    grep -q 'PreToolUse' "$SAFETY_HOOKS/git-snapshot.sh"
+    grep -q 'exit 0' "$SAFETY_HOOKS/git-snapshot.sh"
 }

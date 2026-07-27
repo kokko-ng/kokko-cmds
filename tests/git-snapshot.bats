@@ -143,3 +143,52 @@ run_snapshot_bash() {
     run bash -c "cd '$REPO' && GIT_CEILING_DIRECTORIES='$REPO' printf '{\"hook_event_name\":\"UserPromptSubmit\"}' | bash '$SAFETY_HOOKS/git-snapshot.sh'"
     [ "$status" -eq 0 ]
 }
+
+# ---------------------------------------------------------------------------
+# This plugin does not block commands.
+#
+# The deterministic guards were removed deliberately. These assertions exist so
+# that reintroducing one is a visible, failing change rather than something that
+# quietly lands in a hook edit.
+# ---------------------------------------------------------------------------
+
+@test "the snapshot hook never returns a permission decision" {
+    printf 'change\n' >> tracked.txt
+    for cmd in \
+        "git rebase main" \
+        "git reset --hard HEAD~1" \
+        "git clean -fd" \
+        "git push --force origin main" \
+        "git stash" \
+        "git add ." \
+        "rm -rf /" \
+        "az group delete --name rg-prod --yes" \
+        "terraform destroy -auto-approve"
+    do
+        assert_no_decision git-snapshot.sh "$cmd"
+    done
+}
+
+@test "a destructive git command is checkpointed, not refused" {
+    printf 'the-canary-line\n' >> tracked.txt
+    out="$(run_snapshot_bash "git reset --hard HEAD~1")"
+    # No decision returned...
+    [ -z "$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision // ""' 2>/dev/null)" ]
+    # ...but the work was captured first.
+    [ "$(snapshot_count)" -eq 1 ]
+    ref="$(git for-each-ref --format='%(refname)' refs/snapshots/ | head -1)"
+    git stash show -p "$ref" | grep -q 'the-canary-line'
+}
+
+@test "no guard hook is shipped by this plugin" {
+    for gone in guard-git.sh guard-cloud.sh guard-bash.sh; do
+        [ ! -e "$SAFETY_HOOKS/$gone" ]
+    done
+    [ ! -d "$SAFETY_HOOKS/dangerous-patterns" ]
+    [ ! -e "$SAFETY_HOOKS/lib/patterns.sh" ]
+}
+
+@test "hooks.json wires only the snapshot and context hooks" {
+    wired="$(jq -r '[.hooks[][].hooks[].command] | map(sub(".*/"; "")) | unique | join(",")' "$SAFETY_HOOKS/hooks.json")"
+    [ "$wired" = "git-snapshot.sh,session-context.sh" ]
+}

@@ -1,7 +1,7 @@
 {
   "name": "kokko-safety",
-  "version": "4.0.0",
-  "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context.",
+  "version": "5.0.0",
+  "description": "Git working-tree snapshots that make uncommitted changes recoverable, plus project and work-loss context at session start. No command blocking.",
   "author": {
     "name": "kokko-ng"
   },
@@ -10,8 +10,9 @@
   "keywords": [
     "safety",
     "hooks",
-    "git-protection",
-    "cloud-ops",
+    "git",
+    "snapshots",
+    "recovery",
     "workflow"
   ]
 }
