@@ -2,7 +2,6 @@
 description: Identify performance bottlenecks across a target and recommend prioritized fixes.
 argument-hint: '[target] [--focus database|api|frontend|backend|memory]'
 allowed-tools: Read, Grep, Glob, Bash, Agent
-model: opus
 context: fork
 agent: general-purpose
 ---

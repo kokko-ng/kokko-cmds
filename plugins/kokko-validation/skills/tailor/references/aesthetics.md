@@ -1,3 +1,29 @@
+<!--
+TAILORING NOTES (for the /tailor skill -- delete this entire comment in the tailored output)
+
+Placeholders. Every {{...}} must be resolved. Sources, in order: user hints,
+repo inspection, then ask the user. Never invent values.
+
+  APP_NAME                    Application name
+  PROGRESS_FILE               Defect ledger path, e.g. prompts/aesthetics-progress.md
+  BROWSER_TOOL                Browser automation tool actually available (e.g. playwright-cli, Playwright MCP)
+  FRONTEND_FRAMEWORK / FRONTEND_START_COMMAND / FRONTEND_URL
+  BACKEND_FRAMEWORK / BACKEND_START_COMMAND / BACKEND_URL
+  THEMES                      Theme list, e.g. "dark, light" (single-theme apps: delete the theming block)
+  TYPE_CHECK_COMMAND          Command(s) that must pass with zero errors
+  DESKTOP_STATES              Real page/state list to screenshot at 1280px (enumerate from the router)
+  MOBILE_STATES               Real page/state list to screenshot at 375px
+
+Optional blocks. Delete the whole block -- plus every line elsewhere that
+starts with the block name in brackets, e.g. "[theming]" -- when it does not
+apply. Strip the bracket tags from lines you keep.
+
+  theming       App has more than one theme.
+  registration  App has self-service user registration.
+
+No {{...}} token, no [tag] marker, and none of these notes may remain in the
+tailored output.
+-->
 
 # {{APP_NAME}} -- Aesthetics & UI Fix Prompt
 
@@ -7,8 +33,9 @@
 | ---------- | -------------------------------------------- |
 | `frontend` | {{FRONTEND_FRAMEWORK}} on `{{FRONTEND_URL}}` |
 | `backend`  | {{BACKEND_FRAMEWORK}} on `{{BACKEND_URL}}`   |
-| `themes`   | {{THEMES}}                                   |
-| `tool`     | playwright-cli                               |
+| `tool`     | {{BROWSER_TOOL}}                             |
+| `ledger`   | `{{PROGRESS_FILE}}`                          |
+| [theming] `themes` | {{THEMES}}                           |
 
 ---
 
@@ -32,9 +59,29 @@ driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
 
 ## Primary Goal
 
-Work autonomously to identify and fix all visual and UI defects in the locally running application. Use playwright-cli to screenshot every page, state, and interactive component. Fix every issue found. Re-screenshot after each fix to confirm resolution.
+Work autonomously to identify and fix every visual and UI defect in the
+locally running application. Use {{BROWSER_TOOL}} to screenshot every page,
+state, and interactive component; fix each defect; re-screenshot to confirm.
 
-**YOU CANNOT STOP UNTIL EVERY VISUAL DEFECT IS IDENTIFIED, FIXED, AND CONFIRMED RESOLVED.**
+Completion is defined solely by the checklist in the "Completion, Blockers &
+Stopping" section at the end of this prompt -- nothing else.
+
+---
+
+## Defect Ledger -- Read First, Update Always
+
+`{{PROGRESS_FILE}}` is the single source of truth for progress. Conversation
+memory does not survive context compaction or fresh-context passes
+(multipass); this file does.
+
+- **On start:** if the file exists, read it and resume from the first
+  screenshot pass or defect not marked done. If it does not exist, create it
+  with one line per screenshot pass (viewport x theme), all `pending`.
+- **Defect format:** `D-014 | open / fixed / blocked | page + state | viewport/theme | short note`
+  -- append a line the moment a defect is spotted; flip it to `fixed` only
+  after the confirming re-screenshot.
+- **Update immediately**, never in batches. Append one line to a
+  `## Session log` section at the bottom of the file each pass.
 
 ---
 
@@ -56,28 +103,28 @@ Verify the application loads at `{{FRONTEND_URL}}` before starting.
 
 ## Screenshot Coverage -- Mandatory
 
-Take screenshots of every state listed below in **each theme variant**. Do not skip any state or theme. Identify defects in each.
+Screenshot every state listed below at desktop (1280px wide) and mobile
+(375px wide). If the layout has tablet-specific breakpoints, add a 768px pass
+for the affected pages. Do not skip any state.
 
-### Theme Switching
-
-Before starting each theme pass, toggle the application theme using the theme switcher. Confirm the active theme is applied globally before taking any screenshots in that pass.
+[theming] Repeat full coverage once per theme in {{THEMES}}. Before each
+theme's pass, switch to it with the app's theme switcher and confirm it is
+applied globally before taking any screenshots.
 
 ### Authentication Pages
 
 - Login page (empty form)
 - Login page with validation errors (submit empty form)
-- Register page (empty form) (if applicable)
-- Register page with validation errors (if applicable)
+- [registration] Register page (empty form)
+- [registration] Register page with validation errors
 
-### Main Application -- Desktop (1280px wide)
+### Main Application -- Desktop (1280px)
 
 {{DESKTOP_STATES}}
 
-### Main Application -- Mobile (375px wide)
+### Main Application -- Mobile (375px)
 
 {{MOBILE_STATES}}
-
-All states above must be screenshotted once per theme variant.
 
 ---
 
@@ -87,16 +134,16 @@ For every screenshot, inspect and fix defects in the following categories:
 
 ### Visibility
 
-- Text that is invisible or near-invisible due to insufficient contrast against its background
-- Elements hidden behind other elements unintentionally
+- Text invisible or near-invisible due to insufficient contrast against its background
+- Elements unintentionally hidden behind other elements
 - Overflow: content clipped or cut off without indication
 - Transparent backgrounds revealing unintended layers
-- White or light flashes on dark theme during transitions or page load
+- White or light flashes during transitions or page load
 
 ### Layout & Alignment
 
 - Warped, stretched, or squashed elements (images, avatars, icons, buttons)
-- Misaligned items within a row or column (vertical or horizontal alignment broken)
+- Misaligned items within a row or column
 - Elements overflowing their containers and breaking adjacent layout
 - Inconsistent spacing (gaps, padding, margins) between similar elements
 - Grid or flex layout collapsing incorrectly at any breakpoint
@@ -106,7 +153,7 @@ For every screenshot, inspect and fix defects in the following categories:
 - Text overflow without ellipsis or wrapping
 - Line height causing text overlap
 - Font weight or size inconsistencies across similar elements
-- Truncated labels missing tooltip or accessible alternative
+- Truncated labels missing a tooltip or accessible alternative
 
 ### Interactive States
 
@@ -115,20 +162,26 @@ For every screenshot, inspect and fix defects in the following categories:
 - Disabled states indistinguishable from enabled states
 - Loading spinners or skeletons not centered or sized correctly
 
-### Dark Theme Integrity
+### Accessibility Quick Wins
 
-- Hard-coded light colors (white backgrounds, black text) visible in dark theme
-- Borders or dividers invisible on dark backgrounds
-- Input placeholder text invisible
-- Scrollbar styles inconsistent with dark theme
+- Images missing meaningful alt text
+- Icon-only buttons missing an accessible label (aria-label)
+- Form inputs missing an associated label
+- Keyboard tab order that skips or traps focus on the inspected page
 
-### Light Theme Integrity
+<!-- OPTIONAL: theming -->
 
-- Hard-coded dark colors (dark backgrounds, white text) visible in light theme
-- Borders or dividers invisible on light backgrounds
-- Input placeholder text invisible or too light
-- Scrollbar styles inconsistent with light theme
-- Elements that remain dark-themed and do not respond to the light theme toggle
+### Theme Integrity (per theme in {{THEMES}})
+
+- Hard-coded colors from another theme visible (e.g. white backgrounds or
+  black text in dark theme, and vice versa)
+- Borders or dividers invisible against the theme background
+- Input placeholder text invisible or too faint
+- Scrollbar styles inconsistent with the theme
+- Elements that do not respond to the theme toggle at all
+- Theme switching transitions cleanly with no visual artefacts
+
+<!-- END OPTIONAL: theming -->
 
 ### Responsive Behaviour
 
@@ -139,64 +192,62 @@ For every screenshot, inspect and fix defects in the following categories:
 
 ---
 
-## Fix Workflow
+## Work Cycle
 
-For each defect found:
+1. Screenshot all states at 1280px, then at 375px
+   [theming] -- repeating per theme in {{THEMES}}.
+2. Log every defect found in `{{PROGRESS_FILE}}` as you go.
+3. For each defect: locate the component or style in the frontend source,
+   apply a targeted fix (CSS class correction, style override, component
+   structure adjustment), let hot-reload pick it up, and re-screenshot the
+   same state, viewport, and theme to confirm. Do not move on until the fix
+   is visually confirmed and the ledger updated.
+4. Final pass: re-screenshot ALL states at both viewports
+   [theming] in every theme -- to confirm zero remaining defects and no
+   regressions from the fixes.
+5. Run `{{TYPE_CHECK_COMMAND}}` -- it must pass with zero errors.
 
-1. Screenshot and note the exact element, page, and viewport where the defect appears.
-2. Locate the relevant component or style in the frontend source.
-3. Apply the targeted fix (CSS class correction, style override, component structure adjustment).
-4. Save -- hot-reload picks up the change automatically.
-5. Screenshot the same state again to confirm the fix is resolved.
-6. Do NOT move to the next defect until the current one is visually confirmed.
+**Stuck rule:** after 3 failed fix attempts on the same defect, record what
+you tried in `{{PROGRESS_FILE}}`, mark it `blocked`, move on, and revisit
+blocked defects at the end.
 
 ---
 
 ## Constraints
 
-- **Do NOT change application logic, API calls, or backend code.** Fix only frontend visuals (templates, styles, CSS classes, component structure).
+- **Do NOT change application logic, API calls, or backend code.** Fix only
+  frontend visuals: templates, styles, CSS classes, component structure.
 - **Do NOT modify `spec.md`** or any specification documents.
-- **Never alter** authentication flow, data handling, or WebSocket behaviour as a side effect of visual changes.
-- After all fixes, run type checking -- it MUST pass with zero errors: `{{TYPE_CHECK_COMMAND}}`
+- **Never alter** authentication flow, data handling, or WebSocket behaviour
+  as a side effect of visual changes.
 
 ---
 
-## Autonomous Work Expectations -- CRITICAL
+## Completion, Blockers & Stopping
 
-### Context Window Management
+**Definition of done -- every box checked:**
 
-Your context window will be automatically compacted as it approaches its limit, allowing you to continue working indefinitely from where you left off.
+- [ ] Every page and state has been screenshotted at 1280px and 375px
+- [ ] [theming] Full coverage was repeated in every theme in {{THEMES}}
+- [ ] Every defect found is `fixed` in `{{PROGRESS_FILE}}`, each confirmed by
+      a follow-up screenshot in the affected state, viewport, and theme
+- [ ] The final full pass shows zero remaining defects
+- [ ] `{{TYPE_CHECK_COMMAND}}` passes with zero errors
+- [ ] `{{PROGRESS_FILE}}` is up to date with no `open` defects or `pending` passes
 
-### Completion Mandate -- ABSOLUTE
+Work autonomously and persistently toward this checklist. Do not stop because
+the defect list is long or context is running low -- context is compacted
+automatically, and `{{PROGRESS_FILE}}` carries state across passes.
 
-- **YOU CANNOT STOP** until every defect found is fixed and visually confirmed.
-- **DO NOT** stop early -- work until every screenshot is clean.
-- Do NOT stop tasks due to token budget concerns.
-- NEVER artificially stop any task early regardless of context remaining.
+**The only valid reasons to mark a defect `blocked` instead of fixing it:**
 
-### Work Cycle
+- The fix would require changing application logic, backend code, or specs
+  (out of scope here -- log it for a separate task)
+- A design decision that belongs to a human (e.g. two plausible intended
+  layouts and no way to tell which is right)
+- The stuck rule (3 failed fix attempts) fired
 
-1. Screenshot all states in **dark theme** at 1280px (desktop).
-2. Screenshot all states in **dark theme** at 375px (mobile).
-3. Screenshot all states in **light theme** at 1280px (desktop).
-4. Screenshot all states in **light theme** at 375px (mobile).
-5. Compile the full defect list, tagged by theme and viewport.
-6. Fix each defect -- screenshot in the affected theme and viewport to confirm -- repeat.
-7. Final pass: re-screenshot all states in both themes at both viewports to confirm zero remaining defects.
-8. Run type checking -- confirm zero errors.
-
----
-
-## Completion Criteria
-
-Work is **NOT** complete until:
-
-- Every page and state has been screenshotted in each theme at both 1280px and 375px
-- Every defect in all categories above has been identified and fixed
-- Every fix has been confirmed with a follow-up screenshot in the affected theme and viewport
-- A final full-pass screenshot review shows zero remaining defects in all themes
-- Type checking passes with zero errors
-- Each theme renders correctly with no bleed from other themes at any viewport
-- Theme switching transitions cleanly with no visual artefacts
-
-**DO NOT STOP EARLY. WORK CONTINUOUSLY UNTIL COMPLETE.**
+Stop only when every pass is complete and every defect is `fixed`, or the
+only remaining defects are `blocked`. Then report: what was fixed, and every
+blocker from `{{PROGRESS_FILE}}` with what was tried. Never claim a defect is
+fixed without the confirming screenshot.

@@ -1,9 +1,7 @@
 ---
 description: Deep-read a target to identify technical debt and build a remediation roadmap.
 argument-hint: '[target]'
-arguments: [target]
 allowed-tools: Read, Grep, Glob, Bash, Agent
-model: opus
 context: fork
 agent: general-purpose
 ---
