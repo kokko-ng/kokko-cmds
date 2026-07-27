@@ -20,12 +20,6 @@ hook_command() {
     [[ -n "$HOOK_COMMAND" ]]
 }
 
-# Extract .hook_event_name into HOOK_EVENT.
-hook_event() {
-    command -v jq >/dev/null 2>&1 || return 1
-    HOOK_EVENT=$(printf '%s' "$HOOK_INPUT" | jq -r '.hook_event_name // ""' 2>/dev/null || echo "")
-}
-
 # deny <reason> - refuse the tool call outright and exit.
 #
 # "deny", not "ask": these hooks run under `defaultMode: acceptEdits` where an

@@ -38,3 +38,32 @@ jobs:
             --target "${GITHUB_SHA}" \
             --title "$TAG" \
             --generate-notes
+
+  # Tell kokko-devcontainer to re-check its plugin roster. Its
+  # settings.json hardcodes plugin names from this marketplace; a rename or
+  # removal here silently breaks it, because post-create.sh treats a failed
+  # plugin install as non-fatal by design.
+  #
+  # Needs a PAT with `repo` scope on kokko-ng/kokko-devcontainer, stored as
+  # DEVCONTAINER_DISPATCH_TOKEN. Without the secret this step is skipped rather
+  # than failing the release -- the devcontainer's own weekly schedule still
+  # catches the drift, just later.
+  notify-devcontainer:
+    needs: github-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the devcontainer roster check
+        env:
+          TOKEN: ${{ secrets.DEVCONTAINER_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "${TOKEN}" ]; then
+            echo "DEVCONTAINER_DISPATCH_TOKEN is not set - skipping the roster notification."
+            echo "kokko-devcontainer will still catch any drift on its weekly schedule."
+            exit 0
+          fi
+          curl -fsSL -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${TOKEN}" \
+            https://api.github.com/repos/kokko-ng/kokko-devcontainer/dispatches \
+            -d '{"event_type":"marketplace-updated"}'
+          echo "Dispatched marketplace-updated to kokko-ng/kokko-devcontainer"
