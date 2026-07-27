@@ -15,8 +15,12 @@ repos:
         args: [--fix]
         exclude: ^plugins/kokko-validation/skills/tailor/references/
 
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.11.0
+  # shellcheck-py, not koalaman/shellcheck-precommit: the latter runs shellcheck
+  # in a container, so every `pre-commit run` needs a working Docker daemon.
+  # This one ships the same binary as a Python wheel. Same shellcheck version,
+  # no daemon.
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         args: [--severity=warning]

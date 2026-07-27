@@ -12,12 +12,16 @@ Validate accuracy and completeness of the C4 map in `codemap/<system-id>/`
 against the actual codebase, then apply fixes. Run `/kokko-viz:c4-map` first if
 no model exists.
 
-Shared templates and schemas live in the bundled reference file at:
-!`echo "${CLAUDE_SKILL_DIR}/references/c4-templates.md"`
+**Read the `c4` skill first:** `${CLAUDE_PLUGIN_ROOT}/skills/c4/SKILL.md`. Its
+authoring rules are what this command verifies against — mandatory source-file
+hyperlinks and the ban on validation report files.
+
+Templates and schemas live at:
+!`echo "${CLAUDE_PLUGIN_ROOT}/skills/c4/references/c4-templates.md"`
 
 Read the relevant section whenever a check cites a `c4-templates.md#...` anchor
 (if the path above is empty, locate the file with Glob:
-`**/kokko-viz/commands/references/c4-templates.md` under `~/.claude/plugins/`).
+`**/kokko-viz/skills/c4/references/c4-templates.md` under `~/.claude/plugins/`).
 
 ## Orchestration
 
@@ -220,9 +224,9 @@ the only file 6B–6C may touch).
 
 ## Fixes Applied
 - Structural / Diagrams / Documentation / Navigation / Images: [counts]
-
-## Report: codemap/VERIFICATION.md
 ```
+
+This summary is the deliverable — it goes in the reply, not into a file.
 
 Notes: on subagent failure, continue other checks and note incomplete
 verification; list irreconcilable conflicts for human decision; on fix failure,
