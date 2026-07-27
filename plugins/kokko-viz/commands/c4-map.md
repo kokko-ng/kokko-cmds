@@ -19,12 +19,17 @@ Phase 4: Synthesis -> Phase 5: Files
 Each level depends on the previous. Execute sequentially, passing outputs
 forward.
 
-Shared templates and schemas live in the bundled reference file at:
-!`echo "${CLAUDE_SKILL_DIR}/references/c4-templates.md"`
+**Read the `c4` skill first:** `${CLAUDE_PLUGIN_ROOT}/skills/c4/SKILL.md`. It
+holds the authoring rules every generated document must follow — mandatory
+source-file hyperlinks and the ban on validation report files — and indexes the
+shared templates.
+
+Templates and schemas live at:
+!`echo "${CLAUDE_PLUGIN_ROOT}/skills/c4/references/c4-templates.md"`
 
 Read the relevant section of that file whenever a step below cites a
 `c4-templates.md#...` anchor (if the path above is empty, locate the file with
-Glob: `**/kokko-viz/commands/references/c4-templates.md` under
+Glob: `**/kokko-viz/skills/c4/references/c4-templates.md` under
 `~/.claude/plugins/`). Output structure: see `c4-templates.md#output-structure`.
 
 ---
