@@ -1,6 +1,14 @@
 #!/bin/bash
 # play-sound.sh - Cross-platform sound utility for Claude Code hooks
 # Supports: macOS (afplay), Linux (paplay/aplay/speaker-test/bell), Windows/WSL (PowerShell)
+#
+# SHARED FILE - duplicated byte-for-byte into every plugin that needs it.
+# A plugin cannot source a file from a sibling plugin's directory, and a
+# symlink pointing outside the plugin root does not survive plugin install,
+# so this is a copy. scripts/check-shared-lib-sync.sh asserts every copy is
+# identical and runs in CI; the two copies silently diverging (one keeping a
+# 10x volume default and no mute long after the other was fixed) is exactly
+# what that check exists to prevent.
 
 play_sound() {
     local sound_type="${1:-info}"

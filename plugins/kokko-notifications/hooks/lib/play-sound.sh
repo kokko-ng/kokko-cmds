@@ -1,10 +1,24 @@
 #!/bin/bash
 # play-sound.sh - Cross-platform sound utility for Claude Code hooks
 # Supports: macOS (afplay), Linux (paplay/aplay/speaker-test/bell), Windows/WSL (PowerShell)
+#
+# SHARED FILE - duplicated byte-for-byte into every plugin that needs it.
+# A plugin cannot source a file from a sibling plugin's directory, and a
+# symlink pointing outside the plugin root does not survive plugin install,
+# so this is a copy. scripts/check-shared-lib-sync.sh asserts every copy is
+# identical and runs in CI; the two copies silently diverging (one keeping a
+# 10x volume default and no mute long after the other was fixed) is exactly
+# what that check exists to prevent.
 
 play_sound() {
     local sound_type="${1:-info}"
     local os_type
+
+    # Global mute: KOKKO_SOUNDS=off. Needed for a hook to be testable at all --
+    # a test sweep over the deny paths otherwise fires dozens of alerts at the
+    # machine, which is how you learn the default volume was 10x.
+    [ "${KOKKO_SOUNDS:-on}" = "off" ] && return 0
+
     os_type=$(uname -s)
 
     case "$os_type" in
@@ -19,7 +33,9 @@ play_sound() {
                 completion) sound_file="/System/Library/Sounds/Hero.aiff" ;;
                 *)          sound_file="/System/Library/Sounds/Pop.aiff" ;;
             esac
-            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-10.0}" "$sound_file"
+            # afplay -v is a gain multiplier: 1.0 is unity. The old default of
+            # 10.0 was a 10x amplification on a system alert sound.
+            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-1.0}" "$sound_file"
             ;;
 
         Linux)

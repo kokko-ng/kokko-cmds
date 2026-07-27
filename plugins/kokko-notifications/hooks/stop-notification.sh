@@ -26,7 +26,7 @@
 #
 # Silence it with KOKKO_SOUNDS=off, or disable the plugin in settings.json.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/utils/play-sound.sh"
+source "$SCRIPT_DIR/lib/play-sound.sh"
 
 input=$(cat)
 

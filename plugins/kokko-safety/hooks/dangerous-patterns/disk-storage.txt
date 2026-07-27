@@ -19,9 +19,6 @@ sfdisk[[:space:]]+
 partprobe[[:space:]]+
 
 # Disk destruction with dd
-dd[[:space:]]+if=/dev/zero
-dd[[:space:]]+if=/dev/urandom
-dd[[:space:]]+if=/dev/random
 dd[[:space:]]+of=/dev/[sh]d
 dd[[:space:]]+of=/dev/nvme
 dd[[:space:]]+of=/dev/mmcblk

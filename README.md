@@ -27,15 +27,53 @@ Then install the plugins you want:
 
 ### kokko-safety
 
-Safety hooks for all sessions.
+A working-tree safety net plus destructive-command guards, for all sessions.
 
 | Hook | Purpose |
 | ---- | ------- |
-| `session-start-context` | Detects project type and git status |
-| `pre-tool-cloud-ops` | Prompts before destructive cloud operations |
-| `pre-tool-branch-protection` | Prompts before commits to protected branches |
-| `pre-tool-destructive-git` | Prompts before force push, hard reset |
-| `pre-tool-destructive-bash` | Prompts before rm -rf, mkfs, chmod 777 |
+| `git-snapshot` | Checkpoints uncommitted tracked changes to `refs/snapshots/` before every git command and on every turn |
+| `guard-git` | Blocks git commands that destroy uncommitted work, and prompts on protected branches |
+| `guard-cloud` | Blocks destructive cloud and IaC operations |
+| `guard-bash` | Blocks destructive shell operations |
+| `session-context` | Reports project type, git state and the safety contract at session start |
+
+The guards **deny** rather than prompt. Under `defaultMode: acceptEdits` an
+"ask" either stalls an unattended agent or gets clicked through unread — and an
+agent that planned `git rebase` as step 4 of its own workflow will confirm it
+with total confidence. Each guard has an override for humans:
+
+| Environment Variable | Guard | Purpose |
+| -------------------- | ----- | ------- |
+| `CLAUDE_GIT_GUARD` | `guard-git` | Set to `off`, or prefix a single command, to bypass |
+| `CLAUDE_CLOUD_GUARD` | `guard-cloud` | Same |
+| `CLAUDE_BASH_GUARD` | `guard-bash` | Same |
+
+Guards fire rarely by design. A destructive git command is blocked only while
+the tree is *dirty* — on a clean tree a rebase is fully reflog-recoverable and
+passes through silently. The command patterns are anchored to a shell command
+position, so prose and documentation never trip them.
+
+#### Recovering work
+
+`git-snapshot` makes uncommitted changes real git objects, which survive
+`rebase`, `reset` and `checkout`. If work seems lost:
+
+```bash
+git for-each-ref refs/snapshots/     # list checkpoints, newest last
+git stash show -p <ref>              # inspect one
+git stash apply <ref>                # restore it
+```
+
+[kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer) wraps
+those three as `snaps` / `snaps show` / `snaps restore`.
+
+#### Adding command patterns
+
+Patterns live in `plugins/kokko-safety/hooks/dangerous-patterns/*.txt`, one
+extended regex per line, written to start at the command name — `lib/patterns.sh`
+supplies the command-position anchor. Adding a pattern must leave
+`tests/no-false-positives.bats` green: blocking `uv sync` costs the whole safety
+layer, because a guard that fires on routine work gets switched off.
 
 ### kokko-notifications
 
@@ -145,3 +183,18 @@ Keep a running dev environment current without rebuilding it.
 `/devcontainer-update` applies the config by re-running the project's own
 `post-create.sh --config-only`. A `.devcontainer/` copied before that flag
 existed needs updating first — the command detects this and says so.
+
+## Development
+
+```bash
+bats tests/                          # the hook test suite
+bash scripts/check-patterns.sh       # every pattern compiles and is wired up
+bash scripts/check-shared-lib-sync.sh # duplicated hook libraries are identical
+bash scripts/check-marketplace-sync.sh
+bash scripts/bump.sh patch           # lockstep version bump across all plugins
+pre-commit run --all-files
+```
+
+All plugins share one version. `scripts/bump.sh` updates `marketplace.json` and
+every `plugin.json` together; CI fails a PR that changes plugin content without
+bumping. See [CHANGELOG.md](CHANGELOG.md).

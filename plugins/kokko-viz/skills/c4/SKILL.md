@@ -1,6 +1,7 @@
 ---
 name: c4
 description: Authoring rules for C4 architecture and codemap documents - mandatory source-file hyperlinks, no validation report files, template and diagram conventions
+allowed-tools: Bash(git:*), Read, Write, Edit, Glob, Grep
 ---
 
 # C4 Authoring Skill

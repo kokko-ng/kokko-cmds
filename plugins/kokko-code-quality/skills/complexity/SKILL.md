@@ -2,6 +2,7 @@
 name: complexity
 description: Complexity analysis and refactoring (radon for py, eslint for js, .NET analyzers for dotnet)
 argument-hint: "[py|js|dotnet]"
+allowed-tools: Bash(radon:*), Bash(uv run radon:*), Bash(npx eslint:*), Bash(eslint:*), Bash(dotnet build:*), Bash(git:*), Read, Edit, Glob, Grep
 ---
 
 # Complexity Analysis Skill

@@ -1,5 +1,5 @@
 {
-  "description": "Safety hooks for git operations, cloud commands, and workflow enhancements",
+  "description": "Git working-tree safety net, destructive-command guards for git/cloud/shell, and session context",
   "hooks": {
     "PreToolUse": [
       {
@@ -7,19 +7,34 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-branch-protection.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/git-snapshot.sh",
+            "timeout": 15
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-cloud-ops.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-git.sh",
+            "timeout": 10
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-destructive-git.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-cloud.sh",
+            "timeout": 10
           },
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-destructive-bash.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/guard-bash.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/git-snapshot.sh",
+            "timeout": 15
           }
         ]
       }
@@ -29,7 +44,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start-context.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-context.sh",
+            "timeout": 10
           }
         ]
       }

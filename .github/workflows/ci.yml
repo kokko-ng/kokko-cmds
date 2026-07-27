@@ -6,35 +6,21 @@ on:
   pull_request:
 
 jobs:
-  pre-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Run pre-commit on all files
-        run: |
-          pip install pre-commit
-          pre-commit run --all-files --show-diff-on-failure
+  # The jobs themselves live in plugin-repo-ci.yml so kokko-janitor can reuse
+  # them. This repo ships the hooks, so it opts into the bats suite.
+  plugin-repo:
+    uses: ./.github/workflows/plugin-repo-ci.yml
+    with:
+      run-hook-tests: true
 
-  validate-plugins:
+  # A release must not go out with the marketplace and manifests claiming a
+  # version that nothing bumped. Cheap to check, easy to forget.
+  version-bumped:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-      - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
-      - name: Validate every plugin manifest
-        run: |
-          status=0
-          for dir in plugins/*/; do
-            echo "::group::claude plugin validate $dir"
-            claude plugin validate "$dir" || status=1
-            echo "::endgroup::"
-          done
-          exit "$status"
-      - name: Check marketplace.json is in sync with plugin manifests
-        run: bash scripts/check-marketplace-sync.sh
+          fetch-depth: 0
+      - name: A change under plugins/ must come with a version bump
+        run: bash scripts/check-version-bumped.sh "origin/${{ github.base_ref }}"

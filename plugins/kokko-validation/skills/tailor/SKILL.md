@@ -2,6 +2,7 @@
 name: tailor
 description: Instantiate a generic validation/deployment master prompt for the current repo and save it to prompts/
 argument-hint: "<local|deployed|azure-deploy|aesthetics> [hints, e.g. resource group name, app name]"
+allowed-tools: Bash(git:*), Bash(az:*), Read, Write, Edit, Glob, Grep
 ---
 
 # Tailor Skill

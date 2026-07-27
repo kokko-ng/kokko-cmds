@@ -2,6 +2,7 @@
 name: architecture
 description: Architecture enforcement (import-linter for py, dependency-cruiser for js)
 argument-hint: "[py|js]"
+allowed-tools: Bash(lint-imports:*), Bash(uv run lint-imports:*), Bash(npx depcruise:*), Bash(depcruise:*), Bash(git:*), Read, Edit, Glob, Grep
 ---
 
 # Architecture Enforcement Skill

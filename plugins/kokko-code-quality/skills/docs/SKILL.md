@@ -2,6 +2,7 @@
 name: docs
 description: Documentation coverage and formatting (interrogate/pydocstyle for py, eslint-jsdoc for js, XML docs for dotnet)
 argument-hint: "[py|js|dotnet]"
+allowed-tools: Bash(interrogate:*), Bash(uv run interrogate:*), Bash(pydocstyle:*), Bash(uv run pydocstyle:*), Bash(npx eslint:*), Bash(dotnet build:*), Bash(git:*), Read, Edit, Glob, Grep
 ---
 
 # Documentation Coverage Skill

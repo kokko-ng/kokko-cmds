@@ -2,6 +2,7 @@
 name: types
 description: Type checking and annotation fixes (mypy for py, tsc for js, nullable analyzers for dotnet)
 argument-hint: "[py|js|dotnet]"
+allowed-tools: Bash(mypy:*), Bash(uv run mypy:*), Bash(npx tsc:*), Bash(tsc:*), Bash(dotnet build:*), Bash(git:*), Read, Edit, Glob, Grep
 ---
 
 # Type Checking Skill

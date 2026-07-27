@@ -1,68 +1,73 @@
-# file-operations.txt - File and directory deletion patterns
+# file-operations.txt - deletions that reach outside the workspace, or that
+# cannot be undone.
+#
+# THE RULE HERE IS ABOUT THE TARGET, NOT THE FLAGS.
+#
+# This file used to lead with a bare `rm[[:space:]]+-rf`, plus `rm -r `,
+# `rm -f `, `rm --force` and `rmdir `. That denies `rm -rf ./dist`,
+# `rm -rf node_modules`, `rm -rf .venv` and `rm -f tmp.json` -- which is most
+# of what deleting a file is FOR during development. A guard that fires on
+# every build-directory cleanup is noise, and noise gets the whole plugin
+# switched off.
+#
+# `rm -rf <relative path inside the workspace>` is therefore ALLOWED. What is
+# denied is a delete whose target is the filesystem root, a system directory,
+# the home directory, a parent directory, a bare glob, or credential/config
+# material -- plus the tools that destroy data beyond recovery by design.
+#
+# `rmdir` was dropped entirely: it refuses to remove a non-empty directory, so
+# it is the *safe* delete.
+#
+# Patterns are anchored to a command position and matched case-sensitively by
+# lib/patterns.sh. `OPTS` below stands for any run of leading flags.
 
-# rm commands - file/directory deletion
-rm[[:space:]]+-rf
-rm[[:space:]]+-fr
-rm[[:space:]]+-r[[:space:]]+-f
-rm[[:space:]]+-f[[:space:]]+-r
-rm[[:space:]]+--recursive[[:space:]]+--force
-rm[[:space:]]+--force[[:space:]]+--recursive
-rm[[:space:]]+-r[[:space:]]
-rm[[:space:]]+--recursive
-rm[[:space:]]+-f[[:space:]]
-rm[[:space:]]+--force
-\brm[[:space:]]+/
-\brm[[:space:]]+\*
-\brm[[:space:]]+\.\.
-\brm[[:space:]]+~
-\brm[[:space:]]+\$HOME
+# --- rm targeting the filesystem root or a system directory ---
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*/([[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*/(bin|boot|dev|etc|lib|lib32|lib64|opt|proc|root|run|sbin|srv|sys|usr|var)([/[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*/\*
 
-# Directory removal
-rmdir[[:space:]]+
+# --- rm targeting the home directory or a parent of the workspace ---
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*~([/[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*\$HOME([/[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*/home/[^[:space:]]+([[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*\.\.([/[:space:]]|$)
 
-# Secure deletion utilities
+# --- rm with a bare glob, or the current directory itself ---
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*\*([[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*\.([[:space:]]|$)
+rm[[:space:]]+(-[a-zA-Z-]+[[:space:]]+)*\./([[:space:]]|$)
+
+# --- rm targeting credentials and shell/tool configuration ---
+# Anchored on a separator so `rm notes.ssh-setup.md` does not match.
+rm[[:space:]]+.*\.ssh([/[:space:]]|$)
+rm[[:space:]]+.*\.aws([/[:space:]]|$)
+rm[[:space:]]+.*\.kube([/[:space:]]|$)
+rm[[:space:]]+.*\.azure([/[:space:]]|$)
+rm[[:space:]]+.*\.gnupg([/[:space:]]|$)
+rm[[:space:]]+.*\.docker([/[:space:]]|$)
+rm[[:space:]]+.*\.gitconfig([[:space:]]|$)
+rm[[:space:]]+.*\.bashrc([[:space:]]|$)
+rm[[:space:]]+.*\.zshrc([[:space:]]|$)
+rm[[:space:]]+.*\.bash_profile([[:space:]]|$)
+rm[[:space:]]+.*\.profile([[:space:]]|$)
+
+# --- Unrecoverable by design. These overwrite the bytes; there is no undelete
+# --- and no snapshot, whatever the target.
 shred[[:space:]]+
 srm[[:space:]]+
 wipe[[:space:]]+
 secure-delete[[:space:]]+
 
-# Truncate files
+# --- Silent truncation to zero bytes ---
 truncate[[:space:]]+-s[[:space:]]*0
 truncate[[:space:]]+--size[[:space:]]*0
-(^|[[:space:]])>[[:space:]]*/
-cat[[:space:]]+/dev/null[[:space:]]*>
-
-# Move to /dev/null (data loss)
+cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*[^[:space:]]
 mv[[:space:]]+.*[[:space:]]+/dev/null
 
-# Overwrite files
-cp[[:space:]]+/dev/null[[:space:]]+
-dd[[:space:]]+of=.*[[:space:]]+if=/dev/zero
-dd[[:space:]]+of=.*[[:space:]]+if=/dev/urandom
+# --- Redirection that clobbers a system path ---
+>[[:space:]]*/(bin|boot|dev|etc|lib|proc|sbin|sys|usr|var)/
 
-# Archive with source removal
-zip[[:space:]]+-m
-zip[[:space:]]+--move
-tar[[:space:]]+--remove-files
-7z[[:space:]]+d[[:space:]]
-
-# Dangerous find -delete
-find[[:space:]]+.*-delete
-find[[:space:]]+.*-exec[[:space:]]+rm
-
-# Core system files (extremely dangerous)
-\brm[[:space:]]+.*\.bashrc
-\brm[[:space:]]+.*\.zshrc
-\brm[[:space:]]+.*\.profile
-\brm[[:space:]]+.*\.bash_profile
-\brm[[:space:]]+.*\.gitconfig
-\brm[[:space:]]+.*\.ssh
-\brm[[:space:]]+.*\.gnupg
-\brm[[:space:]]+.*\.aws
-\brm[[:space:]]+.*\.kube
-\brm[[:space:]]+.*\.config
-
-# Clearing temp and cache (can break running processes)
-rm[[:space:]]+-rf[[:space:]]+/tmp
-rm[[:space:]]+-rf[[:space:]]+/var/tmp
-rm[[:space:]]+-rf[[:space:]]+.*\.cache
+# --- Archive operations that DELETE the source files as a side effect. The
+# --- destructive part is easy to miss in review.
+zip[[:space:]]+(-[a-zA-Z]*m|--move)([[:space:]]|$)
+tar[[:space:]]+.*--remove-files

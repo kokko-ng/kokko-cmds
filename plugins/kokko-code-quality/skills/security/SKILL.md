@@ -2,6 +2,7 @@
 name: security
 description: Security analysis and vulnerability fixes (bandit for py, eslint-security/npm-audit for js, SecurityCodeScan for dotnet)
 argument-hint: "[py|js|dotnet]"
+allowed-tools: Bash(bandit:*), Bash(uv run bandit:*), Bash(npm audit:*), Bash(npx eslint:*), Bash(dotnet list:*), Bash(git:*), Read, Edit, Glob, Grep
 ---
 
 # Security Analysis Skill

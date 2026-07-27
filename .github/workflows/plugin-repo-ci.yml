@@ -1,0 +1,142 @@
+# Reusable CI for a kokko plugin marketplace repository.
+#
+# kokko-cmds and kokko-janitor are the same shape -- a marketplace.json plus
+# plugins/*/ with manifests, commands, skills and hooks -- but only kokko-cmds
+# had any CI. Rather than copy the jobs into the other repo and let them drift
+# (the exact failure mode this repo already hit with play-sound.sh), the jobs
+# live here once and kokko-janitor calls this workflow.
+#
+# Called by:
+#   kokko-ng/kokko-cmds     .github/workflows/ci.yml
+#   kokko-ng/kokko-janitor  .github/workflows/ci.yml
+name: Plugin repo CI
+
+on:
+  workflow_call:
+    inputs:
+      run-hook-tests:
+        description: "Run the bats hook suite in tests/ (only kokko-cmds ships hooks)"
+        type: boolean
+        default: false
+      run-python-checks:
+        description: "Lint and test Python under plugins/*/scripts/"
+        type: boolean
+        default: false
+      marketplace-sync-script:
+        description: "Path to the marketplace/plugin.json sync checker"
+        type: string
+        default: "scripts/check-marketplace-sync.sh"
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run pre-commit on all files
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files --show-diff-on-failure
+
+  validate-plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate every plugin manifest
+        run: |
+          status=0
+          for dir in plugins/*/; do
+            echo "::group::claude plugin validate $dir"
+            claude plugin validate "$dir" || status=1
+            echo "::endgroup::"
+          done
+          exit "$status"
+      - name: Check marketplace.json is in sync with plugin manifests
+        run: bash "${{ inputs.marketplace-sync-script }}"
+
+  # Frontmatter is what makes a command or skill discoverable. A missing
+  # description means Claude cannot decide when to use it, and nothing caught
+  # that before.
+  validate-frontmatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every command and skill has usable frontmatter
+        run: |
+          status=0
+          while IFS= read -r f; do
+            case "$f" in */references/*) continue ;; esac
+            if ! head -1 "$f" | grep -q '^---$'; then
+              echo "ERROR: $f has no frontmatter block"
+              status=1
+              continue
+            fi
+            fm="$(awk 'NR>1 && /^---$/{exit} NR>1' "$f")"
+            printf '%s' "$fm" | grep -q '^description:' \
+              || { echo "ERROR: $f has no 'description:' in its frontmatter"; status=1; }
+            case "$f" in
+              */SKILL.md)
+                printf '%s' "$fm" | grep -q '^name:' \
+                  || { echo "ERROR: $f has no 'name:' in its frontmatter"; status=1; }
+                printf '%s' "$fm" | grep -q '^allowed-tools:' \
+                  || { echo "ERROR: $f has no 'allowed-tools:' in its frontmatter"; status=1; }
+                ;;
+            esac
+          done < <(find plugins -name '*.md' \( -path '*/commands/*' -o -name 'SKILL.md' \))
+          exit "$status"
+
+      - name: Reference files must not sit inside a commands/ tree
+        run: |
+          # A .md file under commands/ is a command. Reference material there
+          # either registers as a broken command or is silently ignored.
+          status=0
+          while IFS= read -r f; do
+            echo "ERROR: $f is reference material inside a commands/ tree; move it beside the plugin instead"
+            status=1
+          done < <(find plugins -path '*/commands/*/references/*' -name '*.md')
+          exit "$status"
+
+  hook-tests:
+    if: inputs.run-hook-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bats
+        run: npm install -g bats
+      - name: Shared hook libraries are in sync across plugins
+        run: bash scripts/check-shared-lib-sync.sh
+      - name: Dangerous-command patterns compile and are all wired up
+        run: bash scripts/check-patterns.sh
+      - name: Run the hook suite
+        env:
+          KOKKO_SOUNDS: "off"
+        run: bats --print-output-on-failure tests/
+
+  python-checks:
+    if: inputs.run-python-checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tooling
+        run: pip install ruff pytest
+      - name: Ruff
+        run: ruff check plugins/
+      - name: Ruff format check
+        run: ruff format --check plugins/
+      - name: Pytest
+        run: |
+          if [ -d tests ] && find tests -name 'test_*.py' -print -quit | grep -q .; then
+            pytest tests/ -q
+          else
+            echo "No Python tests found - skipping"
+          fi

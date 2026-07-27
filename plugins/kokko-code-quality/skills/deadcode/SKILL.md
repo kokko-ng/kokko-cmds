@@ -2,6 +2,7 @@
 name: deadcode
 description: Dead code detection and removal (vulture for py, knip for js, .NET analyzers for dotnet)
 argument-hint: "[py|js|dotnet]"
+allowed-tools: Bash(vulture:*), Bash(uv run vulture:*), Bash(npx knip:*), Bash(knip:*), Bash(dotnet build:*), Bash(git:*), Read, Edit, Glob, Grep
 ---
 
 # Dead Code Detection Skill
