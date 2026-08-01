@@ -5,6 +5,12 @@
 play_sound() {
     local sound_type="${1:-info}"
     local os_type
+
+    # Global mute: KOKKO_SOUNDS=off. Needed for a hook to be testable at all --
+    # a test sweep over the deny paths otherwise fires dozens of alerts at the
+    # machine, which is how you learn the default volume was 10x.
+    [ "${KOKKO_SOUNDS:-on}" = "off" ] && return 0
+
     os_type=$(uname -s)
 
     case "$os_type" in
@@ -19,7 +25,9 @@ play_sound() {
                 completion) sound_file="/System/Library/Sounds/Hero.aiff" ;;
                 *)          sound_file="/System/Library/Sounds/Pop.aiff" ;;
             esac
-            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-10.0}" "$sound_file"
+            # afplay -v is a gain multiplier: 1.0 is unity. The old default of
+            # 10.0 was a 10x amplification on a system alert sound.
+            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-1.0}" "$sound_file"
             ;;
 
         Linux)
@@ -67,8 +75,11 @@ play_sound() {
                     (speaker-test -t sine -f "$freq" -l 1 >/dev/null 2>&1 &
                      sleep "$duration" && pkill -f "speaker-test.*-f $freq" 2>/dev/null) &
                 elif [ -e /dev/tty ]; then
-                    # Fallback (containers): terminal bell via host TTY
-                    printf '\a' > /dev/tty 2>/dev/null
+                    # Fallback (containers): terminal bell via host TTY.
+                    # The redirection itself can fail (no controlling terminal),
+                    # so the whole group is silenced -- a sound utility must
+                    # never leak stderr noise into a hook's output.
+                    { printf '\a' > /dev/tty; } 2>/dev/null || true
                 fi
             fi
             ;;
