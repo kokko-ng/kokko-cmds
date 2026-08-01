@@ -5,6 +5,13 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
@@ -17,6 +24,13 @@ jobs:
         run: |
           pip install pre-commit
           pre-commit run --all-files --show-diff-on-failure
+
+  test-hooks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run hook test harness
+        run: bash tests/hooks/run-tests.sh
 
   validate-plugins:
     runs-on: ubuntu-latest
@@ -38,3 +52,25 @@ jobs:
           exit "$status"
       - name: Check marketplace.json is in sync with plugin manifests
         run: bash scripts/check-marketplace-sync.sh
+      - name: Check every hooks.json command resolves to an executable file
+        run: |
+          status=0
+          for hooks_json in plugins/*/hooks/hooks.json; do
+            [ -f "$hooks_json" ] || continue
+            plugin_root=$(dirname "$(dirname "$hooks_json")")
+            while IFS= read -r cmd; do
+              resolved=${cmd//"\${CLAUDE_PLUGIN_ROOT}"/$plugin_root}
+              if [ ! -f "$resolved" ]; then
+                echo "ERROR: $hooks_json -> '$cmd' does not resolve to a file ($resolved)"
+                status=1
+              elif [ ! -x "$resolved" ]; then
+                echo "ERROR: $hooks_json -> $resolved is not executable"
+                status=1
+              fi
+            done < <(jq -r '.hooks | to_entries[] | .value[] | .hooks[] | .command' "$hooks_json")
+          done
+          exit "$status"
+      - name: Check the two play-sound.sh copies are byte-identical
+        run: |
+          cmp plugins/kokko-notifications/hooks/utils/play-sound.sh \
+              plugins/kokko-safety/hooks/utils/play-sound.sh
