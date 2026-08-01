@@ -4,29 +4,26 @@
 #
 # This hook loads patterns from:
 #   hooks/dangerous-patterns/git.txt
+set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
+# shellcheck source=utils/hook-preamble.sh
+source "$SCRIPT_DIR/utils/hook-preamble.sh"
+require_jq_or_ask
+read_input_or_ask
+# shellcheck source=utils/play-sound.sh
 source "$SCRIPT_DIR/utils/play-sound.sh"
+# shellcheck source=utils/load-patterns.sh
 source "$SCRIPT_DIR/utils/load-patterns.sh"
 
-input=$(cat)
-command=$(echo "$input" | jq -r '.tool_input.command // ""')
+command=$(printf '%s' "$HOOK_INPUT" | jq -r '.tool_input.command // ""')
 
 # Load git-specific patterns
 load_patterns "git"
 
 if check_dangerous_pattern "$command"; then
-    play_sound "warning"
-
-    cat << EOF
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "ask"
-  },
-  "systemMessage": "Destructive git operation detected. This could rewrite history, delete branches, or discard changes. Allow Claude to proceed?"
-}
-EOF
+    play_sound "warning" || true
+    emit_ask "Destructive git operation detected: matched pattern '${MATCHED_PATTERN}' from category '${MATCHED_CATEGORY}'. This could rewrite history, delete branches, or discard changes. Allow Claude to proceed?"
     exit 0
 fi
 
