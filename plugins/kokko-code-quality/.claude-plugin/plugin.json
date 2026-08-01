@@ -16,18 +16,5 @@
     "complexity",
     "architecture",
     "documentation"
-  ],
-  "commands": [
-    "./commands/analysis/",
-    "./commands/quality/",
-    "./commands/clean/"
-  ],
-  "skills": [
-    "./skills/architecture/",
-    "./skills/complexity/",
-    "./skills/deadcode/",
-    "./skills/docs/",
-    "./skills/security/",
-    "./skills/types/"
   ]
 }

@@ -1,7 +1,6 @@
 ---
 name: security
-description: Security analysis and vulnerability fixes (bandit for py, eslint-security/npm-audit for js, SecurityCodeScan for dotnet)
-argument-hint: "[py|js|dotnet]"
+description: Run security analysis and fix findings with bandit (Python), eslint-plugin-security plus npm audit (JavaScript/TypeScript), or SecurityCodeScan (.NET). Use when the user asks for a security scan, a vulnerability audit, or fixes for insecure patterns and vulnerable dependencies. Trigger on "security scan", "vulnerabilities", "bandit", "npm audit", or "CVE"; pass py, js, or dotnet to pick the stack.
 ---
 
 # Security Analysis Skill

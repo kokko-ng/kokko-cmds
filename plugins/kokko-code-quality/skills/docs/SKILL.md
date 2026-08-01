@@ -1,7 +1,6 @@
 ---
 name: docs
-description: Documentation coverage and formatting (interrogate/pydocstyle for py, eslint-jsdoc for js, XML docs for dotnet)
-argument-hint: "[py|js|dotnet]"
+description: Check and improve documentation coverage with interrogate/pydocstyle (Python), eslint-plugin-jsdoc (JavaScript/TypeScript), or XML doc comments (.NET). Use when the user asks to add docstrings, audit doc coverage, or fix docstring formatting. Trigger on "docstrings", "documentation coverage", "jsdoc", or "xml docs"; pass py, js, or dotnet to pick the stack.
 ---
 
 # Documentation Coverage Skill
