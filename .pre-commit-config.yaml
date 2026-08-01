@@ -7,12 +7,17 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=lf]
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.47.0
     hooks:
       - id: markdownlint
         args: [--fix]
+        # The kokko-validation templates contain intentional placeholder
+        # syntax ({{LIKE_THIS}}) that trips markdownlint; they are excluded
+        # on purpose, not by accident.
         exclude: ^plugins/kokko-validation/skills/tailor/references/
 
   # shellcheck-py, not koalaman/shellcheck-precommit: the latter runs shellcheck
@@ -23,4 +28,4 @@ repos:
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
-        args: [--severity=warning]
+        args: [--severity=info, -x]
