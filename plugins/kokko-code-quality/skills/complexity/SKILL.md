@@ -1,7 +1,6 @@
 ---
 name: complexity
-description: Complexity analysis and refactoring (radon for py, eslint for js, .NET analyzers for dotnet)
-argument-hint: "[py|js|dotnet]"
+description: Measure and reduce code complexity with radon (Python), ESLint complexity rules (JavaScript/TypeScript), or .NET analyzers. Use when the user asks to find overly complex code, lower cyclomatic complexity, or refactor tangled functions. Trigger on "complexity", "cyclomatic", "too complex", or "simplify this module"; pass py, js, or dotnet to pick the stack.
 ---
 
 # Complexity Analysis Skill

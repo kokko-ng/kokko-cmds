@@ -1,5 +1,5 @@
 ---
-description: Bump version across all files, open/merge a PR, and publish a GitHub release.
+description: Bump version across all files and open/merge a PR; the Release workflow publishes.
 argument-hint: '[patch|minor|major] [--version x.y.z]'
 allowed-tools: Bash(git:*), Bash(gh:*), Read, Edit, Grep, Glob, AskUserQuestion, mcp__github__create_pull_request, mcp__github__merge_pull_request, mcp__github__pull_request_read, mcp__github__list_releases, mcp__github__actions_list, mcp__github__get_job_logs
 disable-model-invocation: true
@@ -7,7 +7,9 @@ disable-model-invocation: true
 
 # Version Bump and Release
 
-Increment version, open and merge a PR, then publish a GitHub release. `$ARGUMENTS` sets the bump type (patch/minor/major, default patch) or an explicit `--version x.y.z`.
+Increment version, then open and merge a PR. The GitHub release itself is
+published automatically by the Release workflow once CI succeeds on `main`.
+`$ARGUMENTS` sets the bump type (patch/minor/major, default patch) or an explicit `--version x.y.z`.
 
 ## Steps
 
@@ -51,32 +53,18 @@ Open the PR with the GitHub MCP tool `mcp__github__create_pull_request` (base `m
 
 Run quality checks and wait for CI. Then **confirm with AskUserQuestion before merging** — show the PR number, title, and CI status, with options "Merge", "Wait", "Abort". Only after approval, merge via `mcp__github__merge_pull_request` (fallback: `gh pr merge --merge`).
 
-### 6. Prepare release notes
+### 6. Verify the automated release
 
-```bash
-git describe --tags --abbrev=0
-git log <previous-tag>..HEAD --oneline
-git diff <previous-tag>..HEAD --stat
-```
+This command's job ends at the version bump + merge. Publishing is owned by
+the Release workflow (`.github/workflows/release.yml`): after the merge lands
+on `main` and CI succeeds, the workflow creates the `vX.Y.Z` GitHub release
+automatically. Do NOT run `gh release create` or push tags by hand.
 
-Categorize commits into Features, Improvements, Bug Fixes, Documentation, Internal, and note Breaking Changes.
-
-### 7. Publish the GitHub release
-
-**Confirm with AskUserQuestion before publishing** — show the version, target, and drafted notes. Then tag and publish:
-
-```bash
-git checkout main && git pull origin main
-git tag -a vX.Y.Z -m "vX.Y.Z"
-git push origin vX.Y.Z
-gh release create vX.Y.Z --target main --title "vX.Y.Z" --notes "<categorized notes>"
-```
-
-If `gh` is unavailable, the pushed annotated tag still marks the release; note to the user that the GitHub Release object must be created from the tag in the web UI (the GitHub MCP server currently has no release-creation tool).
-
-### 8. Verify
-
-Confirm the release exists (`mcp__github__list_releases` or `gh release view vX.Y.Z`) and monitor any triggered CI (`mcp__github__actions_list` / `mcp__github__get_job_logs`, or `gh run list`).
+Monitor the CI and Release workflow runs (`mcp__github__actions_list` /
+`mcp__github__get_job_logs`, or `gh run list`) and confirm the release exists
+once they finish (`mcp__github__list_releases` or `gh release view vX.Y.Z`).
+If the workflow did not fire (e.g. CI failed), report why instead of
+publishing manually.
 
 ## Notes
 

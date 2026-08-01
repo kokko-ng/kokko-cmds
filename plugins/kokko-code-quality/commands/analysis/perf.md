@@ -1,9 +1,7 @@
 ---
 description: Identify performance bottlenecks across a target and recommend prioritized fixes.
 argument-hint: '[target] [--focus database|api|frontend|backend|memory]'
-allowed-tools: Read, Grep, Glob, Bash, Agent
-context: fork
-agent: general-purpose
+allowed-tools: Read, Grep, Glob, Bash, Task
 ---
 
 # Performance Bottleneck Analysis
@@ -12,7 +10,7 @@ Analyze `$1` (default: entire project) for performance bottlenecks, optionally
 scoped by `--focus`. Prioritize hot paths (request handlers, background jobs,
 query-heavy operations, external integrations) and measure before optimizing —
 check existing metrics/logging and TODO comments about performance. For large
-targets, fan out with the Agent tool (subagent_type: Explore) per focus area
+targets, fan out with the Task tool (subagent_type: Explore) per focus area
 and synthesize results.
 
 ## What to Search For

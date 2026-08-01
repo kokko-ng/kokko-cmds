@@ -25,7 +25,9 @@
 # honestly: one completion sound per turn, at unity gain.
 #
 # Silence it with KOKKO_SOUNDS=off, or disable the plugin in settings.json.
+# shellcheck source-path=SCRIPTDIR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=utils/play-sound.sh
 source "$SCRIPT_DIR/utils/play-sound.sh"
 
 input=$(cat)

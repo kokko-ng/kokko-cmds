@@ -1,1 +1,31 @@
+# OS cruft
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+
+# Tool caches
+.pre-commit-cache/
+.cache/
+
+# Editors
+.idea/
+*.swp
+*.swo
+
+# Local scratch
+tmp/
+*.tmp

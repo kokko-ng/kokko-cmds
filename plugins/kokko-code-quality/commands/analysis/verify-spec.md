@@ -2,8 +2,6 @@
 description: Validate a spec.md for structure, completeness, and alignment with the codebase.
 argument-hint: '[spec-file]'
 allowed-tools: Read, Grep, Glob, Bash
-context: fork
-agent: general-purpose
 ---
 
 # Verify Test Specification

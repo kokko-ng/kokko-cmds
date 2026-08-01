@@ -1,134 +1,134 @@
 # cloud-aws.txt - AWS CLI destructive operations
 
 # S3 destructive
-aws[[:space:]]+s3[[:space:]]+rm
-aws[[:space:]]+s3[[:space:]]+rb
-aws[[:space:]]+s3api[[:space:]]+delete-bucket
-aws[[:space:]]+s3api[[:space:]]+delete-object
-aws[[:space:]]+s3api[[:space:]]+delete-objects
+(^|[[:space:]])aws[[:space:]]+s3[[:space:]]+rm
+(^|[[:space:]])aws[[:space:]]+s3[[:space:]]+rb
+(^|[[:space:]])aws[[:space:]]+s3api[[:space:]]+delete-bucket
+(^|[[:space:]])aws[[:space:]]+s3api[[:space:]]+delete-object
+(^|[[:space:]])aws[[:space:]]+s3api[[:space:]]+delete-objects
 
 # EC2 destructive
-aws[[:space:]]+ec2[[:space:]]+terminate-instances
-aws[[:space:]]+ec2[[:space:]]+delete-volume
-aws[[:space:]]+ec2[[:space:]]+delete-snapshot
-aws[[:space:]]+ec2[[:space:]]+delete-key-pair
-aws[[:space:]]+ec2[[:space:]]+delete-security-group
-aws[[:space:]]+ec2[[:space:]]+delete-vpc
-aws[[:space:]]+ec2[[:space:]]+delete-subnet
-aws[[:space:]]+ec2[[:space:]]+delete-internet-gateway
-aws[[:space:]]+ec2[[:space:]]+delete-nat-gateway
-aws[[:space:]]+ec2[[:space:]]+delete-route-table
-aws[[:space:]]+ec2[[:space:]]+delete-network-interface
-aws[[:space:]]+ec2[[:space:]]+release-address
-aws[[:space:]]+ec2[[:space:]]+stop-instances
-aws[[:space:]]+ec2[[:space:]]+reboot-instances
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+terminate-instances
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-volume
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-snapshot
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-key-pair
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-security-group
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-vpc
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-subnet
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-internet-gateway
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-nat-gateway
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-route-table
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+delete-network-interface
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+release-address
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+stop-instances
+(^|[[:space:]])aws[[:space:]]+ec2[[:space:]]+reboot-instances
 
 # RDS destructive
-aws[[:space:]]+rds[[:space:]]+delete-db-instance
-aws[[:space:]]+rds[[:space:]]+delete-db-cluster
-aws[[:space:]]+rds[[:space:]]+delete-db-snapshot
-aws[[:space:]]+rds[[:space:]]+delete-db-cluster-snapshot
-aws[[:space:]]+rds[[:space:]]+stop-db-instance
-aws[[:space:]]+rds[[:space:]]+stop-db-cluster
-aws[[:space:]]+rds[[:space:]]+reboot-db-instance
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+delete-db-instance
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+delete-db-cluster
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+delete-db-snapshot
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+delete-db-cluster-snapshot
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+stop-db-instance
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+stop-db-cluster
+(^|[[:space:]])aws[[:space:]]+rds[[:space:]]+reboot-db-instance
 
 # Lambda destructive
-aws[[:space:]]+lambda[[:space:]]+delete-function
-aws[[:space:]]+lambda[[:space:]]+delete-layer-version
-aws[[:space:]]+lambda[[:space:]]+delete-event-source-mapping
+(^|[[:space:]])aws[[:space:]]+lambda[[:space:]]+delete-function
+(^|[[:space:]])aws[[:space:]]+lambda[[:space:]]+delete-layer-version
+(^|[[:space:]])aws[[:space:]]+lambda[[:space:]]+delete-event-source-mapping
 
 # IAM destructive
-aws[[:space:]]+iam[[:space:]]+delete-user
-aws[[:space:]]+iam[[:space:]]+delete-group
-aws[[:space:]]+iam[[:space:]]+delete-role
-aws[[:space:]]+iam[[:space:]]+delete-policy
-aws[[:space:]]+iam[[:space:]]+delete-access-key
-aws[[:space:]]+iam[[:space:]]+remove-user-from-group
-aws[[:space:]]+iam[[:space:]]+detach-user-policy
-aws[[:space:]]+iam[[:space:]]+detach-role-policy
-aws[[:space:]]+iam[[:space:]]+detach-group-policy
-aws[[:space:]]+iam[[:space:]]+delete-instance-profile
-aws[[:space:]]+iam[[:space:]]+delete-service-linked-role
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-user
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-group
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-role
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-policy
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-access-key
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+remove-user-from-group
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+detach-user-policy
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+detach-role-policy
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+detach-group-policy
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-instance-profile
+(^|[[:space:]])aws[[:space:]]+iam[[:space:]]+delete-service-linked-role
 
 # DynamoDB destructive
-aws[[:space:]]+dynamodb[[:space:]]+delete-table
-aws[[:space:]]+dynamodb[[:space:]]+delete-backup
+(^|[[:space:]])aws[[:space:]]+dynamodb[[:space:]]+delete-table
+(^|[[:space:]])aws[[:space:]]+dynamodb[[:space:]]+delete-backup
 
 # ECS destructive
-aws[[:space:]]+ecs[[:space:]]+delete-cluster
-aws[[:space:]]+ecs[[:space:]]+delete-service
-aws[[:space:]]+ecs[[:space:]]+deregister-task-definition
-aws[[:space:]]+ecs[[:space:]]+stop-task
-aws[[:space:]]+ecs[[:space:]]+delete-capacity-provider
+(^|[[:space:]])aws[[:space:]]+ecs[[:space:]]+delete-cluster
+(^|[[:space:]])aws[[:space:]]+ecs[[:space:]]+delete-service
+(^|[[:space:]])aws[[:space:]]+ecs[[:space:]]+deregister-task-definition
+(^|[[:space:]])aws[[:space:]]+ecs[[:space:]]+stop-task
+(^|[[:space:]])aws[[:space:]]+ecs[[:space:]]+delete-capacity-provider
 
 # EKS destructive
-aws[[:space:]]+eks[[:space:]]+delete-cluster
-aws[[:space:]]+eks[[:space:]]+delete-nodegroup
-aws[[:space:]]+eks[[:space:]]+delete-fargate-profile
-aws[[:space:]]+eks[[:space:]]+delete-addon
+(^|[[:space:]])aws[[:space:]]+eks[[:space:]]+delete-cluster
+(^|[[:space:]])aws[[:space:]]+eks[[:space:]]+delete-nodegroup
+(^|[[:space:]])aws[[:space:]]+eks[[:space:]]+delete-fargate-profile
+(^|[[:space:]])aws[[:space:]]+eks[[:space:]]+delete-addon
 
 # Route53 destructive
-aws[[:space:]]+route53[[:space:]]+delete-hosted-zone
-aws[[:space:]]+route53[[:space:]]+change-resource-record-sets.*DELETE
+(^|[[:space:]])aws[[:space:]]+route53[[:space:]]+delete-hosted-zone
+(^|[[:space:]])aws[[:space:]]+route53[[:space:]]+change-resource-record-sets.*DELETE
 
 # CloudWatch destructive
-aws[[:space:]]+logs[[:space:]]+delete-log-group
-aws[[:space:]]+logs[[:space:]]+delete-log-stream
-aws[[:space:]]+cloudwatch[[:space:]]+delete-alarms
-aws[[:space:]]+cloudwatch[[:space:]]+delete-dashboards
+(^|[[:space:]])aws[[:space:]]+logs[[:space:]]+delete-log-group
+(^|[[:space:]])aws[[:space:]]+logs[[:space:]]+delete-log-stream
+(^|[[:space:]])aws[[:space:]]+cloudwatch[[:space:]]+delete-alarms
+(^|[[:space:]])aws[[:space:]]+cloudwatch[[:space:]]+delete-dashboards
 
 # SNS/SQS destructive
-aws[[:space:]]+sns[[:space:]]+delete-topic
-aws[[:space:]]+sqs[[:space:]]+delete-queue
-aws[[:space:]]+sqs[[:space:]]+purge-queue
+(^|[[:space:]])aws[[:space:]]+sns[[:space:]]+delete-topic
+(^|[[:space:]])aws[[:space:]]+sqs[[:space:]]+delete-queue
+(^|[[:space:]])aws[[:space:]]+sqs[[:space:]]+purge-queue
 
 # Secrets Manager destructive
-aws[[:space:]]+secretsmanager[[:space:]]+delete-secret
+(^|[[:space:]])aws[[:space:]]+secretsmanager[[:space:]]+delete-secret
 
 # KMS destructive
-aws[[:space:]]+kms[[:space:]]+schedule-key-deletion
-aws[[:space:]]+kms[[:space:]]+disable-key
-aws[[:space:]]+kms[[:space:]]+delete-alias
+(^|[[:space:]])aws[[:space:]]+kms[[:space:]]+schedule-key-deletion
+(^|[[:space:]])aws[[:space:]]+kms[[:space:]]+disable-key
+(^|[[:space:]])aws[[:space:]]+kms[[:space:]]+delete-alias
 
 # ElastiCache destructive
-aws[[:space:]]+elasticache[[:space:]]+delete-cache-cluster
-aws[[:space:]]+elasticache[[:space:]]+delete-replication-group
+(^|[[:space:]])aws[[:space:]]+elasticache[[:space:]]+delete-cache-cluster
+(^|[[:space:]])aws[[:space:]]+elasticache[[:space:]]+delete-replication-group
 
 # Elasticsearch/OpenSearch destructive
-aws[[:space:]]+es[[:space:]]+delete-elasticsearch-domain
-aws[[:space:]]+opensearch[[:space:]]+delete-domain
+(^|[[:space:]])aws[[:space:]]+es[[:space:]]+delete-elasticsearch-domain
+(^|[[:space:]])aws[[:space:]]+opensearch[[:space:]]+delete-domain
 
 # API Gateway destructive
-aws[[:space:]]+apigateway[[:space:]]+delete-rest-api
-aws[[:space:]]+apigatewayv2[[:space:]]+delete-api
+(^|[[:space:]])aws[[:space:]]+apigateway[[:space:]]+delete-rest-api
+(^|[[:space:]])aws[[:space:]]+apigatewayv2[[:space:]]+delete-api
 
 # Cognito destructive
-aws[[:space:]]+cognito-idp[[:space:]]+delete-user-pool
-aws[[:space:]]+cognito-identity[[:space:]]+delete-identity-pool
+(^|[[:space:]])aws[[:space:]]+cognito-idp[[:space:]]+delete-user-pool
+(^|[[:space:]])aws[[:space:]]+cognito-identity[[:space:]]+delete-identity-pool
 
 # Kinesis destructive
-aws[[:space:]]+kinesis[[:space:]]+delete-stream
-aws[[:space:]]+firehose[[:space:]]+delete-delivery-stream
+(^|[[:space:]])aws[[:space:]]+kinesis[[:space:]]+delete-stream
+(^|[[:space:]])aws[[:space:]]+firehose[[:space:]]+delete-delivery-stream
 
 # Step Functions destructive
-aws[[:space:]]+stepfunctions[[:space:]]+delete-state-machine
-aws[[:space:]]+stepfunctions[[:space:]]+stop-execution
+(^|[[:space:]])aws[[:space:]]+stepfunctions[[:space:]]+delete-state-machine
+(^|[[:space:]])aws[[:space:]]+stepfunctions[[:space:]]+stop-execution
 
 # ECR destructive
-aws[[:space:]]+ecr[[:space:]]+delete-repository
-aws[[:space:]]+ecr[[:space:]]+batch-delete-image
+(^|[[:space:]])aws[[:space:]]+ecr[[:space:]]+delete-repository
+(^|[[:space:]])aws[[:space:]]+ecr[[:space:]]+batch-delete-image
 
 # Elastic Beanstalk destructive
-aws[[:space:]]+elasticbeanstalk[[:space:]]+terminate-environment
-aws[[:space:]]+elasticbeanstalk[[:space:]]+delete-application
+(^|[[:space:]])aws[[:space:]]+elasticbeanstalk[[:space:]]+terminate-environment
+(^|[[:space:]])aws[[:space:]]+elasticbeanstalk[[:space:]]+delete-application
 
 # CloudFront destructive
-aws[[:space:]]+cloudfront[[:space:]]+delete-distribution
+(^|[[:space:]])aws[[:space:]]+cloudfront[[:space:]]+delete-distribution
 
 # ACM destructive
-aws[[:space:]]+acm[[:space:]]+delete-certificate
+(^|[[:space:]])aws[[:space:]]+acm[[:space:]]+delete-certificate
 
 # Organizations destructive
-aws[[:space:]]+organizations[[:space:]]+delete-organization
-aws[[:space:]]+organizations[[:space:]]+remove-account-from-organization
-aws[[:space:]]+organizations[[:space:]]+delete-organizational-unit
+(^|[[:space:]])aws[[:space:]]+organizations[[:space:]]+delete-organization
+(^|[[:space:]])aws[[:space:]]+organizations[[:space:]]+remove-account-from-organization
+(^|[[:space:]])aws[[:space:]]+organizations[[:space:]]+delete-organizational-unit

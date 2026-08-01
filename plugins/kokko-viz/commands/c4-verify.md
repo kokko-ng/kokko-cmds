@@ -1,9 +1,7 @@
 ---
 description: Verify C4 diagrams against the codebase and auto-fix discrepancies.
 argument-hint: '[system-id]'
-allowed-tools: Agent, Bash, Read, Write, Glob, Grep
-context: fork
-agent: general-purpose
+allowed-tools: Task, Bash, Read, Write, Glob, Grep
 ---
 
 # C4 Architecture Verification
@@ -46,7 +44,7 @@ find codemap/$SYSTEM_ID -type f \
 ## Phase 2: Parallel Verification
 
 Launch ALL FIVE subagents in parallel in a single message. Each is
-`Tool: Agent`, `subagent_type: "Explore"`. Each receives `SYSTEM_ID` and the
+`Tool: Task`, `subagent_type: "Explore"`. Each receives `SYSTEM_ID` and the
 Phase 1 file listing, and outputs JSON with `check_type`, a score, `findings`,
 and `issues` (per c4-templates.md#validation-issue-schema).
 
@@ -83,7 +81,7 @@ Wait for ALL FIVE to complete.
 ## Phase 3: Synthesis
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "general-purpose"
   model: "opus"
@@ -126,7 +124,7 @@ Execute `correction_plan` in order.
 for orphans.
 
 **4B. Diagrams:** for each fix, spawn a focused subagent
-(`Tool: Agent`, `subagent_type: "Explore"`, `model: "haiku"`) given the file
+(`Tool: Task`, `subagent_type: "Explore"`, `model: "haiku"`) given the file
 path, current content, and fixes from the plan; it returns the complete
 updated file.
 
@@ -148,7 +146,7 @@ done
 ## Phase 5: Re-Verification
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   model: "haiku"

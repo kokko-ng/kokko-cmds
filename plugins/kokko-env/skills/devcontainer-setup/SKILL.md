@@ -1,7 +1,6 @@
 ---
 name: devcontainer-setup
-description: Install the kokko-ng/kokko-devcontainer starter into a directory (defaults to the current one), tailor it to that project, and bring the container up
-argument-hint: "[target-directory] [--ref <branch-or-tag>] [--docs] [--no-up]"
+description: Install the kokko-ng/kokko-devcontainer starter into a directory (defaults to the current one), tailor it to that project, and bring the container up. Accepts an optional target directory plus --ref <branch-or-tag>, --docs, and --no-up flags.
 ---
 
 # Devcontainer Setup Skill

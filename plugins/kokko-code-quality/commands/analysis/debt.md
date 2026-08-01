@@ -1,15 +1,13 @@
 ---
 description: Deep-read a target to identify technical debt and build a remediation roadmap.
 argument-hint: '[target]'
-allowed-tools: Read, Grep, Glob, Bash, Agent
-context: fork
-agent: general-purpose
+allowed-tools: Read, Grep, Glob, Bash, Task
 ---
 
 # Technical Debt Analysis
 
 Deep-read `$target` (default: entire project) to surface technical debt and produce
-a prioritized remediation roadmap. For large targets, fan out with the Agent
+a prioritized remediation roadmap. For large targets, fan out with the Task
 tool (subagent_type: Explore) per module and synthesize results.
 
 ## Read Systematically
