@@ -1,10 +1,18 @@
 #!/bin/bash
 # session-start-context.sh - Detect project context at session start
 # SessionStart - Outputs project type and git branch info
+# shellcheck source-path=SCRIPTDIR
+set -euo pipefail
 
-# Read input from stdin
-input=$(cat)
-cwd=$(echo "$input" | jq -r '.cwd // "."')
+SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
+# shellcheck source=utils/hook-preamble.sh
+source "$SCRIPT_DIR/utils/hook-preamble.sh"
+# This hook only adds context; it gates nothing, so missing jq or a malformed
+# payload degrades to a silent no-op instead of a PreToolUse "ask".
+require_jq_or_exit
+read_input_or_exit
+
+cwd=$(printf '%s' "$HOOK_INPUT" | jq -r '.cwd // "."')
 
 cd "$cwd" 2>/dev/null || exit 0
 
@@ -59,7 +67,7 @@ fi
 git_branch=""
 git_dirty=false
 if git rev-parse --git-dir >/dev/null 2>&1; then
-    git_branch=$(git branch --show-current 2>/dev/null)
+    git_branch=$(git branch --show-current 2>/dev/null || true)
     if ! git diff-index --quiet HEAD -- 2>/dev/null; then
         git_dirty=true
     fi

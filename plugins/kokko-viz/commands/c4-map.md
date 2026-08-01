@@ -1,7 +1,7 @@
 ---
 description: Generate a hierarchical C4 architecture map (context/containers/components) from a codebase.
 argument-hint: '[target-directory]'
-allowed-tools: Agent, Bash, Read, Write, Glob, Grep
+allowed-tools: Task, Bash, Read, Write, Glob, Grep
 ---
 
 # C4 Architecture Mapping
@@ -37,7 +37,7 @@ Glob: `**/kokko-viz/skills/c4/references/c4-templates.md` under
 ## Phase 1: System Context
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Map C4 system context"
@@ -67,7 +67,7 @@ Wait for Phase 1. Store: `SYSTEM_ID`, `EXTERNAL_SYSTEMS`, `PRELIMINARY_CONTAINER
 ## Phase 2: Containers
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Map C4 containers"
@@ -104,7 +104,7 @@ Wait for Phase 2. Store: `CONTAINERS` (with `PRELIMINARY_COMPONENTS`),
 ## Phase 3: Components
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Map C4 components"
@@ -138,7 +138,7 @@ Wait for Phase 3. Store: `COMPONENTS_BY_CONTAINER`.
 ## Phase 4: Synthesis
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Synthesize C4 model"

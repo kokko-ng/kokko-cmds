@@ -1,103 +1,103 @@
 # networking.txt - Network configuration and firewall operations
 
 # iptables (Linux firewall)
-iptables[[:space:]]+-F
-iptables[[:space:]]+-X
-iptables[[:space:]]+-D
-iptables[[:space:]]+--flush
-iptables[[:space:]]+--delete
-iptables[[:space:]]+--delete-chain
-ip6tables[[:space:]]+-F
-ip6tables[[:space:]]+-X
-ip6tables[[:space:]]+-D
-iptables-restore[[:space:]]
+(^|[[:space:]])iptables[[:space:]]+-F
+(^|[[:space:]])iptables[[:space:]]+-X
+(^|[[:space:]])iptables[[:space:]]+-D
+(^|[[:space:]])iptables[[:space:]]+--flush
+(^|[[:space:]])iptables[[:space:]]+--delete
+(^|[[:space:]])iptables[[:space:]]+--delete-chain
+(^|[[:space:]])ip6tables[[:space:]]+-F
+(^|[[:space:]])ip6tables[[:space:]]+-X
+(^|[[:space:]])ip6tables[[:space:]]+-D
+(^|[[:space:]])iptables-restore[[:space:]]
 
 # nftables
-nft[[:space:]]+flush
-nft[[:space:]]+delete
-nft[[:space:]]+destroy
+(^|[[:space:]])nft[[:space:]]+flush
+(^|[[:space:]])nft[[:space:]]+delete
+(^|[[:space:]])nft[[:space:]]+destroy
 
 # UFW (Ubuntu firewall)
-ufw[[:space:]]+disable
-ufw[[:space:]]+reset
-ufw[[:space:]]+delete
+(^|[[:space:]])ufw[[:space:]]+disable
+(^|[[:space:]])ufw[[:space:]]+reset
+(^|[[:space:]])ufw[[:space:]]+delete
 
 # firewalld
-firewall-cmd[[:space:]]+--remove
-firewall-cmd[[:space:]]+--delete
-firewall-cmd[[:space:]]+--panic-on
-systemctl[[:space:]]+stop[[:space:]]+firewalld
+(^|[[:space:]])firewall-cmd[[:space:]]+--remove
+(^|[[:space:]])firewall-cmd[[:space:]]+--delete
+(^|[[:space:]])firewall-cmd[[:space:]]+--panic-on
+(^|[[:space:]])systemctl[[:space:]]+stop[[:space:]]+firewalld
 
 # pf (macOS/BSD firewall)
-pfctl[[:space:]]+-d
-pfctl[[:space:]]+-F
+(^|[[:space:]])pfctl[[:space:]]+-d
+(^|[[:space:]])pfctl[[:space:]]+-F
 
 # Network interface control
-ifconfig[[:space:]]+.*[[:space:]]+down
-ifdown[[:space:]]+
-ip[[:space:]]+link[[:space:]]+set[[:space:]]+.*[[:space:]]+down
-ip[[:space:]]+link[[:space:]]+delete
-ip[[:space:]]+addr[[:space:]]+del
-ip[[:space:]]+addr[[:space:]]+flush
+(^|[[:space:]])ifconfig[[:space:]]+.*[[:space:]]+down
+(^|[[:space:]])ifdown[[:space:]]+
+(^|[[:space:]])ip[[:space:]]+link[[:space:]]+set[[:space:]]+.*[[:space:]]+down
+(^|[[:space:]])ip[[:space:]]+link[[:space:]]+delete
+(^|[[:space:]])ip[[:space:]]+addr[[:space:]]+del
+(^|[[:space:]])ip[[:space:]]+addr[[:space:]]+flush
 
 # Route manipulation
-route[[:space:]]+del
-route[[:space:]]+delete
-ip[[:space:]]+route[[:space:]]+del
-ip[[:space:]]+route[[:space:]]+flush
+(^|[[:space:]])route[[:space:]]+del
+(^|[[:space:]])route[[:space:]]+delete
+(^|[[:space:]])ip[[:space:]]+route[[:space:]]+del
+(^|[[:space:]])ip[[:space:]]+route[[:space:]]+flush
 
 # macOS networksetup
-networksetup[[:space:]]+-setairportpower[[:space:]]+.*[[:space:]]+off
-networksetup[[:space:]]+-setnetworkserviceenabled[[:space:]]+.*[[:space:]]+off
-networksetup[[:space:]]+-removeallpreferredwirelessnetworks
-networksetup[[:space:]]+-removepreferredwirelessnetwork
+(^|[[:space:]])networksetup[[:space:]]+-setairportpower[[:space:]]+.*[[:space:]]+off
+(^|[[:space:]])networksetup[[:space:]]+-setnetworkserviceenabled[[:space:]]+.*[[:space:]]+off
+(^|[[:space:]])networksetup[[:space:]]+-removeallpreferredwirelessnetworks
+(^|[[:space:]])networksetup[[:space:]]+-removepreferredwirelessnetwork
 
 # NetworkManager
-nmcli[[:space:]]+connection[[:space:]]+delete
-nmcli[[:space:]]+connection[[:space:]]+down
-nmcli[[:space:]]+device[[:space:]]+disconnect
-nmcli[[:space:]]+networking[[:space:]]+off
-nmcli[[:space:]]+radio[[:space:]]+wifi[[:space:]]+off
+(^|[[:space:]])nmcli[[:space:]]+connection[[:space:]]+delete
+(^|[[:space:]])nmcli[[:space:]]+connection[[:space:]]+down
+(^|[[:space:]])nmcli[[:space:]]+device[[:space:]]+disconnect
+(^|[[:space:]])nmcli[[:space:]]+networking[[:space:]]+off
+(^|[[:space:]])nmcli[[:space:]]+radio[[:space:]]+wifi[[:space:]]+off
 
 # systemd-networkd
-networkctl[[:space:]]+down
-networkctl[[:space:]]+delete
+(^|[[:space:]])networkctl[[:space:]]+down
+(^|[[:space:]])networkctl[[:space:]]+delete
 
 # Wireless tools
-iwconfig[[:space:]]+.*[[:space:]]+txpower[[:space:]]+off
-rfkill[[:space:]]+block
+(^|[[:space:]])iwconfig[[:space:]]+.*[[:space:]]+txpower[[:space:]]+off
+(^|[[:space:]])rfkill[[:space:]]+block
 
 # Bridge manipulation
-brctl[[:space:]]+delbr
-brctl[[:space:]]+delif
-ip[[:space:]]+link[[:space:]]+set[[:space:]]+.*[[:space:]]+nomaster
+(^|[[:space:]])brctl[[:space:]]+delbr
+(^|[[:space:]])brctl[[:space:]]+delif
+(^|[[:space:]])ip[[:space:]]+link[[:space:]]+set[[:space:]]+.*[[:space:]]+nomaster
 
 # VLAN manipulation
-vconfig[[:space:]]+rem
-ip[[:space:]]+link[[:space:]]+delete[[:space:]]+.*[[:space:]]+type[[:space:]]+vlan
+(^|[[:space:]])vconfig[[:space:]]+rem
+(^|[[:space:]])ip[[:space:]]+link[[:space:]]+delete[[:space:]]+.*[[:space:]]+type[[:space:]]+vlan
 
 # VPN/tunnel destruction
-wg-quick[[:space:]]+down
-openvpn[[:space:]]+--kill
-strongswan[[:space:]]+down
-ipsec[[:space:]]+down
-tailscale[[:space:]]+down
-tailscale[[:space:]]+logout
+(^|[[:space:]])wg-quick[[:space:]]+down
+(^|[[:space:]])openvpn[[:space:]]+--kill
+(^|[[:space:]])strongswan[[:space:]]+down
+(^|[[:space:]])ipsec[[:space:]]+down
+(^|[[:space:]])tailscale[[:space:]]+down
+(^|[[:space:]])tailscale[[:space:]]+logout
 
 # DNS manipulation
-resolvectl[[:space:]]+reset
-resolvectl[[:space:]]+flush-caches
-systemd-resolve[[:space:]]+--flush-caches
-dscacheutil[[:space:]]+-flushcache
-killall[[:space:]]+-HUP[[:space:]]+mDNSResponder
+(^|[[:space:]])resolvectl[[:space:]]+reset
+(^|[[:space:]])resolvectl[[:space:]]+flush-caches
+(^|[[:space:]])systemd-resolve[[:space:]]+--flush-caches
+(^|[[:space:]])dscacheutil[[:space:]]+-flushcache
+(^|[[:space:]])killall[[:space:]]+-HUP[[:space:]]+mDNSResponder
 
 # SSH tunnels
-pkill[[:space:]]+-f[[:space:]]+ssh
-killall[[:space:]]+ssh
+(^|[[:space:]])pkill[[:space:]]+-f[[:space:]]+ssh
+(^|[[:space:]])killall[[:space:]]+ssh
 
 # Proxy settings
-unset[[:space:]]+http_proxy
-unset[[:space:]]+https_proxy
-unset[[:space:]]+HTTP_PROXY
-unset[[:space:]]+HTTPS_PROXY
-unset[[:space:]]+all_proxy
+(^|[[:space:]])unset[[:space:]]+http_proxy
+(^|[[:space:]])unset[[:space:]]+https_proxy
+(^|[[:space:]])unset[[:space:]]+HTTP_PROXY
+(^|[[:space:]])unset[[:space:]]+HTTPS_PROXY
+(^|[[:space:]])unset[[:space:]]+all_proxy

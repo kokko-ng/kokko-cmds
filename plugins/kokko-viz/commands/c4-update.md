@@ -1,7 +1,7 @@
 ---
 description: Update an existing C4 model to match current code changes.
 argument-hint: '[system-id]'
-allowed-tools: Agent, Bash, Read, Write, Glob, Grep
+allowed-tools: Task, Bash, Read, Write, Glob, Grep
 ---
 
 # C4 Architecture Update
@@ -55,7 +55,7 @@ git diff --name-status $LAST_UPDATE..HEAD -- . ':!codemap' ':!*.md' | head -50
 ### Step 1C: Categorize Changes
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Detect C4 changes"
@@ -91,7 +91,7 @@ Wait for Phase 1. If no changes detected, report and exit.
 ## Phase 2: Impact Analysis
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Plan C4 updates"
@@ -133,7 +133,7 @@ Update navigation links in parent files after deletions.
 For each modified element, spawn a level-specific subagent:
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Update C4 <level>"
@@ -170,7 +170,7 @@ mkdir -p codemap/$SYSTEM_ID/containers/<container>/components/<new-id>
 ## Phase 4: Cross-Level Consistency
 
 ```yaml
-Tool: Agent
+Tool: Task
 Parameters:
   subagent_type: "Explore"
   description: "Verify C4 consistency"
