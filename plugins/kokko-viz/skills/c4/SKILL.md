@@ -1,6 +1,6 @@
 ---
 name: c4
-description: Authoring rules for C4 architecture and codemap documents - mandatory source-file hyperlinks, no validation report files, template and diagram conventions
+description: Authoring rules and shared templates for C4 architecture and codemap documents - mandatory source-file hyperlinks, no validation report files, template and diagram conventions. Use when the user asks to generate, update, or verify C4 models, architecture diagrams, or codemap documentation. Trigger on "C4", "codemap", "architecture diagram", or any /c4-map, /c4-update, or /c4-verify run.
 ---
 
 # C4 Authoring Skill

@@ -1,7 +1,6 @@
 ---
 name: deadcode
-description: Dead code detection and removal (vulture for py, knip for js, .NET analyzers for dotnet)
-argument-hint: "[py|js|dotnet]"
+description: Detect and remove dead code with vulture (Python), knip (JavaScript/TypeScript), or .NET analyzers. Use when the user asks to find unused code, delete unreachable branches, or clean up unused exports, imports, or dependencies. Trigger on "dead code", "unused code", "unreachable", "vulture", or "knip"; pass py, js, or dotnet to pick the stack.
 ---
 
 # Dead Code Detection Skill

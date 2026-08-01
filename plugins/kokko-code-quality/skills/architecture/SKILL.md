@@ -1,7 +1,6 @@
 ---
 name: architecture
-description: Architecture enforcement (import-linter for py, dependency-cruiser for js)
-argument-hint: "[py|js]"
+description: Enforce architectural layering and import rules with import-linter (Python) or dependency-cruiser (JavaScript/TypeScript). Use when the user asks to enforce architecture, check layering, define import contracts, or fix dependency-direction violations. Trigger on "architecture check", "layer violations", "import rules", "import-linter", or "dependency-cruiser"; pass py or js to pick the stack.
 ---
 
 # Architecture Enforcement Skill

@@ -1,7 +1,6 @@
 ---
 name: types
-description: Type checking and annotation fixes (mypy for py, tsc for js, nullable analyzers for dotnet)
-argument-hint: "[py|js|dotnet]"
+description: Strengthen type safety with mypy (Python), tsc (TypeScript), or nullable reference analyzers (.NET). Use when the user asks to add type annotations, fix type errors, or tighten type-checker configuration. Trigger on "type errors", "type annotations", "mypy", "tsc", or "strict null checks"; pass py, js, or dotnet to pick the stack.
 ---
 
 # Type Checking Skill
