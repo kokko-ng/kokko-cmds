@@ -1,77 +1,77 @@
 # system-services.txt - System service and power operations
 
 # systemd service control
-systemctl[[:space:]]+stop
-systemctl[[:space:]]+disable
-systemctl[[:space:]]+mask
-systemctl[[:space:]]+kill
-systemctl[[:space:]]+reset-failed
+(^|[[:space:]])systemctl[[:space:]]+stop
+(^|[[:space:]])systemctl[[:space:]]+disable
+(^|[[:space:]])systemctl[[:space:]]+mask
+(^|[[:space:]])systemctl[[:space:]]+kill
+(^|[[:space:]])systemctl[[:space:]]+reset-failed
 
 # systemd system operations
-systemctl[[:space:]]+reboot
-systemctl[[:space:]]+poweroff
-systemctl[[:space:]]+halt
-systemctl[[:space:]]+suspend
-systemctl[[:space:]]+hibernate
-systemctl[[:space:]]+hybrid-sleep
-systemctl[[:space:]]+daemon-reexec
+(^|[[:space:]])systemctl[[:space:]]+reboot
+(^|[[:space:]])systemctl[[:space:]]+poweroff
+(^|[[:space:]])systemctl[[:space:]]+halt
+(^|[[:space:]])systemctl[[:space:]]+suspend
+(^|[[:space:]])systemctl[[:space:]]+hibernate
+(^|[[:space:]])systemctl[[:space:]]+hybrid-sleep
+(^|[[:space:]])systemctl[[:space:]]+daemon-reexec
 
 # Traditional service command
-service[[:space:]]+.*[[:space:]]+stop
-service[[:space:]]+.*[[:space:]]+kill
+(^|[[:space:]])service[[:space:]]+.*[[:space:]]+stop
+(^|[[:space:]])service[[:space:]]+.*[[:space:]]+kill
 
 # macOS launchctl
-launchctl[[:space:]]+unload
-launchctl[[:space:]]+remove
-launchctl[[:space:]]+disable
-launchctl[[:space:]]+kill
-launchctl[[:space:]]+bootout
+(^|[[:space:]])launchctl[[:space:]]+unload
+(^|[[:space:]])launchctl[[:space:]]+remove
+(^|[[:space:]])launchctl[[:space:]]+disable
+(^|[[:space:]])launchctl[[:space:]]+kill
+(^|[[:space:]])launchctl[[:space:]]+bootout
 
 # Power commands
-shutdown[[:space:]]+
-reboot([[:space:]]|$)
-halt([[:space:]]|$)
-poweroff([[:space:]]|$)
-init[[:space:]]+[06]
+(^|[[:space:]])shutdown[[:space:]]+
+(^|[[:space:]])reboot([[:space:]]|$)
+(^|[[:space:]])halt([[:space:]]|$)
+(^|[[:space:]])poweroff([[:space:]]|$)
+(^|[[:space:]])init[[:space:]]+[06]
 
 # SysV init
-update-rc.d[[:space:]]+.*[[:space:]]+remove
-update-rc.d[[:space:]]+.*[[:space:]]+disable
-chkconfig[[:space:]]+.*[[:space:]]+off
-chkconfig[[:space:]]+--del
+(^|[[:space:]])update-rc.d[[:space:]]+.*[[:space:]]+remove
+(^|[[:space:]])update-rc.d[[:space:]]+.*[[:space:]]+disable
+(^|[[:space:]])chkconfig[[:space:]]+.*[[:space:]]+off
+(^|[[:space:]])chkconfig[[:space:]]+--del
 
 # Supervisor
-supervisorctl[[:space:]]+stop
-supervisorctl[[:space:]]+remove
-supervisorctl[[:space:]]+shutdown
+(^|[[:space:]])supervisorctl[[:space:]]+stop
+(^|[[:space:]])supervisorctl[[:space:]]+remove
+(^|[[:space:]])supervisorctl[[:space:]]+shutdown
 
 # PM2 (Node.js process manager)
-pm2[[:space:]]+delete
-pm2[[:space:]]+stop
-pm2[[:space:]]+kill
-pm2[[:space:]]+flush
+(^|[[:space:]])pm2[[:space:]]+delete
+(^|[[:space:]])pm2[[:space:]]+stop
+(^|[[:space:]])pm2[[:space:]]+kill
+(^|[[:space:]])pm2[[:space:]]+flush
 
 # Upstart (legacy)
-stop[[:space:]]+[a-z]
-initctl[[:space:]]+stop
+(^|[[:space:]])stop[[:space:]]+[a-z]
+(^|[[:space:]])initctl[[:space:]]+stop
 
 # BSD rc.d
-rcctl[[:space:]]+disable
-rcctl[[:space:]]+stop
+(^|[[:space:]])rcctl[[:space:]]+disable
+(^|[[:space:]])rcctl[[:space:]]+stop
 
 # OpenRC
-rc-update[[:space:]]+del
-rc-service[[:space:]]+.*[[:space:]]+stop
+(^|[[:space:]])rc-update[[:space:]]+del
+(^|[[:space:]])rc-service[[:space:]]+.*[[:space:]]+stop
 
 # runit
-sv[[:space:]]+down
-sv[[:space:]]+force-stop
+(^|[[:space:]])sv[[:space:]]+down
+(^|[[:space:]])sv[[:space:]]+force-stop
 
 # s6
-s6-svc[[:space:]]+-d
-s6-svc[[:space:]]+-k
+(^|[[:space:]])s6-svc[[:space:]]+-d
+(^|[[:space:]])s6-svc[[:space:]]+-k
 
 # macOS-specific
-pmset[[:space:]]+.*sleep
-osascript[[:space:]]+-e.*shutdown
-osascript[[:space:]]+-e.*restart
+(^|[[:space:]])pmset[[:space:]]+.*sleep
+(^|[[:space:]])osascript[[:space:]]+-e.*shutdown
+(^|[[:space:]])osascript[[:space:]]+-e.*restart

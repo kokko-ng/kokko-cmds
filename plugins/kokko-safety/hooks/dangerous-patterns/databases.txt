@@ -1,104 +1,104 @@
 # databases.txt - Database destructive operations
 
 # PostgreSQL
-dropdb[[:space:]]+
-psql[[:space:]]+.*DROP[[:space:]]+DATABASE
-psql[[:space:]]+.*DROP[[:space:]]+TABLE
-psql[[:space:]]+.*DROP[[:space:]]+SCHEMA
-psql[[:space:]]+.*TRUNCATE
-psql[[:space:]]+.*DELETE[[:space:]]+FROM[[:space:]]+[^[:space:]]+[[:space:]]*;
-pg_dump[[:space:]]+.*--clean
-pg_restore[[:space:]]+.*--clean
-vacuumdb[[:space:]]+--full
+(^|[[:space:]])dropdb[[:space:]]+
+(^|[[:space:]])psql[[:space:]]+.*DROP[[:space:]]+DATABASE
+(^|[[:space:]])psql[[:space:]]+.*DROP[[:space:]]+TABLE
+(^|[[:space:]])psql[[:space:]]+.*DROP[[:space:]]+SCHEMA
+(^|[[:space:]])psql[[:space:]]+.*TRUNCATE
+(^|[[:space:]])psql[[:space:]]+.*DELETE[[:space:]]+FROM[[:space:]]+[^[:space:]]+[[:space:]]*;
+(^|[[:space:]])pg_dump[[:space:]]+.*--clean
+(^|[[:space:]])pg_restore[[:space:]]+.*--clean
+(^|[[:space:]])vacuumdb[[:space:]]+--full
 
 # MySQL/MariaDB
-mysql[[:space:]]+.*DROP[[:space:]]+DATABASE
-mysql[[:space:]]+.*DROP[[:space:]]+TABLE
-mysql[[:space:]]+.*TRUNCATE
-mysql[[:space:]]+.*DELETE[[:space:]]+FROM[[:space:]]+[^[:space:]]+[[:space:]]*;
-mysqladmin[[:space:]]+drop
-mysqladmin[[:space:]]+flush
+(^|[[:space:]])mysql[[:space:]]+.*DROP[[:space:]]+DATABASE
+(^|[[:space:]])mysql[[:space:]]+.*DROP[[:space:]]+TABLE
+(^|[[:space:]])mysql[[:space:]]+.*TRUNCATE
+(^|[[:space:]])mysql[[:space:]]+.*DELETE[[:space:]]+FROM[[:space:]]+[^[:space:]]+[[:space:]]*;
+(^|[[:space:]])mysqladmin[[:space:]]+drop
+(^|[[:space:]])mysqladmin[[:space:]]+flush
 
 # Generic SQL patterns
-drop[[:space:]]+database
-drop[[:space:]]+table
-drop[[:space:]]+schema
-drop[[:space:]]+index
-drop[[:space:]]+view
-drop[[:space:]]+procedure
-drop[[:space:]]+function
-drop[[:space:]]+trigger
-truncate[[:space:]]+table
-delete[[:space:]]+from[[:space:]]+[^[:space:]]+[[:space:]]+where[[:space:]]+1=1
-delete[[:space:]]+from[[:space:]]+[^[:space:]]+[[:space:]]*;
+(^|[^[:alnum:]_])drop[[:space:]]+database
+(^|[^[:alnum:]_])drop[[:space:]]+table
+(^|[^[:alnum:]_])drop[[:space:]]+schema
+(^|[^[:alnum:]_])drop[[:space:]]+index
+(^|[^[:alnum:]_])drop[[:space:]]+view
+(^|[^[:alnum:]_])drop[[:space:]]+procedure
+(^|[^[:alnum:]_])drop[[:space:]]+function
+(^|[^[:alnum:]_])drop[[:space:]]+trigger
+(^|[^[:alnum:]_])truncate[[:space:]]+table
+(^|[^[:alnum:]_])delete[[:space:]]+from[[:space:]]+[^[:space:]]+[[:space:]]+where[[:space:]]+1=1
+(^|[^[:alnum:]_])delete[[:space:]]+from[[:space:]]+[^[:space:]]+[[:space:]]*;
 
 # SQLite
-sqlite3[[:space:]]+.*DROP[[:space:]]+TABLE
-sqlite3[[:space:]]+.*DELETE[[:space:]]+FROM
-rm[[:space:]]+.*\.sqlite
-rm[[:space:]]+.*\.db
+(^|[[:space:]])sqlite3[[:space:]]+.*DROP[[:space:]]+TABLE
+(^|[[:space:]])sqlite3[[:space:]]+.*DELETE[[:space:]]+FROM
+(^|[[:space:]])rm[[:space:]]+.*\.sqlite
+(^|[[:space:]])rm[[:space:]]+.*\.db
 
 # MongoDB
-mongosh[[:space:]]+.*dropDatabase
-mongosh[[:space:]]+.*drop\(
-mongo[[:space:]]+.*dropDatabase
-mongo[[:space:]]+.*\.drop\(
-mongosh[[:space:]]+.*deleteMany
-mongo[[:space:]]+.*deleteMany
-mongosh[[:space:]]+.*remove\(
-mongo[[:space:]]+.*remove\(
+(^|[[:space:]])mongosh[[:space:]]+.*dropDatabase
+(^|[[:space:]])mongosh[[:space:]]+.*drop\(
+(^|[[:space:]])mongo[[:space:]]+.*dropDatabase
+(^|[[:space:]])mongo[[:space:]]+.*\.drop\(
+(^|[[:space:]])mongosh[[:space:]]+.*deleteMany
+(^|[[:space:]])mongo[[:space:]]+.*deleteMany
+(^|[[:space:]])mongosh[[:space:]]+.*remove\(
+(^|[[:space:]])mongo[[:space:]]+.*remove\(
 
 # Redis
-redis-cli[[:space:]]+FLUSHALL
-redis-cli[[:space:]]+FLUSHDB
-redis-cli[[:space:]]+DEBUG[[:space:]]+SEGFAULT
-redis-cli[[:space:]]+SHUTDOWN
-redis-cli[[:space:]]+DEL[[:space:]]+
-redis-cli[[:space:]]+KEYS[[:space:]]+.*\|.*DEL
-redis-cli[[:space:]]+--scan.*\|.*DEL
+(^|[[:space:]])redis-cli[[:space:]]+FLUSHALL
+(^|[[:space:]])redis-cli[[:space:]]+FLUSHDB
+(^|[[:space:]])redis-cli[[:space:]]+DEBUG[[:space:]]+SEGFAULT
+(^|[[:space:]])redis-cli[[:space:]]+SHUTDOWN
+(^|[[:space:]])redis-cli[[:space:]]+DEL[[:space:]]+
+(^|[[:space:]])redis-cli[[:space:]]+KEYS[[:space:]]+.*\|.*DEL
+(^|[[:space:]])redis-cli[[:space:]]+--scan.*\|.*DEL
 
 # Elasticsearch/OpenSearch
-curl[[:space:]]+.*-X[[:space:]]+DELETE.*localhost:9200
-curl[[:space:]]+.*-X[[:space:]]+DELETE.*:9200
-curl[[:space:]]+.*-XDELETE.*:9200
+(^|[[:space:]])curl[[:space:]]+.*-X[[:space:]]+DELETE.*localhost:9200
+(^|[[:space:]])curl[[:space:]]+.*-X[[:space:]]+DELETE.*:9200
+(^|[[:space:]])curl[[:space:]]+.*-XDELETE.*:9200
 
 # Cassandra
-cqlsh[[:space:]]+.*DROP[[:space:]]+KEYSPACE
-cqlsh[[:space:]]+.*DROP[[:space:]]+TABLE
-cqlsh[[:space:]]+.*TRUNCATE
-nodetool[[:space:]]+drain
-nodetool[[:space:]]+decommission
-nodetool[[:space:]]+removenode
+(^|[[:space:]])cqlsh[[:space:]]+.*DROP[[:space:]]+KEYSPACE
+(^|[[:space:]])cqlsh[[:space:]]+.*DROP[[:space:]]+TABLE
+(^|[[:space:]])cqlsh[[:space:]]+.*TRUNCATE
+(^|[[:space:]])nodetool[[:space:]]+drain
+(^|[[:space:]])nodetool[[:space:]]+decommission
+(^|[[:space:]])nodetool[[:space:]]+removenode
 
 # CouchDB
-curl[[:space:]]+.*-X[[:space:]]+DELETE.*:5984
+(^|[[:space:]])curl[[:space:]]+.*-X[[:space:]]+DELETE.*:5984
 
 # Neo4j
-cypher-shell[[:space:]]+.*DELETE
-cypher-shell[[:space:]]+.*DETACH[[:space:]]+DELETE
-cypher-shell[[:space:]]+.*DROP
+(^|[[:space:]])cypher-shell[[:space:]]+.*DELETE
+(^|[[:space:]])cypher-shell[[:space:]]+.*DETACH[[:space:]]+DELETE
+(^|[[:space:]])cypher-shell[[:space:]]+.*DROP
 
 # InfluxDB
-influx[[:space:]]+.*drop[[:space:]]+database
-influx[[:space:]]+.*drop[[:space:]]+measurement
-influx[[:space:]]+.*delete
+(^|[[:space:]])influx[[:space:]]+.*drop[[:space:]]+database
+(^|[[:space:]])influx[[:space:]]+.*drop[[:space:]]+measurement
+(^|[[:space:]])influx[[:space:]]+.*delete
 
 # etcd
-etcdctl[[:space:]]+del
-etcdctl[[:space:]]+rm
-etcdctl[[:space:]]+rmdir
+(^|[[:space:]])etcdctl[[:space:]]+del
+(^|[[:space:]])etcdctl[[:space:]]+rm
+(^|[[:space:]])etcdctl[[:space:]]+rmdir
 
 # Consul
-consul[[:space:]]+kv[[:space:]]+delete
+(^|[[:space:]])consul[[:space:]]+kv[[:space:]]+delete
 
 # Memcached
-echo[[:space:]]+"flush_all".*\|.*nc.*11211
+(^|[[:space:]])echo[[:space:]]+"flush_all".*\|.*nc.*11211
 
 # Database backup/restore that can overwrite
-pg_restore[[:space:]]+--clean
-mysql[[:space:]]+.*<[[:space:]].*\.sql
+(^|[[:space:]])pg_restore[[:space:]]+--clean
+(^|[[:space:]])mysql[[:space:]]+.*<[[:space:]].*\.sql
 
 # Database user management
-psql[[:space:]]+.*DROP[[:space:]]+USER
-psql[[:space:]]+.*DROP[[:space:]]+ROLE
-mysql[[:space:]]+.*DROP[[:space:]]+USER
+(^|[[:space:]])psql[[:space:]]+.*DROP[[:space:]]+USER
+(^|[[:space:]])psql[[:space:]]+.*DROP[[:space:]]+ROLE
+(^|[[:space:]])mysql[[:space:]]+.*DROP[[:space:]]+USER
