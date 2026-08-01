@@ -14,6 +14,7 @@
 #   hooks/dangerous-patterns/shell-security.txt
 #   hooks/dangerous-patterns/databases.txt
 #   hooks/dangerous-patterns/docker.txt
+# shellcheck source-path=SCRIPTDIR
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"

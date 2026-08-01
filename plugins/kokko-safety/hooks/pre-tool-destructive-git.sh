@@ -4,6 +4,7 @@
 #
 # This hook loads patterns from:
 #   hooks/dangerous-patterns/git.txt
+# shellcheck source-path=SCRIPTDIR
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
