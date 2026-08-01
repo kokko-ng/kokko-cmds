@@ -1,6 +1,7 @@
 #!/bin/bash
 # session-start-context.sh - Detect project context at session start
 # SessionStart - Outputs project type and git branch info
+# shellcheck source-path=SCRIPTDIR
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"

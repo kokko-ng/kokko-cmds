@@ -9,6 +9,7 @@
 #   hooks/dangerous-patterns/cloud-github.txt
 #   hooks/dangerous-patterns/kubernetes.txt
 #   hooks/dangerous-patterns/terraform.txt
+# shellcheck source-path=SCRIPTDIR
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
