@@ -75,8 +75,11 @@ play_sound() {
                     (speaker-test -t sine -f "$freq" -l 1 >/dev/null 2>&1 &
                      sleep "$duration" && pkill -f "speaker-test.*-f $freq" 2>/dev/null) &
                 elif [ -e /dev/tty ]; then
-                    # Fallback (containers): terminal bell via host TTY
-                    printf '\a' > /dev/tty 2>/dev/null
+                    # Fallback (containers): terminal bell via host TTY.
+                    # The redirection itself can fail (no controlling terminal),
+                    # so the whole group is silenced -- a sound utility must
+                    # never leak stderr noise into a hook's output.
+                    { printf '\a' > /dev/tty; } 2>/dev/null || true
                 fi
             fi
             ;;
