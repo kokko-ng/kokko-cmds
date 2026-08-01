@@ -24,11 +24,30 @@ Then install the plugins you want:
 /plugin install kokko-learning@kokko-ng-kokko-cmds
 ```
 
+## Versioning
+
+All ten plugins version in lock-step: every release bumps every plugin (and
+every marketplace entry) to the same version, even ones that did not change.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Sound environment variables
+
+Both kokko-safety (warning prompts) and kokko-notifications (completion
+chimes) play sounds through the same `play-sound.sh` utility and honor the
+same variables:
+
+| Environment Variable | Default | Purpose |
+| -------------------- | ------- | ------- |
+| `KOKKO_SOUNDS` | `on` | Set to `off` to mute all hook sounds |
+| `KOKKO_SOUND_VOLUME` | `1.0` | afplay gain multiplier (macOS); `1.0` = system default |
+
 ## Plugins
 
 ### kokko-safety
 
-Safety hooks for all sessions.
+Safety hooks for all sessions. See
+[plugins/kokko-safety/README.md](plugins/kokko-safety/README.md) for the
+pattern categories, how to add patterns, and known limitations.
 
 | Hook | Purpose |
 | ---- | ------- |
@@ -45,11 +64,6 @@ Sound notifications for task completion events.
 | Hook | Purpose |
 | ---- | ------- |
 | `stop-notification` | Plays sounds on task completion |
-
-| Environment Variable | Default | Purpose |
-| -------------------- | ------- | ------- |
-| `KOKKO_SOUND_VOLUME` | `1.0` | afplay gain multiplier (macOS); `1.0` = system default |
-| `KOKKO_SOUNDS` | `on` | Set to `off` to mute all notification sounds |
 
 ### kokko-git
 
