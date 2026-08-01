@@ -1,77 +1,77 @@
 # users.txt - User and group management operations
 
 # User deletion
-userdel[[:space:]]+
-deluser[[:space:]]+
-user[[:space:]]+del[[:space:]]+
+(^|[[:space:]])userdel[[:space:]]+
+(^|[[:space:]])deluser[[:space:]]+
+(^|[[:space:]])user[[:space:]]+del[[:space:]]+
 
 # User modification (can lock out)
-usermod[[:space:]]+-L
-usermod[[:space:]]+--lock
-usermod[[:space:]]+-e[[:space:]]+1
-passwd[[:space:]]+-l
-passwd[[:space:]]+--lock
-passwd[[:space:]]+-d
-passwd[[:space:]]+--delete
+(^|[[:space:]])usermod[[:space:]]+-L
+(^|[[:space:]])usermod[[:space:]]+--lock
+(^|[[:space:]])usermod[[:space:]]+-e[[:space:]]+1
+(^|[[:space:]])passwd[[:space:]]+-l
+(^|[[:space:]])passwd[[:space:]]+--lock
+(^|[[:space:]])passwd[[:space:]]+-d
+(^|[[:space:]])passwd[[:space:]]+--delete
 
 # Group deletion
-groupdel[[:space:]]+
-delgroup[[:space:]]+
+(^|[[:space:]])groupdel[[:space:]]+
+(^|[[:space:]])delgroup[[:space:]]+
 
 # Remove user from groups
-gpasswd[[:space:]]+-d
-usermod[[:space:]]+-G[[:space:]]+""
+(^|[[:space:]])gpasswd[[:space:]]+-d
+(^|[[:space:]])usermod[[:space:]]+-G[[:space:]]+""
 
 # Modify /etc/passwd or /etc/shadow directly
-vipw
-vigr
-chpasswd
-newusers
+(^|[[:space:]])vipw
+(^|[[:space:]])vigr
+(^|[[:space:]])chpasswd
+(^|[[:space:]])newusers
 
 # Direct edits to auth files (extremely dangerous)
-echo[[:space:]]+.*>>[[:space:]]*/etc/passwd
-echo[[:space:]]+.*>>[[:space:]]*/etc/shadow
-echo[[:space:]]+.*>>[[:space:]]*/etc/group
-echo[[:space:]]+.*>>[[:space:]]*/etc/sudoers
-cat[[:space:]]+.*>[[:space:]]*/etc/passwd
-cat[[:space:]]+.*>[[:space:]]*/etc/shadow
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*/etc/passwd
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*/etc/shadow
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*/etc/group
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*/etc/sudoers
+(^|[[:space:]])cat[[:space:]]+.*>[[:space:]]*/etc/passwd
+(^|[[:space:]])cat[[:space:]]+.*>[[:space:]]*/etc/shadow
 
 # PAM configuration
-rm[[:space:]]+.*pam\.d
-mv[[:space:]]+.*pam\.d
+(^|[[:space:]])rm[[:space:]]+.*pam\.d
+(^|[[:space:]])mv[[:space:]]+.*pam\.d
 
 # sudoers manipulation
-visudo[[:space:]]+
-rm[[:space:]]+.*sudoers
-mv[[:space:]]+.*sudoers
-echo[[:space:]]+.*sudoers
+(^|[[:space:]])visudo[[:space:]]+
+(^|[[:space:]])rm[[:space:]]+.*sudoers
+(^|[[:space:]])mv[[:space:]]+.*sudoers
+(^|[[:space:]])echo[[:space:]]+.*sudoers
 
 # SSH authorized keys manipulation
-rm[[:space:]]+.*authorized_keys
-cat[[:space:]]+.*>[[:space:]].*authorized_keys
-echo[[:space:]]+.*>[[:space:]].*authorized_keys
-truncate[[:space:]]+.*authorized_keys
+(^|[[:space:]])rm[[:space:]]+.*authorized_keys
+(^|[[:space:]])cat[[:space:]]+.*>[[:space:]].*authorized_keys
+(^|[[:space:]])echo[[:space:]]+.*>[[:space:]].*authorized_keys
+(^|[[:space:]])truncate[[:space:]]+.*authorized_keys
 
 # Home directory removal
-rm[[:space:]]+-rf[[:space:]]+/home/
-rm[[:space:]]+-rf[[:space:]]+/Users/
-userdel[[:space:]]+-r
+(^|[[:space:]])rm[[:space:]]+-rf[[:space:]]+/home/
+(^|[[:space:]])rm[[:space:]]+-rf[[:space:]]+/Users/
+(^|[[:space:]])userdel[[:space:]]+-r
 
 # Login shell manipulation
-chsh[[:space:]]+
-usermod[[:space:]]+-s[[:space:]]+/sbin/nologin
-usermod[[:space:]]+-s[[:space:]]+/bin/false
+(^|[[:space:]])chsh[[:space:]]+
+(^|[[:space:]])usermod[[:space:]]+-s[[:space:]]+/sbin/nologin
+(^|[[:space:]])usermod[[:space:]]+-s[[:space:]]+/bin/false
 
 # Kerberos
-kdestroy[[:space:]]+
-kinit[[:space:]]+.*-k
+(^|[[:space:]])kdestroy[[:space:]]+
+(^|[[:space:]])kinit[[:space:]]+.*-k
 
 # LDAP
-ldapdelete[[:space:]]+
-ldapmodify[[:space:]]+.*changetype:[[:space:]]*delete
+(^|[[:space:]])ldapdelete[[:space:]]+
+(^|[[:space:]])ldapmodify[[:space:]]+.*changetype:[[:space:]]*delete
 
 # macOS user management
-dscl[[:space:]]+.[[:space:]]+delete
-dscl[[:space:]]+.[[:space:]]+delete[[:space:]]+/Users
-dscl[[:space:]]+.[[:space:]]+delete[[:space:]]+/Groups
-sysadminctl[[:space:]]+-deleteUser
+(^|[[:space:]])dscl[[:space:]]+.[[:space:]]+delete
+(^|[[:space:]])dscl[[:space:]]+.[[:space:]]+delete[[:space:]]+/Users
+(^|[[:space:]])dscl[[:space:]]+.[[:space:]]+delete[[:space:]]+/Groups
+(^|[[:space:]])sysadminctl[[:space:]]+-deleteUser

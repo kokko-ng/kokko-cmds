@@ -1,66 +1,66 @@
 # shell-security.txt - Shell, history, and security-sensitive operations
 
 # Privilege escalation
-sudo[[:space:]]+
+(^|[[:space:]])sudo[[:space:]]+
 \bsu[[:space:]]+-
 \bsu[[:space:]]+root
 \bsu[[:space:]]+--login
-doas[[:space:]]+
-pkexec[[:space:]]+
+(^|[[:space:]])doas[[:space:]]+
+(^|[[:space:]])pkexec[[:space:]]+
 
 # Environment destruction
-unset[[:space:]]+PATH
-export[[:space:]]+PATH=''
-export[[:space:]]+PATH=""
-export[[:space:]]+PATH=$
-unset[[:space:]]+HOME
-unset[[:space:]]+USER
-unset[[:space:]]+SHELL
-export[[:space:]]+LD_PRELOAD=
-export[[:space:]]+LD_LIBRARY_PATH=
+(^|[[:space:]])unset[[:space:]]+PATH
+(^|[[:space:]])export[[:space:]]+PATH=''
+(^|[[:space:]])export[[:space:]]+PATH=""
+(^|[[:space:]])export[[:space:]]+PATH=$
+(^|[[:space:]])unset[[:space:]]+HOME
+(^|[[:space:]])unset[[:space:]]+USER
+(^|[[:space:]])unset[[:space:]]+SHELL
+(^|[[:space:]])export[[:space:]]+LD_PRELOAD=
+(^|[[:space:]])export[[:space:]]+LD_LIBRARY_PATH=
 
 # History manipulation
-history[[:space:]]+-c
-history[[:space:]]+-w[[:space:]]*/dev/null
+(^|[[:space:]])history[[:space:]]+-c
+(^|[[:space:]])history[[:space:]]+-w[[:space:]]*/dev/null
 \brm[[:space:]]+.*\.bash_history
 \brm[[:space:]]+.*\.zsh_history
 \brm[[:space:]]+.*\.history
 \brm[[:space:]]+.*\.sh_history
-cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*.*_history
-truncate[[:space:]]+.*_history
-export[[:space:]]+HISTFILE=/dev/null
-export[[:space:]]+HISTSIZE=0
-unset[[:space:]]+HISTFILE
+(^|[[:space:]])cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*.*_history
+(^|[[:space:]])truncate[[:space:]]+.*_history
+(^|[[:space:]])export[[:space:]]+HISTFILE=/dev/null
+(^|[[:space:]])export[[:space:]]+HISTSIZE=0
+(^|[[:space:]])unset[[:space:]]+HISTFILE
 
 # Dangerous shell options
-set[[:space:]]+\+o[[:space:]]+history
-shopt[[:space:]]+-u[[:space:]]+histappend
+(^|[[:space:]])set[[:space:]]+\+o[[:space:]]+history
+(^|[[:space:]])shopt[[:space:]]+-u[[:space:]]+histappend
 
 # Remote code execution
-curl[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)
-wget[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)
-curl[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)
-wget[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)
-eval[[:space:]]+\$\(curl
-eval[[:space:]]+\$\(wget
+(^|[[:space:]])curl[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)
+(^|[[:space:]])wget[[:space:]]+.*\|[[:space:]]*(bash|sh|zsh|ksh)
+(^|[[:space:]])curl[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)
+(^|[[:space:]])wget[[:space:]]+.*>[[:space:]]*/tmp/.*&&.*(bash|sh)
+(^|[[:space:]])eval[[:space:]]+\$\(curl
+(^|[[:space:]])eval[[:space:]]+\$\(wget
 \$\(curl[[:space:]]
 \$\(wget[[:space:]]
 `curl[[:space:]]
 `wget[[:space:]]
 
 # SSH agent manipulation
-ssh-add[[:space:]]+-D
-ssh-add[[:space:]]+--delete-all
-ssh-agent[[:space:]]+-k
+(^|[[:space:]])ssh-add[[:space:]]+-D
+(^|[[:space:]])ssh-add[[:space:]]+--delete-all
+(^|[[:space:]])ssh-agent[[:space:]]+-k
 
 # SSH known hosts manipulation
-ssh-keygen[[:space:]]+-R
+(^|[[:space:]])ssh-keygen[[:space:]]+-R
 \brm[[:space:]]+.*known_hosts
-truncate[[:space:]]+.*known_hosts
+(^|[[:space:]])truncate[[:space:]]+.*known_hosts
 
 # GPG key manipulation
-gpg[[:space:]]+--delete-key
-gpg[[:space:]]+--delete-secret-key
+(^|[[:space:]])gpg[[:space:]]+--delete-key
+(^|[[:space:]])gpg[[:space:]]+--delete-secret-key
 \brm[[:space:]]+-rf[[:space:]]+.*\.gnupg
 
 # Certificate manipulation
@@ -69,46 +69,46 @@ gpg[[:space:]]+--delete-secret-key
 \brm[[:space:]]+.*\.key
 \brm[[:space:]]+.*\.p12
 \brm[[:space:]]+.*\.pfx
-update-ca-certificates[[:space:]]+--fresh
+(^|[[:space:]])update-ca-certificates[[:space:]]+--fresh
 
 # Keychain/credential manipulation
-security[[:space:]]+delete-keychain
-security[[:space:]]+delete-generic-password
-security[[:space:]]+delete-internet-password
-keyctl[[:space:]]+clear
-keyctl[[:space:]]+revoke
-keyctl[[:space:]]+unlink
+(^|[[:space:]])security[[:space:]]+delete-keychain
+(^|[[:space:]])security[[:space:]]+delete-generic-password
+(^|[[:space:]])security[[:space:]]+delete-internet-password
+(^|[[:space:]])keyctl[[:space:]]+clear
+(^|[[:space:]])keyctl[[:space:]]+revoke
+(^|[[:space:]])keyctl[[:space:]]+unlink
 
 # Shell profile modification
-echo[[:space:]]+.*>>[[:space:]]*.*bashrc
-echo[[:space:]]+.*>>[[:space:]]*.*zshrc
-echo[[:space:]]+.*>>[[:space:]]*.*profile
-cat[[:space:]]+.*>[[:space:]]*.*bashrc
-cat[[:space:]]+.*>[[:space:]]*.*zshrc
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*.*bashrc
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*.*zshrc
+(^|[[:space:]])echo[[:space:]]+.*>>[[:space:]]*.*profile
+(^|[[:space:]])cat[[:space:]]+.*>[[:space:]]*.*bashrc
+(^|[[:space:]])cat[[:space:]]+.*>[[:space:]]*.*zshrc
 
 # Audit log manipulation
-auditctl[[:space:]]+-D
-auditctl[[:space:]]+-e[[:space:]]+0
+(^|[[:space:]])auditctl[[:space:]]+-D
+(^|[[:space:]])auditctl[[:space:]]+-e[[:space:]]+0
 \brm[[:space:]]+.*audit\.log
-truncate[[:space:]]+.*audit\.log
+(^|[[:space:]])truncate[[:space:]]+.*audit\.log
 
 # System log manipulation
 \brm[[:space:]]+/var/log/
-truncate[[:space:]]+/var/log/
-cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*/var/log/
-journalctl[[:space:]]+--vacuum-time=0
-journalctl[[:space:]]+--rotate[[:space:]]+--vacuum-size=0
+(^|[[:space:]])truncate[[:space:]]+/var/log/
+(^|[[:space:]])cat[[:space:]]+/dev/null[[:space:]]*>[[:space:]]*/var/log/
+(^|[[:space:]])journalctl[[:space:]]+--vacuum-time=0
+(^|[[:space:]])journalctl[[:space:]]+--rotate[[:space:]]+--vacuum-size=0
 
 # Core dump manipulation
-ulimit[[:space:]]+-c[[:space:]]+0
-echo[[:space:]]+0[[:space:]]+>[[:space:]]*/proc/sys/kernel/core_pattern
+(^|[[:space:]])ulimit[[:space:]]+-c[[:space:]]+0
+(^|[[:space:]])echo[[:space:]]+0[[:space:]]+>[[:space:]]*/proc/sys/kernel/core_pattern
 
 # Cron manipulation
-crontab[[:space:]]+-r
-crontab[[:space:]]+-ir
+(^|[[:space:]])crontab[[:space:]]+-r
+(^|[[:space:]])crontab[[:space:]]+-ir
 \brm[[:space:]]+/etc/cron
 \brm[[:space:]]+/var/spool/cron
 
 # Systemd journal clearing
-journalctl[[:space:]]+--flush
-journalctl[[:space:]]+--relinquish-var
+(^|[[:space:]])journalctl[[:space:]]+--flush
+(^|[[:space:]])journalctl[[:space:]]+--relinquish-var
