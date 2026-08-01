@@ -1,7 +1,7 @@
 {
   "name": "kokko-env",
-  "version": "3.2.0",
-  "description": "Dev environment maintenance commands: refresh the devcontainer config inside a running container and update Claude Code plugins to their latest marketplace versions.",
+  "version": "3.3.0",
+  "description": "Dev environment setup and maintenance: install the kokko-devcontainer starter into a project, refresh the devcontainer config inside a running container, and update Claude Code plugins to their latest marketplace versions.",
   "author": {
     "name": "kokko-ng"
   },
@@ -12,6 +12,8 @@
     "plugins",
     "marketplace",
     "environment",
-    "update"
+    "update",
+    "setup",
+    "colima"
   ]
 }
