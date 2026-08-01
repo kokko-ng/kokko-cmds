@@ -135,12 +135,20 @@ AI/Claude configuration management commands.
 
 ### kokko-env
 
-Keep a running dev environment current without rebuilding it.
+Set up a dev environment, then keep it current without rebuilding it.
 
 | Commands | Purpose |
 | -------- | ------- |
 | `/devcontainer-update` | Pull the latest `.devcontainer/` from [kokko-ng/kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer) and apply it live, reporting what still needs a rebuild |
 | `/plugins-update` | Refresh the marketplaces, update installed plugins to the published versions, then prompt for `/reload-plugins` |
+
+| Skill | Purpose |
+| ----- | ------- |
+| `devcontainer-setup` | Install the [kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer) starter into a directory (defaults to the current one), tailor it to that project, and bring the container up |
+
+`devcontainer-setup` is the first-time install and runs on the host;
+`/devcontainer-update` is the follow-up for a project that already has a
+`.devcontainer/`.
 
 `/devcontainer-update` applies the config by re-running the project's own
 `post-create.sh --config-only`. A `.devcontainer/` copied before that flag
