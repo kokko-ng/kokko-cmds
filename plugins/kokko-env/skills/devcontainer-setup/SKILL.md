@@ -42,20 +42,32 @@ git -C "$TARGET" rev-parse --show-toplevel 2>/dev/null || echo "NOT A GIT REPO"
 
 Stop and ask when any of these is true:
 
-- **The target directory does not exist.** Do not create a project the user did
-  not ask for; confirm the path first.
+- **The target is a folder of projects, not a project.** The default target is
+  `$PWD`, and a `~/code`-style parent directory passes every other check here
+  while being the wrong answer — one shared container across ten unrelated
+  projects. Suspect this when the target itself has no project markers
+  (`pyproject.toml`, `package.json`, `*.csproj`, `go.mod`, `src/`) but two or
+  more of its subdirectories do. Confirm the intended project before copying
+  anything.
+- **The target directory does not exist.** Do not invent a path. But when the
+  user has explicitly named a new directory ("a new folder called `sandbox/`"),
+  that *is* the confirmation — create it, `git init` it, and say so in the
+  report.
 - **`.devcontainer/` already exists.** This skill would overwrite it. Report
   what is there and recommend `/devcontainer-update`, which merges instead.
 - **Inside a container.** The build has to happen on the host. Say so and stop.
 - **Target is not a git repo.** Not fatal — the starter works in a plain
-  directory — but say so, because the bundled git safety hooks and `snaps` only
-  do anything in a repo.
+  directory — but the bundled git safety hooks and `snaps` do nothing outside
+  one. For a directory this skill just created, `git init` it rather than
+  merely reporting the gap; for a pre-existing directory, say so and let the
+  user decide.
 
 Then check the host toolchain (report what is missing; do not install anything
 without asking):
 
 ```bash
 command -v colima devcontainer docker || true
+colima list                     # existing profiles and their specs
 colima status 2>&1 | head -5
 docker ps >/dev/null 2>&1 && echo "docker OK" || echo "docker NOT reachable"
 ```
@@ -68,8 +80,21 @@ brew install --cask ghostty     # only with --docs, or if the user wants it
 colima start --cpu 8 --memory 16 --disk 150
 ```
 
-`--disk` is deliberately large: each image built from this starter is 5-6 GB and
-Colima can grow a disk but never shrink one.
+Those `colima start` flags create a *new* profile. They are not the common case:
+usually `colima list` shows an existing profile that is merely `Stopped`, often
+with smaller specs. A bare `colima start` reuses that profile's existing specs —
+the flags above are ignored on a profile that already exists, except that
+`--disk` can grow one. A disk can never shrink, so recreating the VM is the only
+way back down. `--disk 150` is deliberately large because each image built from
+this starter is 5-6 GB.
+
+Starting the VM also restarts every container that was running when it stopped,
+including ones belonging to other projects. Worth a line in the report if
+`docker ps` shows containers this skill did not create.
+
+`colima status` on a stopped VM exits non-zero with
+`level=fatal msg="colima is not running"` — that, not a `docker ps` error, is
+usually the first symptom you see.
 
 If Colima reports "already running" but `docker ps` fails, check the VM disk
 before anything else — a full disk kills the daemon while `colima status` still
@@ -140,6 +165,24 @@ Report every edit you make and why. Where the right value is genuinely
 ambiguous (a monorepo with three candidate frontends, say), ask rather than
 guessing.
 
+**Greenfield target.** An empty directory — a scratch or sandbox project — has
+none of that evidence, so the table above has nothing to act on. Do not infer a
+stack from the directory name. Instead:
+
+- Set `"name"`, and leave `PYTHONPATH` and `forwardPorts` at the starter
+  defaults. They are harmless when they point at paths and ports that do not
+  exist yet, and they are right again as soon as the directory has content.
+- Ask once, in a single question, which of the expensive optional pieces to
+  keep: `docker-in-docker`, the `azure-cli` feature, the ODBC block, the Node
+  feature. Each costs real build time or disk, and nothing in an empty
+  directory justifies either keeping or dropping it.
+- Say in the report that the defaults were kept for want of evidence, so the
+  user knows to revisit them.
+
+The dependency steps in `post-create.sh` are all guarded, so an empty target
+builds cleanly — expect `Skipping Python dependencies (no pyproject.toml)` and
+friends in the log rather than failures.
+
 ### 5. Bring the container up
 
 Skip this whole step with `--no-up`, and say clearly that nothing was built.
@@ -164,6 +207,14 @@ Failure handling:
   and that the config can be re-applied in place with
   `bash .devcontainer/post-create.sh --config-only`.
 
+Then confirm it before reporting success. `devcontainer up` can return
+`{"outcome":"success"}` over a post-create step that failed, so read the log for
+skipped or failed steps and check the container is actually up:
+
+```bash
+docker ps --format '{{.Names}}\t{{.Status}}'
+```
+
 Then open a shell:
 
 ```bash
@@ -175,10 +226,15 @@ devcontainer exec --workspace-folder . zsh
 Report in the reply — do not write a setup report file:
 
 - Target directory, upstream commit installed
-  (`git -C "$UPSTREAM" rev-parse --short HEAD`)
+  (`git -C "$UPSTREAM" rev-parse --short HEAD`), and whether the directory was
+  created and `git init`ed as part of this run
 - Files copied, files skipped because they already existed
-- Every tailoring edit made, with the evidence behind it
-- Container status: built and running, or not built and why
+- Every tailoring edit made, with the evidence behind it — and, on a greenfield
+  target, which defaults were kept for want of evidence
+- Host state worth knowing: the Colima profile that was started and its specs if
+  they differ from the recommended 8/16/150, plus any unrelated containers the
+  VM brought back up
+- Container status as verified by `docker ps`, or not built and why
 - The first-run sign-ins still owed, inside the container:
 
   ```bash
