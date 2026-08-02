@@ -27,7 +27,11 @@ play_sound() {
             esac
             # afplay -v is a gain multiplier: 1.0 is unity. The old default of
             # 10.0 was a 10x amplification on a system alert sound.
-            [ -f "$sound_file" ] && afplay -v "${KOKKO_SOUND_VOLUME:-1.0}" "$sound_file"
+            # Backgrounded like every other branch: a foreground afplay holds
+            # the hook (and the tool call) hostage for the sound's duration.
+            if [ -f "$sound_file" ]; then
+                afplay -v "${KOKKO_SOUND_VOLUME:-1.0}" "$sound_file" &
+            fi
             ;;
 
         Linux)
