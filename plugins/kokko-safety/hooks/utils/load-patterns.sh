@@ -1,7 +1,6 @@
 #!/bin/bash
 # load-patterns.sh - Load dangerous command patterns from text files
 # Usage: source this file, then call load_patterns "category1" "category2" ...
-# Or call load_all_patterns to load everything
 #
 # MATCHED_PATTERN/MATCHED_CATEGORY are consumed by the sourcing hook, not here:
 # shellcheck disable=SC2034
@@ -10,7 +9,7 @@
 _LOAD_PATTERNS_SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
 PATTERNS_DIR="$_LOAD_PATTERNS_SCRIPT_DIR/../dangerous-patterns"
 
-# Populated by load_patterns/load_all_patterns (parallel arrays)
+# Populated by load_patterns (parallel arrays)
 DANGEROUS_PATTERNS=()
 DANGEROUS_PATTERN_CATEGORIES=()
 
@@ -48,23 +47,16 @@ load_patterns() {
     done
 }
 
-# Load all patterns from all .txt files in the patterns directory
-load_all_patterns() {
-    DANGEROUS_PATTERNS=()
-    DANGEROUS_PATTERN_CATEGORIES=()
-    local file category
-    for file in "$PATTERNS_DIR"/*.txt; do
-        [[ -f "$file" ]] || continue
-        category="${file##*/}"
-        category="${category%.txt}"
-        _append_pattern_file "$category" "$file"
-    done
-}
-
 # Check if a command matches any loaded pattern.
 # Arguments: command string
 # Returns: 0 if match found (MATCHED_PATTERN/MATCHED_CATEGORY are set),
 #          1 otherwise.
+# One batch grep over all patterns decides the common no-match case in a
+# single process instead of one grep spawn per pattern (~676 patterns for
+# destructive-bash made every benign command cost seconds). The per-pattern
+# loop below only runs to name which pattern matched, or -- when the batch
+# grep itself errors because one invalid ERE poisons the whole pattern file
+# -- to report the offending pattern(s) individually.
 # The command is fed to grep with printf (not echo) so a command starting
 # with -n/-e is matched verbatim instead of being eaten as an echo option.
 # A pattern that is not a valid ERE (grep exit status >= 2) is reported to
@@ -73,17 +65,30 @@ check_dangerous_pattern() {
     local command="$1"
     MATCHED_PATTERN=""
     MATCHED_CATEGORY=""
+    # No patterns can never match; returning here also keeps grep -f from
+    # seeing an empty pattern file. load_patterns never stores an empty line
+    # (an empty pattern would match everything), so the batch file is safe.
+    if [[ ${#DANGEROUS_PATTERNS[@]} -eq 0 ]]; then
+        return 1
+    fi
+    local batch_status=0
+    grep -qiE -f <(printf '%s\n' "${DANGEROUS_PATTERNS[@]}") <<<"$command" 2>/dev/null \
+        || batch_status=$?
+    if [[ "$batch_status" -eq 1 ]]; then
+        return 1
+    fi
     local i status
-    for i in ${DANGEROUS_PATTERNS[@]+"${!DANGEROUS_PATTERNS[@]}"}; do
-        if printf '%s\n' "$command" | grep -qiE -- "${DANGEROUS_PATTERNS[$i]}"; then
+    for i in "${!DANGEROUS_PATTERNS[@]}"; do
+        # Capture the pipeline status immediately: any command in between
+        # (even an assignment) would overwrite PIPESTATUS.
+        printf '%s\n' "$command" | grep -qiE -- "${DANGEROUS_PATTERNS[$i]}" \
+            && status=0 || status=${PIPESTATUS[1]}
+        if [[ "$status" -eq 0 ]]; then
             MATCHED_PATTERN="${DANGEROUS_PATTERNS[$i]}"
             MATCHED_CATEGORY="${DANGEROUS_PATTERN_CATEGORIES[$i]}"
             return 0
-        else
-            status=${PIPESTATUS[1]}
-            if [[ "$status" -ge 2 ]]; then
-                echo "kokko-safety: invalid pattern in ${DANGEROUS_PATTERN_CATEGORIES[$i]}.txt (grep exit $status): ${DANGEROUS_PATTERNS[$i]}" >&2
-            fi
+        elif [[ "$status" -ge 2 ]]; then
+            echo "kokko-safety: invalid pattern in ${DANGEROUS_PATTERN_CATEGORIES[$i]}.txt (grep exit $status): ${DANGEROUS_PATTERNS[$i]}" >&2
         fi
     done
     return 1
