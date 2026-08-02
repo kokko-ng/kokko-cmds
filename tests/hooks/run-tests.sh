@@ -251,6 +251,40 @@ for hook in "$BASH_HOOK" "$GIT_HOOK" "$CLOUD_HOOK" "$BP_HOOK"; do
 done
 
 # ---------------------------------------------------------------------------
+# KOKKO_SAFETY_SKIP: disables exactly the named hook, nothing else
+# ---------------------------------------------------------------------------
+skip_case() { # skipval hook command expected label
+    local skipval="$1" hook="$2" cmd="$3" want="$4" label="$5" out rc got
+    out=$( (cd "$ROOT" && payload "$cmd" | env KOKKO_SAFETY_SKIP="$skipval" "$HOOKS/$hook") 2>/dev/null )
+    rc=$?
+    if [ "$rc" -ne 0 ]; then
+        got="error:$rc"
+    elif [ -z "$out" ]; then
+        got="pass"
+    else
+        got=$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision // "pass"' 2>/dev/null || echo invalid-json)
+    fi
+    if [ "$got" = "$want" ]; then
+        record PASS "${hook%.sh}: $label"
+    else
+        record FAIL "${hook%.sh}: $label" "want=$want got=$got"
+    fi
+}
+
+skip_case 'destructive-git' "$GIT_HOOK" 'git push --force origin main' pass \
+    'KOKKO_SAFETY_SKIP=destructive-git allows force push silently'
+skip_case 'destructive-git' "$BASH_HOOK" 'rm -rf /' ask \
+    'KOKKO_SAFETY_SKIP=destructive-git leaves destructive-bash asking'
+skip_case '' "$GIT_HOOK" 'git push --force origin main' ask \
+    'empty KOKKO_SAFETY_SKIP changes nothing'
+skip_case 'branch-protection, cloud-ops' "$GIT_HOOK" 'git push --force origin main' ask \
+    'KOKKO_SAFETY_SKIP with other tokens does not skip destructive-git'
+skip_case 'destructive-bash destructive-git' "$GIT_HOOK" 'git push --force origin main' pass \
+    'space-separated KOKKO_SAFETY_SKIP tokens are honored'
+skip_case 'destructive-bash,destructive-git' "$BASH_HOOK" 'rm -rf /' pass \
+    'comma-separated KOKKO_SAFETY_SKIP tokens are honored'
+
+# ---------------------------------------------------------------------------
 # session-start-context.sh basic behavior
 # ---------------------------------------------------------------------------
 SS_HOOK=session-start-context.sh

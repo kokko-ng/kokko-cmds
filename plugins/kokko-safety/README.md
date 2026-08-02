@@ -13,8 +13,8 @@ closed to a prompt rather than open.
 | ---- | ------- |
 | `pre-tool-destructive-bash` | Prompts on destructive shell commands (rm -rf, mkfs, chmod 777, ...) |
 | `pre-tool-cloud-ops` | Prompts on destructive cloud/IaC commands (aws/az/gcloud delete, terraform destroy, kubectl delete, ...) |
-| `pre-tool-destructive-git` | Prompts on history-rewriting git (force push, hard reset, clean -fd, ...) |
-| `pre-tool-branch-protection` | Prompts on commit/push/reset/rebase on protected branches (main, master, production, prod, release) and on force pushes to them; understands `cd <dir> &&` and `git -C <dir>` prefixes |
+| `pre-tool-destructive-git` | Prompts on history-rewriting git on any branch (force push, hard reset, clean -fd, rebase, ...) |
+| `pre-tool-branch-protection` | Prompts on commits and plain (non-force) pushes on protected branches (main, master, production, prod, release), including from a detached HEAD parked on a protected branch's tip; understands `cd <dir> &&` and `git -C <dir>` prefixes, with `-C` taking precedence like git itself |
 | `session-start-context` | Emits project type and git status at session start (non-gating) |
 
 The prompt reason always names the exact pattern and category that matched.
@@ -48,6 +48,21 @@ per line, `#` for comments. The 18 category files:
 `pre-tool-destructive-bash` loads the general categories,
 `pre-tool-cloud-ops` the cloud/IaC ones, `pre-tool-destructive-git` only
 `git`.
+
+## Disabling individual hooks: KOKKO_SAFETY_SKIP
+
+`KOKKO_SAFETY_SKIP` holds a comma- and/or space-separated list of hooks to
+disable. Tokens are the hook basenames without the `pre-tool-` prefix:
+`destructive-git`, `branch-protection`, `cloud-ops`, `destructive-bash`.
+A hook that finds its own token exits 0 silently (= allow) before doing any
+work; the other hooks are unaffected. Unset or empty means everything stays
+active.
+
+The intended use case is an environment that already guards a category by
+other means: the [kokko-devcontainer](https://github.com/kokko-ng/kokko-devcontainer)
+image ships its own deny-based git guard and sets
+`KOKKO_SAFETY_SKIP=destructive-git` while keeping this plugin's non-git
+protections enabled.
 
 ## Sound environment variables
 
