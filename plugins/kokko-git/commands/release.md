@@ -15,7 +15,12 @@ published automatically by the Release workflow once CI succeeds on `main`.
 
 ### 1. Detect current version
 
-Check common locations: `pyproject.toml`, `package.json`, `*/__init__.py` (`__version__`), `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `Cargo.toml`, `version.txt`/`VERSION`.
+If the repo has a bump script, it owns the version locations — read the
+current version from where it writes (for kokko-cmds:
+`jq -r '.plugins[0].version' .claude-plugin/marketplace.json`). Otherwise
+check common locations: `pyproject.toml`, `package.json`, `*/__init__.py`
+(`__version__`), `.claude-plugin/plugin.json`,
+`.claude-plugin/marketplace.json`, `Cargo.toml`, `version.txt`/`VERSION`.
 
 ```bash
 grep -r '"version"' . --include="*.json" 2>/dev/null | head -20
@@ -30,7 +35,16 @@ Semantic versioning: patch = Z+1 (fixes), minor = Y+1/Z=0 (features), major = X+
 
 ### 3. Update ALL version references
 
-Replace the old version in every file from step 1. Keep formats consistent — no `v` prefix in files, `v` prefix on the git tag. Then verify:
+If `scripts/bump-version.sh` exists (it does in kokko-cmds), use it — it
+rewrites every plugin manifest and marketplace entry in lock-step and ends
+with the sync check; do not grep-and-edit version strings by hand:
+
+```bash
+bash scripts/bump-version.sh X.Y.Z
+```
+
+Otherwise replace the old version in every file from step 1. Keep formats
+consistent — no `v` prefix in files, `v` prefix on the git tag. Then verify:
 
 ```bash
 git diff
