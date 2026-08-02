@@ -30,16 +30,18 @@ All ten plugins version in lock-step: every release bumps every plugin (and
 every marketplace entry) to the same version, even ones that did not change.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Sound environment variables
+## Environment variables
 
 Both kokko-safety (warning prompts) and kokko-notifications (completion
 chimes) play sounds through the same `play-sound.sh` utility and honor the
-same variables:
+same sound variables; `KOKKO_SAFETY_SKIP` is read by the kokko-safety hooks
+only:
 
 | Environment Variable | Default | Purpose |
 | -------------------- | ------- | ------- |
 | `KOKKO_SOUNDS` | `on` | Set to `off` to mute all hook sounds |
 | `KOKKO_SOUND_VOLUME` | `1.0` | afplay gain multiplier (macOS); `1.0` = system default |
+| `KOKKO_SAFETY_SKIP` | unset | Comma/space-separated kokko-safety hooks to disable (`destructive-git`, `branch-protection`, `cloud-ops`, `destructive-bash`); see [plugins/kokko-safety/README.md](plugins/kokko-safety/README.md) |
 
 ## Plugins
 

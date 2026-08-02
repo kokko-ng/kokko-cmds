@@ -25,6 +25,17 @@ trap _fail_closed EXIT
 
 set -euo pipefail
 
+# KOKKO_SAFETY_SKIP lists hooks to disable by name (comma- and/or space-
+# separated, basenames without the pre-tool- prefix). Environments that carry
+# their own guard for a category -- e.g. kokko-devcontainer's deny-based git
+# guard -- can switch off just that hook and keep the rest.
+IFS=', ' read -r -a _skip_tokens <<<"${KOKKO_SAFETY_SKIP:-}"
+for _token in ${_skip_tokens[@]+"${_skip_tokens[@]}"}; do
+    if [ "$_token" = "destructive-git" ]; then
+        exit 0
+    fi
+done
+
 SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
 # shellcheck source=utils/hook-preamble.sh
 source "$SCRIPT_DIR/utils/hook-preamble.sh"
