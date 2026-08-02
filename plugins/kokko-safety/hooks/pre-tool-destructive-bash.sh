@@ -15,6 +15,24 @@
 #   hooks/dangerous-patterns/databases.txt
 #   hooks/dangerous-patterns/docker.txt
 # shellcheck source-path=SCRIPTDIR
+
+# Fail closed from the very first line: a crash before hook-preamble.sh is
+# sourced (missing utils/, unresolvable SCRIPT_DIR, set -u trip) would
+# otherwise exit non-zero with no output, which Claude Code treats as allow.
+# EXIT rather than ERR: bash does not run ERR traps on fatal errors such as a
+# failed `source` or an unbound-variable abort, but it does run EXIT traps.
+# JSON shape mirrors emit_ask_static in utils/hook-preamble.sh.
+# Invoked via the EXIT trap below, which shellcheck cannot see:
+# shellcheck disable=SC2329
+_fail_closed() {
+    rc=$?
+    [ "$rc" -eq 0 ] && exit 0
+    reason="kokko-safety: pre-tool-destructive-bash.sh crashed before it could evaluate this command; failing closed to a permission prompt"
+    printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"%s"},"systemMessage":"%s"}\n' "$reason" "$reason"
+    exit 0
+}
+trap _fail_closed EXIT
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
