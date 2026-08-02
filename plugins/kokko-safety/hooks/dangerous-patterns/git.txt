@@ -1,8 +1,9 @@
 # git.txt - Git destructive operations
 
-# Force push variants
-(^|[[:space:]])git[[:space:]]+push[[:space:]]+(.*[[:space:]])?(--force|-f)([[:space:]]|$)
-(^|[[:space:]])git[[:space:]]+push[[:space:]]+--force-with-lease
+# Force push variants (any branch, any flag position; git may carry -C <dir>).
+# This file is the sole owner of force pushes -- see the ownership note below.
+(^|[[:space:]])git[[:space:]]+(-C[[:space:]]+[^[:space:]]+[[:space:]]+)?push[[:space:]]+(.*[[:space:]])?(--force|-f)([[:space:]]|$)
+(^|[[:space:]])git[[:space:]]+(-C[[:space:]]+[^[:space:]]+[[:space:]]+)?push[[:space:]]+(.*[[:space:]])?--force-with-lease
 
 # Hard reset
 (^|[[:space:]])git[[:space:]]+reset[[:space:]]+--hard
@@ -25,9 +26,10 @@
 (^|[[:space:]])git[[:space:]]+rebase[[:space:]]+-i
 (^|[[:space:]])git[[:space:]]+rebase[[:space:]]+--interactive
 
-# NOTE: direct pushes to protected branches are owned by
-# pre-tool-branch-protection.sh -- do not duplicate them here or the same
-# command double-prompts.
+# NOTE: division of labor with pre-tool-branch-protection.sh. This file owns
+# force push, hard reset, and rebase on ALL branches; branch-protection owns
+# commit and plain (non-force) push on protected branches. Do not duplicate
+# either side or the same command double-prompts.
 
 # Checkout/restore that discards changes
 (^|[[:space:]])git[[:space:]]+checkout[[:space:]]+--[[:space:]]+\.
