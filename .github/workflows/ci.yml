@@ -24,6 +24,10 @@ jobs:
         run: |
           pip install pre-commit
           pre-commit run --all-files --show-diff-on-failure
+      - name: Lint workflows
+        uses: docker://rhysd/actionlint:1.7.7
+        with:
+          args: -color
 
   test-hooks:
     runs-on: ubuntu-latest
