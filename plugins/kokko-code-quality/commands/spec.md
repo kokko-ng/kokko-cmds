@@ -21,8 +21,10 @@ config options.
   component implementations, API endpoints, and rendered UI — no speculative features.
 - **Focus on deterministically testable behavior**: API requests/responses,
   auth rules, CRUD and persistence, form/input validation, state transitions,
-  upload/download round-trips, component rendering logic. Mark stories whose
-  outcome can only be judged visually (layout, styling) as visual-only.
+  upload/download round-trips, component rendering logic, and browser flows
+  assertable in Playwright E2E specs (navigation, form submissions, modals,
+  rendered content). Mark stories whose outcome can only be judged visually
+  (layout, styling) as visual-only.
 - Organize by priority: critical path (auth, core) → primary → secondary → edge/error cases.
 - Map stories to concrete hooks tests can target: routes, endpoints, element
   roles/labels/test ids, prerequisites, and measurable outcomes (status codes,
@@ -54,5 +56,5 @@ Brief description of the application and its purpose.
 2. Edge case: [description]
 3. Error case: [description]
 
-**Deterministic tests:** API / Component / API + Component / None (visual only)
+**Deterministic tests:** API / Component / E2E (any combination) / None (visual only)
 ```

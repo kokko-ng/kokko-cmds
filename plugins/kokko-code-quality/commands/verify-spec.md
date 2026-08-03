@@ -14,8 +14,9 @@ missing or unparseable.
 1. **Structure**: title, `## Overview`, `## User Stories`, at least one `### Feature:`.
    Each story has a US-XXX id, "As a / I want to / So that", acceptance-criteria
    checkboxes, test scenarios, and a "Deterministic tests" indicator
-   (API / Component / API + Component / None (visual only)). Treat the legacy
-   "Testable with Playwright" indicator as a Warning to migrate, not a failure.
+   (API / Component / E2E in any combination, or None (visual only)). Treat the
+   legacy "Testable with Playwright" indicator as a Warning to migrate, not a
+   failure.
 2. **Codebase alignment**: every documented route, component, API endpoint, and
    data-testid (or CLI command/flag) actually exists. Flag mismatches.
 3. **Missing coverage**: scan the codebase for testable features absent from the spec.

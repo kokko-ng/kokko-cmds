@@ -7,7 +7,8 @@ repo inspection, read-only `az cli`, then ask the user. Never invent values.
   APP_NAME                     Application name
   PROGRESS_FILE                Progress checklist path, e.g. prompts/deployed-validation-progress.md
   API_TEST_COMMAND             Runs the deterministic API suite; must honor the API_BASE_URL env var (e.g. cd backend && pytest -q tests/api)
-  TEST_DIRS                    Space-separated test directories for the spec-coverage grep (e.g. backend/tests)
+  E2E_TEST_COMMAND             Runs the Playwright E2E suite headlessly; its config must honor the E2E_BASE_URL env var (e.g. cd frontend && npx playwright test)
+  TEST_DIRS                    Space-separated test directories for the spec-coverage grep (e.g. backend/tests frontend/e2e)
   RESOURCE_GROUP / AZURE_REGION  Fill region from `az group show --name <rg> --query location`
   BACKEND_APP_NAME / FRONTEND_APP_NAME   Container App names
   BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
@@ -47,6 +48,7 @@ tailored output.
 | `storage`        | {{AZURE_STORAGE_TYPE}}                           |
 | `auth`           | {{DEPLOYED_AUTH_TYPE}}                           |
 | `api_tests`      | `{{API_TEST_COMMAND}}`                           |
+| `e2e_tests`      | `{{E2E_TEST_COMMAND}}`                           |
 | `progress`       | `{{PROGRESS_FILE}}`                              |
 
 <!-- OPTIONAL: azure-ai -->
@@ -69,19 +71,30 @@ assertions, never from interpreting screenshots or driving a browser by
 hand.
 
 - **API/integration tests** (`{{API_TEST_COMMAND}}`): the suite reads its
-  target origin from the `API_BASE_URL` environment variable. Point it at
-  the deployed frontend origin so every request also exercises the nginx
-  `/api` proxy:
+  target origin from the `API_BASE_URL` environment variable.
+- **End-to-end browser tests** (`{{E2E_TEST_COMMAND}}`): Playwright test
+  specs (`@playwright/test`) committed to the repo and run headlessly with
+  `npx playwright test`; the Playwright config takes its `baseURL` from the
+  `E2E_BASE_URL` environment variable. Real user flows against the deployed
+  frontend, verified with web-first assertions that auto-wait -- never
+  `waitForTimeout`, never screenshot judging (failure screenshots and
+  traces are debugging artifacts, not pass evidence). If Playwright is not
+  installed, add it first
+  (`npm i -D @playwright/test && npx playwright install chromium`).
+- Point both suites at the deployed frontend origin so every request also
+  exercises the nginx `/api` proxy:
 
   ```bash
   export API_BASE_URL="https://$FRONTEND_FQDN"
+  export E2E_BASE_URL="https://$FRONTEND_FQDN"
   {{API_TEST_COMMAND}}
+  {{E2E_TEST_COMMAND}}
   ```
 
 - **Frontend smoke checks** are curl assertions: the frontend origin returns
   200 and serves the app shell (expected title/root element in the HTML),
   and its static assets resolve.
-- If no such suite exists yet, creating it is part of this prompt's job --
+- If a suite does not exist yet, creating it is part of this prompt's job --
   build it in the repo and commit it (tests deploy nothing, so they need no
   pipeline run) so later passes re-run it.
 - Tests must be deterministic: they create and clean up their own data
@@ -90,11 +103,12 @@ hand.
   the same result on every re-run.
 - [azure-ai] Assertions on AI-backed endpoints target status codes and
   response structure, never exact model output.
-- Do NOT drive a browser or judge outcomes visually: no ad-hoc
-  playwright-cli sessions, no Playwright MCP server or `mcp__playwright__*` /
-  `browser_*` tools, no screenshot-based validation. Visual appearance and
-  responsive layout are out of scope here -- the aesthetics prompt covers
-  them.
+- Browser automation lives ONLY inside those committed Playwright specs.
+  Do NOT drive a browser yourself or judge outcomes visually: no ad-hoc
+  playwright-cli sessions or one-off page-driving scripts, no Playwright
+  MCP server or `mcp__playwright__*` / `browser_*` tools, no
+  screenshot-based validation. Pixel-level appearance is out of scope
+  here -- the aesthetics prompt covers it.
 
 ### Spec Coverage -- Every Story Maps to Tests
 
@@ -225,11 +239,13 @@ Validate before any feature testing:
 
 3. Wrong credentials are rejected (401); valid credentials succeed.
 4. The full login lifecycle passes deterministically through the frontend
-   origin (so the nginx proxy is exercised too): the frontend serves the app
-   shell (curl 200); login with wrong credentials returns the specified
-   error; login with valid credentials returns a token/session; that
-   credential makes protected API requests succeed; after logout (or token
-   discard) the same requests fail again.
+   origin (so the nginx proxy is exercised too), at both levels: API
+   assertions prove wrong credentials return the specified error, valid
+   credentials return a token/session that makes protected requests
+   succeed, and logout (or token discard) makes them fail again; a
+   Playwright spec proves the UI flow -- the login page renders, invalid
+   credentials show the error, valid credentials land in the app, and
+   logout returns to the login page.
 
 <!-- END AUTH VARIANT: custom-credentials -->
 
@@ -252,13 +268,14 @@ Validate before any feature testing:
 1. `https://$BACKEND_FQDN{{HEALTH_ENDPOINT}}` returns 200 with no credentials.
 2. An unauthenticated request to a protected page redirects to the Entra
    sign-in page; an unauthenticated API request is rejected.
-3. A token acquired non-interactively for the test identity (client
-   credentials, or whichever flow {{ENTRA_TEST_ACCOUNT_SOURCE}} supports)
-   makes protected API requests succeed; the same requests without the
-   token are rejected.
-4. The interactive browser sign-in/sign-out experience itself is NOT
-   validated here -- the redirect and token assertions above are its
-   deterministic proxy.
+3. Sign-in completes deterministically: a Playwright spec signs in as the
+   automatable test account (no MFA/conditional-access) and asserts it
+   lands in the app; where only API checks are needed, a token acquired
+   non-interactively (client credentials, or whichever flow
+   {{ENTRA_TEST_ACCOUNT_SOURCE}} supports) makes protected API requests
+   succeed while the same requests without it are rejected.
+4. Sign-out, asserted in the same spec, returns to the sign-in flow and
+   protected pages are no longer reachable.
 
 If no automatable test identity exists, mark auth validation `blocked` in
 `{{PROGRESS_FILE}}` (note why), and continue validating whatever is reachable
@@ -305,8 +322,9 @@ so much that a failure is hard to attribute.
 
 1. Mark the story `in-progress` in `{{PROGRESS_FILE}}`.
 2. Write or extend its deterministic tests (story ID tagged verbatim;
-   happy path plus every spec edge/error scenario), then run them against
-   the DEPLOYED app (`API_BASE_URL` at the deployed frontend origin).
+   happy path plus every spec edge/error scenario; a Playwright spec for
+   the user-visible flow), then run them against the DEPLOYED app
+   (`API_BASE_URL` / `E2E_BASE_URL` at the deployed frontend origin).
 3. If they fail: debug (container logs, workflow logs, test output), fix the
    code locally, commit and push, wait for the workflow (`gh run watch`),
    verify deployment health.
@@ -323,8 +341,9 @@ revisit blocked items at the end.
 ## Validation Standards
 
 Run every story's tests against the deployed app through the frontend
-origin (`API_BASE_URL="https://$FRONTEND_FQDN"`), so the nginx proxy path
-is what gets validated. Tests assert, per `spec.md`:
+origin (`API_BASE_URL` and `E2E_BASE_URL` set to
+`https://$FRONTEND_FQDN`), so the nginx proxy path is what gets validated.
+Tests assert, per `spec.md`:
 
 - The API responds correctly: expected status codes, response shape, and
   field values on the happy path; the specified errors for invalid input
@@ -333,6 +352,9 @@ is what gets validated. Tests assert, per `spec.md`:
   session)
 - Errors are handled appropriately and edge cases behave as specified --
   each edge/error scenario in `spec.md` is its own test
+- The story's user-visible flow passes in a Playwright spec against the
+  deployed frontend: navigate, interact, and assert the rendered result
+  (content, URL/state, error messages) with web-first assertions
 - The frontend origin serves the app shell and its static assets (curl
   smoke assertions)
 - Test data created against the live deployment is cleaned up by the tests
@@ -348,9 +370,11 @@ is what gets validated. Tests assert, per `spec.md`:
 - [ ] Authentication validation (section above) fully passes
 - [ ] Every user story in `spec.md` is implemented in the deployed app and
       marked `passed` in `{{PROGRESS_FILE}}`, backed by deterministic tests
-      run with `API_BASE_URL` at the deployed frontend origin
+      run with `API_BASE_URL` / `E2E_BASE_URL` at the deployed frontend
+      origin
 - [ ] The spec-coverage check prints no uncovered story IDs
 - [ ] `{{API_TEST_COMMAND}}` passes with zero failures against the deployed app
+- [ ] `{{E2E_TEST_COMMAND}}` passes with zero failures against the deployed app
 - [ ] Database and storage connectivity are confirmed operational
 - [ ] [azure-ai] The AI model endpoint is confirmed responsive through the app
 - [ ] [websocket] WebSocket features work end-to-end with authentication
