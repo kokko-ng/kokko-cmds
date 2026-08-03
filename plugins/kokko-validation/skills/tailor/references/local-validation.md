@@ -6,7 +6,9 @@ repo inspection, read-only `az cli`, then ask the user. Never invent values.
 
   APP_NAME                    Application name
   PROGRESS_FILE               Progress checklist path, e.g. prompts/local-validation-progress.md
-  BROWSER_TOOL                Browser automation tool actually available (e.g. playwright-cli, Playwright MCP)
+  API_TEST_COMMAND            Runs the API/integration suite against the running backend (e.g. cd backend && pytest -q tests/api)
+  FRONTEND_TEST_COMMAND       Runs the frontend unit/component suite (e.g. cd frontend && npx vitest run)
+  TEST_DIRS                   Space-separated test directories for the spec-coverage grep (e.g. backend/tests frontend/src)
   BACKEND_DIR / FRONTEND_DIR  Repo-relative app directories (e.g. backend, frontend)
   BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
   BACKEND_START_COMMAND / FRONTEND_START_COMMAND
@@ -29,7 +31,6 @@ apply. Strip the bracket tags from lines you keep.
   azure-ai      App calls a pre-provisioned Azure AI model. Delete if there is no AI integration.
   websocket     App uses WebSockets.
   registration  App has self-service user registration.
-  theming       App has more than one theme.
 
 No {{...}} token, no [tag] marker, and none of these notes may remain in the
 tailored output.
@@ -46,7 +47,8 @@ tailored output.
 | `frontend`     | {{FRONTEND_FRAMEWORK}} on `{{FRONTEND_URL}}` |
 | `database`     | {{LOCAL_DB_TYPE}} (local)                    |
 | `storage`      | Local filesystem (`{{LOCAL_STORAGE_PATH}}`)  |
-| `browser_tool` | {{BROWSER_TOOL}}                             |
+| `api_tests`    | `{{API_TEST_COMMAND}}`                       |
+| `ui_tests`     | `{{FRONTEND_TEST_COMMAND}}`                  |
 | `progress`     | `{{PROGRESS_FILE}}`                          |
 
 <!-- OPTIONAL: azure-ai -->
@@ -62,20 +64,50 @@ tailored output.
 
 ---
 
-## Browser Automation -- Playwright CLI (NOT the MCP server)
+## Deterministic Testing -- No Agent-Driven Browsing
 
-`playwright-cli` in this prompt means the Playwright **command-line interface**,
-driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
+Validation in this prompt is performed by deterministic, assertion-based
+tests run from the shell -- pass/fail comes from test-runner exit codes and
+assertion output, never from interpreting screenshots or driving a browser
+by hand.
 
-- Drive the browser by writing and running Playwright scripts: ad-hoc Node
-  scripts using the `playwright` package, or `.spec` files run with
-  `npx playwright test`. Use `npx playwright screenshot <url> <out.png>` for
-  one-off captures.
-- If Playwright is not installed, add it first
-  (`npm i -D @playwright/test && npx playwright install chromium`).
-- Do NOT use the Playwright MCP server or any `mcp__playwright__*` / `browser_*`
-  tool for navigation, snapshots, or screenshots. All browser interaction goes
-  through the Playwright CLI.
+- **API/integration tests** (`{{API_TEST_COMMAND}}`): real HTTP requests
+  against the locally running backend, asserting status codes, response
+  shapes, field values, error messages, auth enforcement, and persistence.
+- **Frontend unit/component tests** (`{{FRONTEND_TEST_COMMAND}}`): rendering
+  logic, form validation, and state transitions asserted at the DOM level
+  with the framework's standard testing tools.
+- If a suite (or the frontend test setup) does not exist yet, creating it is
+  part of this prompt's job -- use the stack's conventional tooling and keep
+  it in the repo so later passes re-run it.
+- Tests must be deterministic: they seed or reset their own data, poll/await
+  conditions instead of sleeping fixed durations, never depend on execution
+  order, and produce the same result on every re-run.
+- [azure-ai] Assertions on AI-backed endpoints target status codes and
+  response structure, never exact model output.
+- Do NOT drive a browser or judge outcomes visually: no ad-hoc
+  playwright-cli sessions, no Playwright MCP server or `mcp__playwright__*` /
+  `browser_*` tools, no screenshot-based validation. Visual appearance and
+  responsive layout are out of scope here -- the aesthetics prompt covers
+  them.
+
+### Spec Coverage -- Every Story Maps to Tests
+
+Tag every test with the literal story ID it validates -- in a describe or
+test name (`describe('US-003 login', ...)`), or, where names cannot contain
+hyphens (pytest), in the test's docstring or a marker. The ID must appear
+verbatim (`US-003`) so the coverage check below can find it. Each story
+gets its happy path plus every edge and error scenario listed in `spec.md`
+as its own test. Check coverage mechanically -- every story ID in the spec
+must appear in the suite:
+
+```bash
+comm -23 <(grep -Eoh 'US-[0-9]+' spec.md | sort -u) \
+         <(grep -Eroh 'US-[0-9]+' {{TEST_DIRS}} | sort -u)
+```
+
+Any ID this prints is an uncovered story -- write its tests before calling
+the suite complete.
 
 ---
 
@@ -83,8 +115,9 @@ driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
 
 Work autonomously to validate the application end-to-end against every feature
 and requirement in `spec.md`, running entirely locally ({{BACKEND_FRAMEWORK}}
-backend + {{FRONTEND_FRAMEWORK}} frontend). Implement what is missing, fix what
-is broken, and re-validate until everything passes.
+backend + {{FRONTEND_FRAMEWORK}} frontend). Build out the deterministic test
+suites described above, implement what is missing, fix what is broken, and
+re-run the tests until everything passes.
 
 `spec.md` is the authoritative source of scope. If a requirement is ambiguous,
 refine it to be explicit and testable while preserving its intent.
@@ -232,25 +265,36 @@ On a non-`Succeeded` deployment state, wait and re-check -- do not recreate.
 2. [azure-ai] Verify `{{BACKEND_DIR}}/.env` has the Azure AI credentials
    (retrieve them per the Azure AI section if missing).
 3. Start the backend, then the frontend dev server.
-4. Confirm `{{FRONTEND_URL}}` loads and `{{FRONTEND_URL}}{{HEALTH_ENDPOINT}}`
-   reaches the backend through the dev proxy.
-5. Log in once to confirm auth works.
-6. [azure-ai] Exercise one AI feature to confirm model connectivity.
-7. Read or create `{{PROGRESS_FILE}}`, then start the work cycle.
+4. Confirm `{{FRONTEND_URL}}` serves the app shell and
+   `{{FRONTEND_URL}}{{HEALTH_ENDPOINT}}` reaches the backend through the dev
+   proxy (curl, expect 200).
+5. Confirm auth works once with a curl login round-trip: valid credentials
+   return a token/session, and an authenticated request succeeds with it.
+6. [azure-ai] Exercise one AI endpoint via curl to confirm model connectivity.
+7. Confirm both test suites run at all (`{{API_TEST_COMMAND}}`,
+   `{{FRONTEND_TEST_COMMAND}}`) -- failing tests are fine at this stage, a
+   broken or missing harness is not: create or repair it now.
+8. Read or create `{{PROGRESS_FILE}}`, then start the work cycle.
 
 ### Work Cycle (per user story)
 
 1. Mark the story `in-progress` in `{{PROGRESS_FILE}}`.
-2. Validate it against the local app with {{BROWSER_TOOL}}.
-3. If it fails: debug, fix the code, let the servers reload, re-validate.
-4. When it fully passes -- UI, API, persistence, error handling, edge cases --
-   run `{{TYPE_CHECK_COMMAND}}`, then mark it `passed` with a short note.
+2. Write or extend its deterministic tests first: happy path plus every edge
+   and error scenario from `spec.md`, tagged with the story ID.
+3. Run the story's tests. If they fail: debug, fix the application code (or
+   the test, only when the test itself contradicts `spec.md`), let the
+   servers reload, re-run.
+4. When the story's tests pass -- API behavior, persistence, error handling,
+   edge cases, and frontend logic where the story has UI behavior -- run the
+   FULL suites (`{{API_TEST_COMMAND}}`, `{{FRONTEND_TEST_COMMAND}}`) to catch
+   regressions, then `{{TYPE_CHECK_COMMAND}}`, then mark it `passed` with a
+   short note.
 5. Move to the next story. Repeat until every story is `passed` or `blocked`.
 
 ### Debugging
 
-- Backend errors: backend terminal logs. Frontend errors: browser console and
-  dev-server output.
+- Backend errors: backend terminal logs. Frontend errors: test-runner output
+  and dev-server logs.
 - [azure-ai] AI errors: check `.env` credentials first, then deployment health
   via `az cognitiveservices account deployment show`.
 - **Stuck rule:** after 3 failed fix attempts on the same issue, record what
@@ -261,31 +305,30 @@ On a non-`Succeeded` deployment state, wait and re-check -- do not recreate.
 
 ## Validation Standards
 
-Validate with {{BROWSER_TOOL}} against `{{FRONTEND_URL}}` -- real browser
-flows, not just curl.
+Every user story is validated by deterministic tests that assert, per
+`spec.md`:
 
-Authentication:
+- The API responds correctly: expected status codes, response shape, and
+  field values on the happy path; the specified error status and message for
+  invalid input
+- Data persists: written through the API, then read back in a separate
+  request (and, where sessions matter, from a fresh authenticated session)
+- Errors are handled appropriately and edge cases behave as specified --
+  each edge/error scenario in `spec.md` is its own test
+- Frontend logic is covered where the story has UI behavior: rendering,
+  form validation, and state transitions asserted in component tests
 
-- Valid credentials log in; invalid credentials are rejected with a visible error
-- Protected endpoints reject unauthenticated requests and succeed when authenticated
-- Logout clears auth state and returns to the login page
+Authentication (suite-level, not per-story):
+
+- Valid credentials authenticate; invalid credentials are rejected with the
+  specified error
+- Protected endpoints reject unauthenticated requests and succeed when
+  authenticated
+- Logout (or session expiry) clears access: subsequent protected requests fail
 - [registration] Registration creates an account that can immediately log in
 
-Every feature (per `spec.md`):
-
-- The UI renders correctly
-- The backend API responds correctly
-- Data persists across reloads
-- Errors are handled appropriately
-- Edge cases behave sensibly
-
-UI & responsiveness:
-
-- Navigation and layout render correctly; interactive elements respond
-- Layout adapts to mobile (375px) and desktop (1280px) viewports
-- [theming] Each theme renders without bleed from another theme (no hard-coded
-  colors, no white flashes on dark theme)
-- [websocket] WebSocket features connect and stream correctly
+[websocket] WebSocket features: a scripted test client connects with auth
+and asserts the expected messages stream back.
 
 ---
 
@@ -294,12 +337,15 @@ UI & responsiveness:
 **Definition of done -- every box checked:**
 
 - [ ] Every user story in `spec.md` is implemented and marked `passed` in
-      `{{PROGRESS_FILE}}` after {{BROWSER_TOOL}} validation
-- [ ] Authentication protects all sensitive endpoints
-- [ ] Data persistence and file handling work correctly
-- [ ] [azure-ai] AI integration works end-to-end through the app
-- [ ] UI renders properly at desktop and mobile widths
-- [ ] [theming] Every theme renders correctly at both widths
+      `{{PROGRESS_FILE}}`, backed by deterministic tests tagged with its ID
+      that cover the happy path and every spec edge/error scenario
+- [ ] The spec-coverage check prints no uncovered story IDs
+- [ ] `{{API_TEST_COMMAND}}` passes with zero failures
+- [ ] `{{FRONTEND_TEST_COMMAND}}` passes with zero failures
+- [ ] Tests prove authentication protects all sensitive endpoints
+- [ ] Tests prove data persistence and file handling work correctly
+- [ ] [azure-ai] AI integration works end-to-end through the app, asserted
+      on status and response structure
 - [ ] `{{TYPE_CHECK_COMMAND}}` passes with zero errors
 - [ ] `{{PROGRESS_FILE}}` is up to date with no `pending` or `in-progress` items
 

@@ -19,11 +19,14 @@ config options.
 
 - **Document existing features only.** Verify against route definitions,
   component implementations, API endpoints, and rendered UI — no speculative features.
-- **Focus on Playwright-testable behavior**: navigation, form submissions,
-  clicks, content verification, modals, uploads/downloads, auth flows. Mark
-  backend-only features as "API test only".
+- **Focus on deterministically testable behavior**: API requests/responses,
+  auth rules, CRUD and persistence, form/input validation, state transitions,
+  upload/download round-trips, component rendering logic. Mark stories whose
+  outcome can only be judged visually (layout, styling) as visual-only.
 - Organize by priority: critical path (auth, core) → primary → secondary → edge/error cases.
-- Map stories to actual UI elements (data-testid), prerequisites, and expected outcomes.
+- Map stories to concrete hooks tests can target: routes, endpoints, element
+  roles/labels/test ids, prerequisites, and measurable outcomes (status codes,
+  response fields, visible text).
 
 ## Template
 
@@ -51,5 +54,5 @@ Brief description of the application and its purpose.
 2. Edge case: [description]
 3. Error case: [description]
 
-**Testable with Playwright:** Yes/No
+**Deterministic tests:** API / Component / API + Component / None (visual only)
 ```

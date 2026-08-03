@@ -6,7 +6,8 @@ repo inspection, read-only `az cli`, then ask the user. Never invent values.
 
   APP_NAME                     Application name
   PROGRESS_FILE                Progress checklist path, e.g. prompts/deployed-validation-progress.md
-  BROWSER_TOOL                 Browser automation tool actually available (e.g. playwright-cli, Playwright MCP)
+  API_TEST_COMMAND             Runs the deterministic API suite; must honor the API_BASE_URL env var (e.g. cd backend && pytest -q tests/api)
+  TEST_DIRS                    Space-separated test directories for the spec-coverage grep (e.g. backend/tests)
   RESOURCE_GROUP / AZURE_REGION  Fill region from `az group show --name <rg> --query location`
   BACKEND_APP_NAME / FRONTEND_APP_NAME   Container App names
   BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
@@ -45,7 +46,7 @@ tailored output.
 | `database`       | {{AZURE_DB_TYPE}}                                |
 | `storage`        | {{AZURE_STORAGE_TYPE}}                           |
 | `auth`           | {{DEPLOYED_AUTH_TYPE}}                           |
-| `browser_tool`   | {{BROWSER_TOOL}}                                 |
+| `api_tests`      | `{{API_TEST_COMMAND}}`                           |
 | `progress`       | `{{PROGRESS_FILE}}`                              |
 
 <!-- OPTIONAL: azure-ai -->
@@ -60,20 +61,58 @@ tailored output.
 
 ---
 
-## Browser Automation -- Playwright CLI (NOT the MCP server)
+## Deterministic Testing -- No Agent-Driven Browsing
 
-`playwright-cli` in this prompt means the Playwright **command-line interface**,
-driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
+Validation runs through deterministic, assertion-based tests executed from
+the shell -- pass/fail comes from test-runner exit codes and curl
+assertions, never from interpreting screenshots or driving a browser by
+hand.
 
-- Drive the browser by writing and running Playwright scripts: ad-hoc Node
-  scripts using the `playwright` package, or `.spec` files run with
-  `npx playwright test`. Use `npx playwright screenshot <url> <out.png>` for
-  one-off captures. Point every script at the deployed URLs.
-- If Playwright is not installed, add it first
-  (`npm i -D @playwright/test && npx playwright install chromium`).
-- Do NOT use the Playwright MCP server or any `mcp__playwright__*` / `browser_*`
-  tool for navigation, snapshots, or screenshots. All browser interaction goes
-  through the Playwright CLI.
+- **API/integration tests** (`{{API_TEST_COMMAND}}`): the suite reads its
+  target origin from the `API_BASE_URL` environment variable. Point it at
+  the deployed frontend origin so every request also exercises the nginx
+  `/api` proxy:
+
+  ```bash
+  export API_BASE_URL="https://$FRONTEND_FQDN"
+  {{API_TEST_COMMAND}}
+  ```
+
+- **Frontend smoke checks** are curl assertions: the frontend origin returns
+  200 and serves the app shell (expected title/root element in the HTML),
+  and its static assets resolve.
+- If no such suite exists yet, creating it is part of this prompt's job --
+  build it in the repo and commit it (tests deploy nothing, so they need no
+  pipeline run) so later passes re-run it.
+- Tests must be deterministic: they create and clean up their own data
+  (this is a live deployed database), poll/await conditions instead of
+  sleeping fixed durations, never depend on execution order, and produce
+  the same result on every re-run.
+- [azure-ai] Assertions on AI-backed endpoints target status codes and
+  response structure, never exact model output.
+- Do NOT drive a browser or judge outcomes visually: no ad-hoc
+  playwright-cli sessions, no Playwright MCP server or `mcp__playwright__*` /
+  `browser_*` tools, no screenshot-based validation. Visual appearance and
+  responsive layout are out of scope here -- the aesthetics prompt covers
+  them.
+
+### Spec Coverage -- Every Story Maps to Tests
+
+Tag every test with the literal story ID it validates -- in a describe or
+test name (`describe('US-003 login', ...)`), or, where names cannot contain
+hyphens (pytest), in the test's docstring or a marker. The ID must appear
+verbatim (`US-003`) so the coverage check below can find it. Each story
+gets its happy path plus every edge and error scenario listed in `spec.md`
+as its own test. Check coverage mechanically -- every story ID in the spec
+must appear in the suite:
+
+```bash
+comm -23 <(grep -Eoh 'US-[0-9]+' spec.md | sort -u) \
+         <(grep -Eroh 'US-[0-9]+' {{TEST_DIRS}} | sort -u)
+```
+
+Any ID this prints is an uncovered story -- write its tests before calling
+the suite complete.
 
 ---
 
@@ -185,10 +224,12 @@ Validate before any feature testing:
    ```
 
 3. Wrong credentials are rejected (401); valid credentials succeed.
-4. Frontend login UI via {{BROWSER_TOOL}}: the login page loads; invalid
-   credentials show an error and no navigation; valid credentials land in the
-   app; subsequent API requests succeed; logout returns to the login page, and
-   protected pages then redirect back to login.
+4. The full login lifecycle passes deterministically through the frontend
+   origin (so the nginx proxy is exercised too): the frontend serves the app
+   shell (curl 200); login with wrong credentials returns the specified
+   error; login with valid credentials returns a token/session; that
+   credential makes protected API requests succeed; after logout (or token
+   discard) the same requests fail again.
 
 <!-- END AUTH VARIANT: custom-credentials -->
 
@@ -211,10 +252,13 @@ Validate before any feature testing:
 1. `https://$BACKEND_FQDN{{HEALTH_ENDPOINT}}` returns 200 with no credentials.
 2. An unauthenticated request to a protected page redirects to the Entra
    sign-in page; an unauthenticated API request is rejected.
-3. Via {{BROWSER_TOOL}}, the test account completes sign-in and lands in the
-   app; subsequent API requests succeed.
-4. Sign-out returns to the sign-in flow and protected pages are no longer
-   reachable.
+3. A token acquired non-interactively for the test identity (client
+   credentials, or whichever flow {{ENTRA_TEST_ACCOUNT_SOURCE}} supports)
+   makes protected API requests succeed; the same requests without the
+   token are rejected.
+4. The interactive browser sign-in/sign-out experience itself is NOT
+   validated here -- the redirect and token assertions above are its
+   deterministic proxy.
 
 If no automatable test identity exists, mark auth validation `blocked` in
 `{{PROGRESS_FILE}}` (note why), and continue validating whatever is reachable
@@ -222,8 +266,8 @@ without it.
 
 <!-- END AUTH VARIANT: entra-id -->
 
-[websocket] After login, exercise one WebSocket feature: the connection is
-established with auth and messages stream back correctly.
+[websocket] After auth validation passes, run a WebSocket test: a scripted
+client connects with auth and asserts messages stream back correctly.
 
 ---
 
@@ -260,12 +304,14 @@ so much that a failure is hard to attribute.
 ## Work Cycle (per user story)
 
 1. Mark the story `in-progress` in `{{PROGRESS_FILE}}`.
-2. Validate it against the DEPLOYED app with {{BROWSER_TOOL}}.
-3. If it fails: debug (container logs, workflow logs, screenshots), fix the
+2. Write or extend its deterministic tests (story ID tagged verbatim;
+   happy path plus every spec edge/error scenario), then run them against
+   the DEPLOYED app (`API_BASE_URL` at the deployed frontend origin).
+3. If they fail: debug (container logs, workflow logs, test output), fix the
    code locally, commit and push, wait for the workflow (`gh run watch`),
    verify deployment health.
-4. Re-validate. When it fully passes -- UI, API, persistence, error handling,
-   edge cases -- mark it `passed` with a short note.
+4. Re-run the tests. When they fully pass -- API behavior, persistence,
+   error handling, edge cases -- mark the story `passed` with a short note.
 5. Move to the next story. Repeat until every story is `passed` or `blocked`.
 
 **Stuck rule:** after 3 failed fix-and-deploy cycles on the same issue, record
@@ -276,15 +322,21 @@ revisit blocked items at the end.
 
 ## Validation Standards
 
-Validate with {{BROWSER_TOOL}} against the deployed frontend URL -- real
-browser flows, not just curl. For each feature in `spec.md`:
+Run every story's tests against the deployed app through the frontend
+origin (`API_BASE_URL="https://$FRONTEND_FQDN"`), so the nginx proxy path
+is what gets validated. Tests assert, per `spec.md`:
 
-- The UI renders correctly
-- The backend API responds correctly
-- Data persists (survives reload and a new session)
-- Errors are handled appropriately
-- Edge cases behave sensibly
-- UI renders properly at desktop (1280px) and mobile (375px) widths
+- The API responds correctly: expected status codes, response shape, and
+  field values on the happy path; the specified errors for invalid input
+- Data persists in the deployed database: written in one request, read back
+  in a separate request (and, where sessions matter, a fresh authenticated
+  session)
+- Errors are handled appropriately and edge cases behave as specified --
+  each edge/error scenario in `spec.md` is its own test
+- The frontend origin serves the app shell and its static assets (curl
+  smoke assertions)
+- Test data created against the live deployment is cleaned up by the tests
+  themselves
 
 ---
 
@@ -295,11 +347,13 @@ browser flows, not just curl. For each feature in `spec.md`:
 - [ ] `{{HEALTH_ENDPOINT}}` returns 200 without authentication
 - [ ] Authentication validation (section above) fully passes
 - [ ] Every user story in `spec.md` is implemented in the deployed app and
-      marked `passed` in `{{PROGRESS_FILE}}` after {{BROWSER_TOOL}} validation
+      marked `passed` in `{{PROGRESS_FILE}}`, backed by deterministic tests
+      run with `API_BASE_URL` at the deployed frontend origin
+- [ ] The spec-coverage check prints no uncovered story IDs
+- [ ] `{{API_TEST_COMMAND}}` passes with zero failures against the deployed app
 - [ ] Database and storage connectivity are confirmed operational
 - [ ] [azure-ai] The AI model endpoint is confirmed responsive through the app
 - [ ] [websocket] WebSocket features work end-to-end with authentication
-- [ ] UI renders properly at desktop and mobile widths
 - [ ] The GitHub Actions pipeline is green on the latest commit
 - [ ] `{{PROGRESS_FILE}}` is up to date with no `pending` or `in-progress` items
 

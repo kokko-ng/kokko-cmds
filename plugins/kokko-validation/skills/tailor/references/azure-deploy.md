@@ -6,7 +6,8 @@ repo inspection, read-only `az cli`, then ask the user. Never invent values.
 
   APP_NAME                     Application name
   PROGRESS_FILE                Progress checklist path, e.g. prompts/azure-deploy-progress.md
-  BROWSER_TOOL                 Browser automation tool actually available (e.g. playwright-cli, Playwright MCP)
+  API_TEST_COMMAND             Runs the deterministic API suite; must honor the API_BASE_URL env var (e.g. cd backend && pytest -q tests/api)
+  TEST_DIRS                    Space-separated test directories for the spec-coverage grep (e.g. backend/tests)
   RESOURCE_GROUP / AZURE_REGION  Fill region from `az group show --name <rg> --query location`
   BACKEND_DIR / FRONTEND_DIR   Repo-relative app directories (e.g. backend, frontend)
   BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
@@ -51,7 +52,7 @@ tailored output.
 | `storage`        | {{AZURE_STORAGE_TYPE}} (replaces local {{LOCAL_STORAGE_TYPE}}) |
 | `auth`           | {{DEPLOYED_AUTH_TYPE}}                             |
 | `ci_cd`          | GitHub Actions (managed via `gh` CLI)              |
-| `browser_tool`   | {{BROWSER_TOOL}}                                   |
+| `api_tests`      | `{{API_TEST_COMMAND}}`                             |
 | `progress`       | `{{PROGRESS_FILE}}`                                |
 
 <!-- OPTIONAL: azure-ai -->
@@ -66,20 +67,29 @@ tailored output.
 
 ---
 
-## Browser Automation -- Playwright CLI (NOT the MCP server)
+## Deterministic Testing -- No Agent-Driven Browsing
 
-`playwright-cli` in this prompt means the Playwright **command-line interface**,
-driven from the shell -- NOT the Playwright MCP server or its `browser_*` tools.
+Post-deployment validation (Phase 5) runs through deterministic,
+assertion-based tests and curl checks -- pass/fail comes from exit codes
+and assertion output, never from interpreting screenshots or driving a
+browser by hand.
 
-- Drive the browser by writing and running Playwright scripts: ad-hoc Node
-  scripts using the `playwright` package, or `.spec` files run with
-  `npx playwright test`. Use `npx playwright screenshot <url> <out.png>` for
-  one-off captures. Point every script at the deployed URLs.
-- If Playwright is not installed, add it first
-  (`npm i -D @playwright/test && npx playwright install chromium`).
-- Do NOT use the Playwright MCP server or any `mcp__playwright__*` / `browser_*`
-  tool for navigation, snapshots, or screenshots. All browser interaction goes
-  through the Playwright CLI.
+- `{{API_TEST_COMMAND}}` runs the repo's API/integration suite; the suite
+  reads its target origin from the `API_BASE_URL` environment variable.
+  Point it at the deployed frontend origin so the nginx `/api` proxy is
+  exercised. If the repo has no such suite yet, creating it is part of
+  Phase 5 -- build it in the repo and commit it.
+- Tests are tagged with the verbatim `spec.md` story IDs they validate
+  (`US-003` in a describe/test name, docstring, or marker, so the Phase 5.2
+  coverage grep finds them), create and clean up their own data (this is a
+  live deployed database), and poll/await conditions instead of sleeping
+  fixed durations.
+- [azure-ai] Assertions on AI-backed endpoints target status codes and
+  response structure, never exact model output.
+- Do NOT drive a browser or judge outcomes visually: no ad-hoc
+  playwright-cli sessions, no Playwright MCP server or `mcp__playwright__*` /
+  `browser_*` tools, no screenshot-based validation. Visual polish is the
+  aesthetics prompt's job.
 
 ---
 
@@ -590,24 +600,34 @@ az containerapp revision list -g {{RESOURCE_GROUP}} -n {{FRONTEND_APP_NAME}} --o
 
 - `{{HEALTH_ENDPOINT}}` is publicly accessible (no auth)
 - All protected backend routes reject unauthenticated and invalid requests
-- Valid credentials grant access; the frontend login UI works end-to-end;
-  logout clears credentials and prevents further access
-- WebSocket connections authenticate correctly (if the app uses them)
+- Valid credentials grant access via the login API through the frontend
+  origin; after logout (or token discard) the same requests fail again
+- WebSocket connections authenticate correctly, asserted by a scripted test
+  client (if the app uses them)
 
 ### 5.2 Feature Validation
 
-Validate every feature in `spec.md` against the deployed application with
-{{BROWSER_TOOL}}, tracking each story in `{{PROGRESS_FILE}}`: UI renders,
-API responds, data persists in {{AZURE_DB_TYPE}}, files round-trip through
-{{AZURE_STORAGE_TYPE}}, errors are handled, and the UI works at desktop
-(1280px) and mobile (375px) widths.
+Validate every user story in `spec.md` against the deployed application by
+running its deterministic tests with `API_BASE_URL` at the deployed
+frontend origin, tracking each story in `{{PROGRESS_FILE}}`: the API
+responds correctly, data persists in {{AZURE_DB_TYPE}}, files round-trip
+through {{AZURE_STORAGE_TYPE}}, and every spec edge/error scenario passes
+as its own test.
+
+Verify spec coverage mechanically -- every story ID in `spec.md` must
+appear in the suite; write tests for any ID this prints:
+
+```bash
+comm -23 <(grep -Eoh 'US-[0-9]+' spec.md | sort -u) \
+         <(grep -Eroh 'US-[0-9]+' {{TEST_DIRS}} | sort -u)
+```
 
 ### 5.3 Iterative Fix Cycle
 
-1. Debug (container logs, workflow logs, screenshots).
+1. Debug (container logs, workflow logs, test output).
 2. Fix the code locally; commit and push to trigger GitHub Actions.
 3. Wait for workflow success (`gh run watch`); verify deployment health.
-4. Re-validate against the deployed app; update `{{PROGRESS_FILE}}`.
+4. Re-run the tests against the deployed app; update `{{PROGRESS_FILE}}`.
 
 **Stuck rule:** after 3 failed fix-and-deploy cycles on the same issue, record
 what you tried in `{{PROGRESS_FILE}}`, mark the item `blocked`, move on, and
@@ -629,8 +649,10 @@ revisit blocked items at the end.
       file round-trips work in the deployed app)
 - [ ] [azure-ai] The AI model endpoint is confirmed responsive through the app
 - [ ] Local mode still works: `DEPLOY_MODE=local` behavior is unchanged
-- [ ] Every user story in `spec.md` is validated against the deployed app with
-      {{BROWSER_TOOL}} and marked `passed` in `{{PROGRESS_FILE}}`
+- [ ] Every user story in `spec.md` is validated against the deployed app by
+      deterministic tests (run with `API_BASE_URL` at the deployed frontend
+      origin, spec-coverage check printing no uncovered story IDs) and
+      marked `passed` in `{{PROGRESS_FILE}}`
 - [ ] `{{PROGRESS_FILE}}` is up to date with no `pending` or `in-progress` items
 
 Work autonomously and persistently toward this checklist. Do not stop because
