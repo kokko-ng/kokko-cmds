@@ -20,12 +20,12 @@ starts with a `TAILORING NOTES` comment: the full placeholder manifest
 variants. Read it first — it is the authoritative checklist for that
 template.
 
-| Argument       | Template                 | Purpose                                      |
-| -------------- | ------------------------ | -------------------------------------------- |
-| `local`        | `local-validation.md`    | Validate the app end-to-end running locally  |
-| `deployed`     | `deployed-validation.md` | Validate the deployed app end-to-end         |
-| `azure-deploy` | `azure-deploy.md`        | Deploy to Azure Container Apps with CI/CD    |
-| `aesthetics`   | `aesthetics.md`          | Screenshot-driven visual defect hunt and fix |
+| Argument       | Template                 | Purpose                                                 |
+| -------------- | ------------------------ | ------------------------------------------------------- |
+| `local`        | `local-validation.md`    | Validate the local app with deterministic tests         |
+| `deployed`     | `deployed-validation.md` | Validate the deployed app with deterministic tests      |
+| `azure-deploy` | `azure-deploy.md`        | Deploy to Azure Container Apps with CI/CD               |
+| `aesthetics`   | `aesthetics.md`          | Screenshot-driven visual defect hunt and fix            |
 
 ## Workflow
 
@@ -54,8 +54,14 @@ Determine, from the code and configuration (not by guessing):
   public routes
 - Type-check / lint / test commands — confirm they actually exist in
   package.json / pyproject / Makefile; do not invent them
-- Which browser automation tool is actually available (playwright-cli,
-  Playwright MCP, ...) for the `{{BROWSER_TOOL}}` placeholder
+- Test tooling for the deterministic-test placeholders (`local`, `deployed`,
+  `azure-deploy`): which runners actually exist (pytest, vitest, jest, ...),
+  where the suites live, and the exact commands that run them. If the repo
+  has no test setup yet, pick the stack's conventional tooling and fill the
+  placeholders with the commands the suite will use once the prompt creates
+  it — the templates make creating a missing suite part of the prompt's job
+- `aesthetics` only: which browser automation tool is actually available
+  (playwright-cli) for its `{{BROWSER_TOOL}}` placeholder
 - Existing Azure config: workflow files, bicep/terraform, `.env.example`,
   CLAUDE.md notes, existing `prompts/*.md`
 
@@ -85,10 +91,16 @@ a secret, keep the retrieval command, not the retrieved value.
   route lists, real desktop/mobile page states for aesthetics passes.
 - Keep the template's autonomous-work framing, progress-file mechanism,
   blocker rules, and completion checklist.
-- Keep browser automation on the **Playwright CLI**, never the Playwright
-  MCP server: preserve each template's "Browser Automation -- Playwright CLI"
-  section and its `playwright-cli` references. Do not rewrite them to use
-  `mcp__playwright__*` / `browser_*` tools.
+- Keep validation deterministic in `local`, `deployed`, and `azure-deploy`
+  outputs: preserve each template's "Deterministic Testing" section, its
+  test-command placeholders, and the spec-coverage check. Never rewrite
+  validation into agent-driven browsing — no ad-hoc playwright-cli driving,
+  no Playwright MCP server or `mcp__playwright__*` / `browser_*` tools, no
+  judging outcomes from screenshots.
+- `aesthetics` is screenshot-driven by design: keep its browser automation
+  on the **Playwright CLI**, never the Playwright MCP server — preserve its
+  "Browser Automation -- Playwright CLI" section and its `playwright-cli`
+  references.
 - Keep git usage safe: staging must name explicit file paths (never
   `git add .` or bare directory adds); no history rewrites; nothing force.
 
