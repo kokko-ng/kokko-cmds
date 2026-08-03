@@ -9,6 +9,7 @@ repos:
         args: [--fix=lf]
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
+      - id: check-json
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.47.0

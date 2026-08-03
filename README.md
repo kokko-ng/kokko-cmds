@@ -30,16 +30,18 @@ All ten plugins version in lock-step: every release bumps every plugin (and
 every marketplace entry) to the same version, even ones that did not change.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Sound environment variables
+## Environment variables
 
 Both kokko-safety (warning prompts) and kokko-notifications (completion
 chimes) play sounds through the same `play-sound.sh` utility and honor the
-same variables:
+same sound variables; `KOKKO_SAFETY_SKIP` is read by the kokko-safety hooks
+only:
 
 | Environment Variable | Default | Purpose |
 | -------------------- | ------- | ------- |
 | `KOKKO_SOUNDS` | `on` | Set to `off` to mute all hook sounds |
 | `KOKKO_SOUND_VOLUME` | `1.0` | afplay gain multiplier (macOS); `1.0` = system default |
+| `KOKKO_SAFETY_SKIP` | unset | Comma/space-separated kokko-safety hooks to disable (`destructive-git`, `branch-protection`, `cloud-ops`, `destructive-bash`); see [plugins/kokko-safety/README.md](plugins/kokko-safety/README.md) |
 
 ## Plugins
 
@@ -59,7 +61,8 @@ pattern categories, how to add patterns, and known limitations.
 
 ### kokko-notifications
 
-Sound notifications for task completion events.
+Sound notifications for task completion events. See
+[plugins/kokko-notifications/README.md](plugins/kokko-notifications/README.md).
 
 | Hook | Purpose |
 | ---- | ------- |
@@ -68,7 +71,8 @@ Sound notifications for task completion events.
 ### kokko-git
 
 Git workflow commands. The janitor skill moved to its own repo:
-[kokko-ng/kokko-janitor](https://github.com/kokko-ng/kokko-janitor).
+[kokko-ng/kokko-janitor](https://github.com/kokko-ng/kokko-janitor). See
+[plugins/kokko-git/README.md](plugins/kokko-git/README.md).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -80,7 +84,8 @@ Git workflow commands. The janitor skill moved to its own repo:
 ### kokko-validation
 
 Generic master-prompt templates (local validation, deployed validation,
-Azure deployment, aesthetics) and a skill that tailors them to the repo.
+Azure deployment, aesthetics) and a skill that tailors them to the repo. See
+[plugins/kokko-validation/README.md](plugins/kokko-validation/README.md).
 
 | Skill | Purpose |
 | ----- | ------- |
@@ -88,7 +93,8 @@ Azure deployment, aesthetics) and a skill that tailors them to the repo.
 
 ### kokko-code-quality
 
-Code analysis commands and quality skills.
+Code analysis commands and quality skills. See
+[plugins/kokko-code-quality/README.md](plugins/kokko-code-quality/README.md).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -115,7 +121,8 @@ Code analysis commands and quality skills.
 
 ### kokko-viz
 
-C4 architecture diagram commands.
+C4 architecture diagram commands. See
+[plugins/kokko-viz/README.md](plugins/kokko-viz/README.md).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -132,7 +139,8 @@ All three commands read the `c4` skill first. Templates live in
 
 ### kokko-infra
 
-Azure infrastructure commands.
+Azure infrastructure commands. See
+[plugins/kokko-infra/README.md](plugins/kokko-infra/README.md).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -141,7 +149,8 @@ Azure infrastructure commands.
 
 ### kokko-ai-config
 
-AI/Claude configuration management commands.
+AI/Claude configuration management commands. See
+[plugins/kokko-ai-config/README.md](plugins/kokko-ai-config/README.md).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -150,7 +159,8 @@ AI/Claude configuration management commands.
 
 ### kokko-env
 
-Set up a dev environment, then keep it current without rebuilding it.
+Set up a dev environment, then keep it current without rebuilding it. See
+[plugins/kokko-env/README.md](plugins/kokko-env/README.md).
 
 | Commands | Purpose |
 | -------- | ------- |
@@ -171,7 +181,8 @@ existed needs updating first — the command detects this and says so.
 
 ### kokko-learning
 
-Study and recall aids.
+Study and recall aids. See
+[plugins/kokko-learning/README.md](plugins/kokko-learning/README.md).
 
 | Skill | Purpose |
 | ----- | ------- |

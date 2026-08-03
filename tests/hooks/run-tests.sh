@@ -115,6 +115,13 @@ expect "$BASH_HOOK" 'backdrop table settings' pass
 GIT_HOOK=pre-tool-destructive-git.sh
 
 expect "$GIT_HOOK" 'git push --force origin main' ask
+# Force-push ownership is here for ALL branches and flag positions; the
+# branch-protection hook stays out of force pushes entirely.
+expect "$GIT_HOOK" 'git push origin --force main' ask '' 'force flag between remote and branch'
+expect "$GIT_HOOK" 'git push origin main --force' ask '' 'force flag after branch'
+expect "$GIT_HOOK" 'git push origin -f main' ask '' '-f between remote and branch'
+expect "$GIT_HOOK" 'git push origin --force-with-lease main' ask '' 'force-with-lease after remote'
+expect "$GIT_HOOK" 'git -C /repo push --force origin main' ask '' 'force push with git -C'
 expect "$GIT_HOOK" 'git reset --hard HEAD~1' ask
 expect "$GIT_HOOK" 'git clean -fd' ask
 expect "$GIT_HOOK" 'git branch -D topic' ask
@@ -159,36 +166,42 @@ make_repo() { # dir branch
 }
 MAIN_REPO="$TMPDIR_TESTS/mainrepo"
 FEAT_REPO="$TMPDIR_TESTS/featrepo"
-QUOTE_REPO="$TMPDIR_TESTS/quoterepo"
 make_repo "$MAIN_REPO" main
 make_repo "$FEAT_REPO" feature
-make_repo "$QUOTE_REPO" 'we"ird'
 
 expect "$BP_HOOK" 'git commit -m x' ask "$MAIN_REPO" 'commit while on main'
 expect "$BP_HOOK" 'git push origin main' ask "$MAIN_REPO" 'push while on main'
 expect "$BP_HOOK" 'git commit -m x' pass "$FEAT_REPO" 'commit on feature branch'
 expect "$BP_HOOK" 'git push origin feature' pass "$FEAT_REPO" 'plain push on feature branch'
-# Force flag before remote, between remote and branch, and after branch (item 15)
-expect "$BP_HOOK" 'git push --force origin main' ask "$FEAT_REPO" 'force flag before remote'
-expect "$BP_HOOK" 'git push origin --force main' ask "$FEAT_REPO" 'force flag between remote and branch'
-expect "$BP_HOOK" 'git push origin main --force' ask "$FEAT_REPO" 'force flag after branch'
-expect "$BP_HOOK" 'git push origin -f main' ask "$FEAT_REPO" '-f between remote and branch'
-expect "$BP_HOOK" 'git push --force-with-lease origin main' ask "$FEAT_REPO" 'force-with-lease'
+# Force pushes, resets, and rebases are owned by pre-tool-destructive-git on
+# every branch; branch-protection must stay quiet on them or one command
+# would prompt twice.
+expect "$BP_HOOK" 'git push --force origin main' pass "$FEAT_REPO" 'force push owned by destructive-git'
+expect "$BP_HOOK" 'git push --force origin main' pass "$MAIN_REPO" 'force push on main: no double prompt'
+expect "$BP_HOOK" 'git push --force-with-lease origin main' pass "$MAIN_REPO" 'force-with-lease: no double prompt'
+expect "$BP_HOOK" 'git reset --hard HEAD~1' pass "$MAIN_REPO" 'reset on main: no double prompt'
+expect "$BP_HOOK" 'git rebase -i HEAD~3' pass "$MAIN_REPO" 'rebase on main: no double prompt'
 expect "$BP_HOOK" 'git push origin feature --force' pass "$FEAT_REPO" 'force push to unprotected branch'
 # Directory parsing (item 14): cd <dir> && ... and git -C <dir>
 expect "$BP_HOOK" "cd $MAIN_REPO && git commit -m x" ask "$TMPDIR_TESTS" 'cd protected-repo && commit'
 expect "$BP_HOOK" "git -C $MAIN_REPO commit -m x" ask "$TMPDIR_TESTS" 'git -C protected-repo commit'
 expect "$BP_HOOK" "cd $FEAT_REPO && git commit -m x" pass "$MAIN_REPO" 'cd feature-repo && commit overrides cwd'
+# git -C has precedence over a leading cd, matching git's own semantics
+expect "$BP_HOOK" "cd $FEAT_REPO && git -C $MAIN_REPO commit -m x" ask "$TMPDIR_TESTS" 'git -C protected-repo wins over cd feature-repo'
+expect "$BP_HOOK" "cd $MAIN_REPO && git -C $FEAT_REPO commit -m x" pass "$TMPDIR_TESTS" 'git -C feature-repo wins over cd protected-repo'
 expect "$BP_HOOK" 'git commit -m x' pass "$TMPDIR_TESTS" 'not in a git repo'
 expect "$BP_HOOK" 'ls -la' pass "$MAIN_REPO" 'non-git command on main'
 
-# Branch name containing a double quote: output must be valid JSON (item 4)
-bp_quote_out=$( (cd "$QUOTE_REPO" && payload 'git push --force origin main' | "$HOOKS/$BP_HOOK") 2>/dev/null )
-if printf '%s' "$bp_quote_out" | jq -e '.hookSpecificOutput.permissionDecision == "ask"' >/dev/null 2>&1; then
-    record PASS "$BP_HOOK: valid JSON with double quote in branch name"
-else
-    record FAIL "$BP_HOOK: valid JSON with double quote in branch name" "output=$bp_quote_out"
-fi
+# Detached HEAD: sitting on a protected branch's tip is still that branch
+DETACHED_MAIN="$TMPDIR_TESTS/detachedmain"
+make_repo "$DETACHED_MAIN" main
+git -C "$DETACHED_MAIN" checkout -q --detach
+DETACHED_FEAT="$TMPDIR_TESTS/detachedfeat"
+make_repo "$DETACHED_FEAT" feature
+git -C "$DETACHED_FEAT" -c user.email=t@test -c user.name=test commit -q --allow-empty -m feat
+git -C "$DETACHED_FEAT" checkout -q --detach
+expect "$BP_HOOK" 'git commit -m x' ask "$DETACHED_MAIN" 'detached HEAD at tip of main'
+expect "$BP_HOOK" 'git commit -m x' pass "$DETACHED_FEAT" 'detached HEAD at tip of feature branch'
 
 # ---------------------------------------------------------------------------
 # Fail-closed paths: jq missing and malformed JSON (all four PreToolUse hooks)
@@ -216,6 +229,60 @@ for hook in "$BASH_HOOK" "$GIT_HOOK" "$CLOUD_HOOK" "$BP_HOOK"; do
         record FAIL "${hook%.sh}: fails closed to ask on malformed JSON payload" "rc=$rc output=$out"
     fi
 done
+
+# ---------------------------------------------------------------------------
+# Fail-closed: a hook that crashes before its preamble loads must still ask.
+# Copying the hook without its utils/ directory is the exact setup that used
+# to exit 1 with no output (= fail OPEN).
+# ---------------------------------------------------------------------------
+BROKEN_DIR="$TMPDIR_TESTS/broken-hooks"
+mkdir -p "$BROKEN_DIR"
+for hook in "$BASH_HOOK" "$GIT_HOOK" "$CLOUD_HOOK" "$BP_HOOK"; do
+    cp "$HOOKS/$hook" "$BROKEN_DIR/$hook"
+    out=$(payload 'rm -rf /' | "$BROKEN_DIR/$hook" 2>/dev/null)
+    rc=$?
+    if [ "$rc" -eq 0 ] \
+        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecision == "ask"' >/dev/null 2>&1 \
+        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecisionReason | test("crashed")' >/dev/null 2>&1; then
+        record PASS "${hook%.sh}: fails closed to ask when utils/ is missing"
+    else
+        record FAIL "${hook%.sh}: fails closed to ask when utils/ is missing" "rc=$rc output=$out"
+    fi
+done
+
+# ---------------------------------------------------------------------------
+# KOKKO_SAFETY_SKIP: disables exactly the named hook, nothing else
+# ---------------------------------------------------------------------------
+skip_case() { # skipval hook command expected label
+    local skipval="$1" hook="$2" cmd="$3" want="$4" label="$5" out rc got
+    out=$( (cd "$ROOT" && payload "$cmd" | env KOKKO_SAFETY_SKIP="$skipval" "$HOOKS/$hook") 2>/dev/null )
+    rc=$?
+    if [ "$rc" -ne 0 ]; then
+        got="error:$rc"
+    elif [ -z "$out" ]; then
+        got="pass"
+    else
+        got=$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision // "pass"' 2>/dev/null || echo invalid-json)
+    fi
+    if [ "$got" = "$want" ]; then
+        record PASS "${hook%.sh}: $label"
+    else
+        record FAIL "${hook%.sh}: $label" "want=$want got=$got"
+    fi
+}
+
+skip_case 'destructive-git' "$GIT_HOOK" 'git push --force origin main' pass \
+    'KOKKO_SAFETY_SKIP=destructive-git allows force push silently'
+skip_case 'destructive-git' "$BASH_HOOK" 'rm -rf /' ask \
+    'KOKKO_SAFETY_SKIP=destructive-git leaves destructive-bash asking'
+skip_case '' "$GIT_HOOK" 'git push --force origin main' ask \
+    'empty KOKKO_SAFETY_SKIP changes nothing'
+skip_case 'branch-protection, cloud-ops' "$GIT_HOOK" 'git push --force origin main' ask \
+    'KOKKO_SAFETY_SKIP with other tokens does not skip destructive-git'
+skip_case 'destructive-bash destructive-git' "$GIT_HOOK" 'git push --force origin main' pass \
+    'space-separated KOKKO_SAFETY_SKIP tokens are honored'
+skip_case 'destructive-bash,destructive-git' "$BASH_HOOK" 'rm -rf /' pass \
+    'comma-separated KOKKO_SAFETY_SKIP tokens are honored'
 
 # ---------------------------------------------------------------------------
 # session-start-context.sh basic behavior
@@ -267,6 +334,47 @@ if cmp -s "$ROOT/plugins/kokko-notifications/hooks/utils/play-sound.sh" \
     record PASS "play-sound: notification and safety copies are byte-identical"
 else
     record FAIL "play-sound: notification and safety copies are byte-identical"
+fi
+
+# ---------------------------------------------------------------------------
+# Pattern corpus: every pattern must compile as an ERE. One bad pattern would
+# poison the batch grep and force every command through the slow path.
+# ---------------------------------------------------------------------------
+PATTERNS_DIR="$HOOKS/dangerous-patterns"
+bad_patterns=0
+total_patterns=0
+while IFS= read -r line || [ -n "$line" ]; do
+    file="${line%%:*}"
+    pattern="${line#*:}"
+    total_patterns=$((total_patterns + 1))
+    grep -qE -e "$pattern" <<<"" 2>/dev/null
+    rc=$?
+    if [ "$rc" -ge 2 ]; then
+        echo "invalid ERE in $(basename "$file"): $pattern" >&2
+        bad_patterns=$((bad_patterns + 1))
+    fi
+done < <(grep -H -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$PATTERNS_DIR"/*.txt)
+if [ "$bad_patterns" -eq 0 ] && [ "$total_patterns" -gt 0 ]; then
+    record PASS "dangerous-patterns: all $total_patterns patterns compile as EREs"
+else
+    record FAIL "dangerous-patterns: all $total_patterns patterns compile as EREs" "$bad_patterns invalid"
+fi
+
+# ---------------------------------------------------------------------------
+# Pattern-file coverage: every dangerous-patterns/*.txt must be loaded by
+# some hook, or a new category file would silently protect nothing.
+# ---------------------------------------------------------------------------
+unreferenced=""
+for file in "$PATTERNS_DIR"/*.txt; do
+    category="$(basename "$file" .txt)"
+    if ! grep -q "\"$category\"" "$HOOKS"/pre-tool-*.sh; then
+        unreferenced="$unreferenced $category"
+    fi
+done
+if [ -z "$unreferenced" ]; then
+    record PASS "dangerous-patterns: every category file is loaded by a hook"
+else
+    record FAIL "dangerous-patterns: every category file is loaded by a hook" "unreferenced:$unreferenced"
 fi
 
 # ---------------------------------------------------------------------------
