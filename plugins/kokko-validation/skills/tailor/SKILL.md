@@ -55,11 +55,12 @@ Determine, from the code and configuration (not by guessing):
 - Type-check / lint / test commands — confirm they actually exist in
   package.json / pyproject / Makefile; do not invent them
 - Test tooling for the deterministic-test placeholders (`local`, `deployed`,
-  `azure-deploy`): which runners actually exist (pytest, vitest, jest, ...),
-  where the suites live, and the exact commands that run them. If the repo
-  has no test setup yet, pick the stack's conventional tooling and fill the
-  placeholders with the commands the suite will use once the prompt creates
-  it — the templates make creating a missing suite part of the prompt's job
+  `azure-deploy`): which runners actually exist (pytest, vitest, jest,
+  `@playwright/test` for the E2E suite, ...), where the suites live, and
+  the exact commands that run them. If the repo has no test setup yet, pick
+  the stack's conventional tooling and fill the placeholders with the
+  commands the suite will use once the prompt creates it — the templates
+  make creating a missing suite part of the prompt's job
 - `aesthetics` only: which browser automation tool is actually available
   (playwright-cli) for its `{{BROWSER_TOOL}}` placeholder
 - Existing Azure config: workflow files, bicep/terraform, `.env.example`,
@@ -93,10 +94,12 @@ a secret, keep the retrieval command, not the retrieved value.
   blocker rules, and completion checklist.
 - Keep validation deterministic in `local`, `deployed`, and `azure-deploy`
   outputs: preserve each template's "Deterministic Testing" section, its
-  test-command placeholders, and the spec-coverage check. Never rewrite
-  validation into agent-driven browsing — no ad-hoc playwright-cli driving,
-  no Playwright MCP server or `mcp__playwright__*` / `browser_*` tools, no
-  judging outcomes from screenshots.
+  test-command placeholders (API, frontend, and Playwright E2E), and the
+  spec-coverage check. Browser coverage belongs in committed
+  `@playwright/test` specs run headlessly by `npx playwright test` — never
+  rewrite validation into agent-driven browsing: no ad-hoc playwright-cli
+  page-driving, no Playwright MCP server or `mcp__playwright__*` /
+  `browser_*` tools, no judging outcomes from screenshots.
 - `aesthetics` is screenshot-driven by design: keep its browser automation
   on the **Playwright CLI**, never the Playwright MCP server — preserve its
   "Browser Automation -- Playwright CLI" section and its `playwright-cli`

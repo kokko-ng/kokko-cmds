@@ -7,7 +7,8 @@ repo inspection, read-only `az cli`, then ask the user. Never invent values.
   APP_NAME                     Application name
   PROGRESS_FILE                Progress checklist path, e.g. prompts/azure-deploy-progress.md
   API_TEST_COMMAND             Runs the deterministic API suite; must honor the API_BASE_URL env var (e.g. cd backend && pytest -q tests/api)
-  TEST_DIRS                    Space-separated test directories for the spec-coverage grep (e.g. backend/tests)
+  E2E_TEST_COMMAND             Runs the Playwright E2E suite headlessly; its config must honor the E2E_BASE_URL env var (e.g. cd frontend && npx playwright test)
+  TEST_DIRS                    Space-separated test directories for the spec-coverage grep (e.g. backend/tests frontend/e2e)
   RESOURCE_GROUP / AZURE_REGION  Fill region from `az group show --name <rg> --query location`
   BACKEND_DIR / FRONTEND_DIR   Repo-relative app directories (e.g. backend, frontend)
   BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
@@ -53,6 +54,7 @@ tailored output.
 | `auth`           | {{DEPLOYED_AUTH_TYPE}}                             |
 | `ci_cd`          | GitHub Actions (managed via `gh` CLI)              |
 | `api_tests`      | `{{API_TEST_COMMAND}}`                             |
+| `e2e_tests`      | `{{E2E_TEST_COMMAND}}`                             |
 | `progress`       | `{{PROGRESS_FILE}}`                                |
 
 <!-- OPTIONAL: azure-ai -->
@@ -76,9 +78,14 @@ browser by hand.
 
 - `{{API_TEST_COMMAND}}` runs the repo's API/integration suite; the suite
   reads its target origin from the `API_BASE_URL` environment variable.
-  Point it at the deployed frontend origin so the nginx `/api` proxy is
-  exercised. If the repo has no such suite yet, creating it is part of
-  Phase 5 -- build it in the repo and commit it.
+- `{{E2E_TEST_COMMAND}}` runs the repo's Playwright E2E suite
+  (`@playwright/test`) headlessly; its config takes `baseURL` from the
+  `E2E_BASE_URL` environment variable. Specs use web-first assertions that
+  auto-wait -- never `waitForTimeout`, never screenshot judging.
+- Point both suites at the deployed frontend origin
+  (`API_BASE_URL` / `E2E_BASE_URL` = `https://$FRONTEND_FQDN`) so the nginx
+  `/api` proxy is exercised. If the repo lacks either suite, creating it is
+  part of Phase 5 -- build it in the repo and commit it.
 - Tests are tagged with the verbatim `spec.md` story IDs they validate
   (`US-003` in a describe/test name, docstring, or marker, so the Phase 5.2
   coverage grep finds them), create and clean up their own data (this is a
@@ -86,10 +93,11 @@ browser by hand.
   fixed durations.
 - [azure-ai] Assertions on AI-backed endpoints target status codes and
   response structure, never exact model output.
-- Do NOT drive a browser or judge outcomes visually: no ad-hoc
-  playwright-cli sessions, no Playwright MCP server or `mcp__playwright__*` /
-  `browser_*` tools, no screenshot-based validation. Visual polish is the
-  aesthetics prompt's job.
+- Browser automation lives ONLY inside the committed Playwright specs. Do
+  NOT drive a browser yourself or judge outcomes visually: no ad-hoc
+  playwright-cli sessions or one-off page-driving scripts, no Playwright
+  MCP server or `mcp__playwright__*` / `browser_*` tools, no
+  screenshot-based validation. Visual polish is the aesthetics prompt's job.
 
 ---
 
@@ -600,19 +608,22 @@ az containerapp revision list -g {{RESOURCE_GROUP}} -n {{FRONTEND_APP_NAME}} --o
 
 - `{{HEALTH_ENDPOINT}}` is publicly accessible (no auth)
 - All protected backend routes reject unauthenticated and invalid requests
-- Valid credentials grant access via the login API through the frontend
-  origin; after logout (or token discard) the same requests fail again
+- Valid credentials grant access through the frontend origin, at both
+  levels: API assertions on the token/session lifecycle, and a Playwright
+  spec covering the login UI flow end-to-end (invalid credentials show the
+  error, valid credentials land in the app, logout revokes access)
 - WebSocket connections authenticate correctly, asserted by a scripted test
   client (if the app uses them)
 
 ### 5.2 Feature Validation
 
 Validate every user story in `spec.md` against the deployed application by
-running its deterministic tests with `API_BASE_URL` at the deployed
-frontend origin, tracking each story in `{{PROGRESS_FILE}}`: the API
-responds correctly, data persists in {{AZURE_DB_TYPE}}, files round-trip
-through {{AZURE_STORAGE_TYPE}}, and every spec edge/error scenario passes
-as its own test.
+running its deterministic tests with `API_BASE_URL` / `E2E_BASE_URL` at
+the deployed frontend origin, tracking each story in `{{PROGRESS_FILE}}`:
+the API responds correctly, the user-visible flow passes in its Playwright
+spec, data persists in {{AZURE_DB_TYPE}}, files round-trip through
+{{AZURE_STORAGE_TYPE}}, and every spec edge/error scenario passes as its
+own test.
 
 Verify spec coverage mechanically -- every story ID in `spec.md` must
 appear in the suite; write tests for any ID this prints:
@@ -650,9 +661,10 @@ revisit blocked items at the end.
 - [ ] [azure-ai] The AI model endpoint is confirmed responsive through the app
 - [ ] Local mode still works: `DEPLOY_MODE=local` behavior is unchanged
 - [ ] Every user story in `spec.md` is validated against the deployed app by
-      deterministic tests (run with `API_BASE_URL` at the deployed frontend
-      origin, spec-coverage check printing no uncovered story IDs) and
-      marked `passed` in `{{PROGRESS_FILE}}`
+      deterministic tests -- API and Playwright E2E suites run with
+      `API_BASE_URL` / `E2E_BASE_URL` at the deployed frontend origin, and
+      the spec-coverage check prints no uncovered story IDs -- and marked
+      `passed` in `{{PROGRESS_FILE}}`
 - [ ] `{{PROGRESS_FILE}}` is up to date with no `pending` or `in-progress` items
 
 Work autonomously and persistently toward this checklist. Do not stop because

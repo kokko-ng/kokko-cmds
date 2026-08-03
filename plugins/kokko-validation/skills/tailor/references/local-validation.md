@@ -8,7 +8,8 @@ repo inspection, read-only `az cli`, then ask the user. Never invent values.
   PROGRESS_FILE               Progress checklist path, e.g. prompts/local-validation-progress.md
   API_TEST_COMMAND            Runs the API/integration suite against the running backend (e.g. cd backend && pytest -q tests/api)
   FRONTEND_TEST_COMMAND       Runs the frontend unit/component suite (e.g. cd frontend && npx vitest run)
-  TEST_DIRS                   Space-separated test directories for the spec-coverage grep (e.g. backend/tests frontend/src)
+  E2E_TEST_COMMAND            Runs the Playwright E2E suite headlessly (e.g. cd frontend && npx playwright test)
+  TEST_DIRS                   Space-separated test directories for the spec-coverage grep (e.g. backend/tests frontend/src frontend/e2e)
   BACKEND_DIR / FRONTEND_DIR  Repo-relative app directories (e.g. backend, frontend)
   BACKEND_FRAMEWORK / FRONTEND_FRAMEWORK
   BACKEND_START_COMMAND / FRONTEND_START_COMMAND
@@ -49,6 +50,7 @@ tailored output.
 | `storage`      | Local filesystem (`{{LOCAL_STORAGE_PATH}}`)  |
 | `api_tests`    | `{{API_TEST_COMMAND}}`                       |
 | `ui_tests`     | `{{FRONTEND_TEST_COMMAND}}`                  |
+| `e2e_tests`    | `{{E2E_TEST_COMMAND}}`                       |
 | `progress`     | `{{PROGRESS_FILE}}`                          |
 
 <!-- OPTIONAL: azure-ai -->
@@ -77,19 +79,29 @@ by hand.
 - **Frontend unit/component tests** (`{{FRONTEND_TEST_COMMAND}}`): rendering
   logic, form validation, and state transitions asserted at the DOM level
   with the framework's standard testing tools.
-- If a suite (or the frontend test setup) does not exist yet, creating it is
-  part of this prompt's job -- use the stack's conventional tooling and keep
-  it in the repo so later passes re-run it.
+- **End-to-end browser tests** (`{{E2E_TEST_COMMAND}}`): Playwright test
+  specs (`@playwright/test`) committed to the repo and run headlessly with
+  `npx playwright test` -- real user flows through the UI at
+  `{{FRONTEND_URL}}`, verified with web-first assertions
+  (`await expect(page.getByRole(...)).toBeVisible()` and friends) that
+  auto-wait instead of sleeping. If Playwright is not installed, add it
+  first (`npm i -D @playwright/test && npx playwright install chromium`).
+- If a suite (or the frontend/E2E test setup) does not exist yet, creating
+  it is part of this prompt's job -- use the stack's conventional tooling
+  and keep it in the repo so later passes re-run it.
 - Tests must be deterministic: they seed or reset their own data, poll/await
-  conditions instead of sleeping fixed durations, never depend on execution
-  order, and produce the same result on every re-run.
+  conditions instead of sleeping fixed durations (in Playwright: web-first
+  assertions and auto-waiting, never `waitForTimeout`), never depend on
+  execution order, and produce the same result on every re-run.
 - [azure-ai] Assertions on AI-backed endpoints target status codes and
   response structure, never exact model output.
-- Do NOT drive a browser or judge outcomes visually: no ad-hoc
-  playwright-cli sessions, no Playwright MCP server or `mcp__playwright__*` /
-  `browser_*` tools, no screenshot-based validation. Visual appearance and
-  responsive layout are out of scope here -- the aesthetics prompt covers
-  them.
+- Browser automation lives ONLY inside those committed Playwright specs.
+  Do NOT drive a browser yourself or judge outcomes visually: no ad-hoc
+  playwright-cli sessions or one-off page-driving scripts, no Playwright
+  MCP server or `mcp__playwright__*` / `browser_*` tools, no
+  screenshot-based validation (Playwright's failure screenshots and traces
+  are debugging artifacts, not pass evidence). Pixel-level appearance is
+  out of scope here -- the aesthetics prompt covers it.
 
 ### Spec Coverage -- Every Story Maps to Tests
 
@@ -271,9 +283,10 @@ On a non-`Succeeded` deployment state, wait and re-check -- do not recreate.
 5. Confirm auth works once with a curl login round-trip: valid credentials
    return a token/session, and an authenticated request succeeds with it.
 6. [azure-ai] Exercise one AI endpoint via curl to confirm model connectivity.
-7. Confirm both test suites run at all (`{{API_TEST_COMMAND}}`,
-   `{{FRONTEND_TEST_COMMAND}}`) -- failing tests are fine at this stage, a
-   broken or missing harness is not: create or repair it now.
+7. Confirm all three test suites run at all (`{{API_TEST_COMMAND}}`,
+   `{{FRONTEND_TEST_COMMAND}}`, `{{E2E_TEST_COMMAND}}`) -- failing tests are
+   fine at this stage, a broken or missing harness is not: create or repair
+   it now (including `npx playwright install chromium` if needed).
 8. Read or create `{{PROGRESS_FILE}}`, then start the work cycle.
 
 ### Work Cycle (per user story)
@@ -285,16 +298,17 @@ On a non-`Succeeded` deployment state, wait and re-check -- do not recreate.
    the test, only when the test itself contradicts `spec.md`), let the
    servers reload, re-run.
 4. When the story's tests pass -- API behavior, persistence, error handling,
-   edge cases, and frontend logic where the story has UI behavior -- run the
-   FULL suites (`{{API_TEST_COMMAND}}`, `{{FRONTEND_TEST_COMMAND}}`) to catch
-   regressions, then `{{TYPE_CHECK_COMMAND}}`, then mark it `passed` with a
-   short note.
+   edge cases, and UI flows where the story has them -- run the FULL suites
+   (`{{API_TEST_COMMAND}}`, `{{FRONTEND_TEST_COMMAND}}`,
+   `{{E2E_TEST_COMMAND}}`) to catch regressions, then
+   `{{TYPE_CHECK_COMMAND}}`, then mark it `passed` with a short note.
 5. Move to the next story. Repeat until every story is `passed` or `blocked`.
 
 ### Debugging
 
 - Backend errors: backend terminal logs. Frontend errors: test-runner output
-  and dev-server logs.
+  and dev-server logs. E2E failures: Playwright's failure output, traces,
+  and failure screenshots (debugging artifacts, not pass evidence).
 - [azure-ai] AI errors: check `.env` credentials first, then deployment health
   via `az cognitiveservices account deployment show`.
 - **Stuck rule:** after 3 failed fix attempts on the same issue, record what
@@ -317,6 +331,11 @@ Every user story is validated by deterministic tests that assert, per
   each edge/error scenario in `spec.md` is its own test
 - Frontend logic is covered where the story has UI behavior: rendering,
   form validation, and state transitions asserted in component tests
+- The story's user-visible flow passes end-to-end in a Playwright spec:
+  navigate, interact, and assert the rendered result (content, URL/state,
+  error messages) with web-first assertions
+- UI-critical stories run their E2E specs under both Playwright viewport
+  projects: desktop (1280px) and mobile (375px)
 
 Authentication (suite-level, not per-story):
 
@@ -342,6 +361,8 @@ and asserts the expected messages stream back.
 - [ ] The spec-coverage check prints no uncovered story IDs
 - [ ] `{{API_TEST_COMMAND}}` passes with zero failures
 - [ ] `{{FRONTEND_TEST_COMMAND}}` passes with zero failures
+- [ ] `{{E2E_TEST_COMMAND}}` passes with zero failures, including the
+      desktop (1280px) and mobile (375px) viewport projects
 - [ ] Tests prove authentication protects all sensitive endpoints
 - [ ] Tests prove data persistence and file handling work correctly
 - [ ] [azure-ai] AI integration works end-to-end through the app, asserted
