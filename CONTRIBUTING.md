@@ -1,5 +1,36 @@
 # Contributing
 
+## Developing locally
+
+Add your checkout as a local marketplace and install plugins straight from
+it:
+
+```text
+/plugin marketplace add /path/to/kokko-cmds
+/plugin install kokko-safety@kokko-ng-kokko-cmds
+```
+
+Claude Code copies the plugin at install time, so edits to the checkout do
+not appear in a running session automatically. The reliable reload path is
+to remove and re-add:
+
+```text
+/plugin uninstall kokko-safety@kokko-ng-kokko-cmds
+/plugin marketplace update kokko-ng-kokko-cmds
+/plugin install kokko-safety@kokko-ng-kokko-cmds
+```
+
+then restart Claude Code (or run `/reload-plugins` where available) so hooks
+and commands are re-read.
+
+For the safety hooks you rarely need an installed plugin at all:
+`tests/hooks/run-tests.sh` feeds real JSON payloads through the hook scripts
+directly from the working tree.
+
+Run `pre-commit install` once after cloning so the lint suite runs as a git
+pre-commit hook; `pre-commit run --all-files` covers the whole tree on
+demand (see Local checks below).
+
 ## Versioning policy: lock-step
 
 All ten plugins share one version number. Every release bumps every
@@ -40,7 +71,10 @@ entry matches its plugin manifest (name, version, description) and that every
 ## Release flow
 
 1. `/release` (kokko-git) bumps the version in all plugin manifests and the
-   marketplace, then opens and merges a PR to `main`.
+   marketplace via `scripts/bump-version.sh <x.y.z>` (which ends by running
+   the sync check), then opens and merges a PR to `main`. Update
+   [CHANGELOG.md](CHANGELOG.md) with an entry for the new version as part of
+   the same PR.
 2. CI runs on `main` (pre-commit, hook tests, plugin validation, sync check).
 3. When CI succeeds, `.github/workflows/release.yml` fires via `workflow_run`
    and creates the `v<version>` GitHub release. It is the sole publisher;

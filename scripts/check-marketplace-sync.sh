@@ -54,6 +54,14 @@ if [ -d plugins ]; then
   done
 fi
 
+# Lock-step versioning: every marketplace entry must carry the same version,
+# so a missed bump fails the PR instead of the post-merge release.
+if ! jq -e '[.plugins[].version] | unique | length == 1' "$MARKETPLACE" >/dev/null; then
+  divergent=$(jq -r '[.plugins[].version] | unique | join(", ")' "$MARKETPLACE")
+  echo "ERROR: plugins are not lock-step versioned; marketplace.json carries: $divergent"
+  FAIL=1
+fi
+
 if [ "$FAIL" -eq 0 ]; then
   echo "marketplace.json is in sync with all plugin manifests"
 fi
