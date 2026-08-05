@@ -8,18 +8,32 @@ description: Enforce architectural layering and import rules with import-linter 
 Detect and fix architectural violations -- dependency structure, coupling,
 cycles, and layering -- using language-specific architecture analyzers.
 
+<!-- shared:language-detection start -- this block is byte-identical across all kokko-code-quality skills; scripts/check-skill-sync.sh enforces it -->
+
 ## Language Detection
 
-Parse `$ARGUMENTS` for the language:
+Parse `$ARGUMENTS` for an explicit language and check only that one:
 
-- `py` or `python` - Python architecture enforcement
-- `js` or `javascript` or `typescript` or `ts` - JavaScript/TypeScript
-  architecture enforcement
+- `py` or `python` - Python
+- `js`, `javascript`, `typescript`, or `ts` - JavaScript/TypeScript
+- `dotnet`, `csharp`, or `cs` - .NET
 
-If no language specified, auto-detect:
+If no language is specified, detect every language present -- a repo can be
+more than one, and covering only the first match silently skips the rest:
 
-1. Check for `pyproject.toml` or `setup.py` - use Python
-2. Check for `package.json` - use JavaScript/TypeScript
+1. `pyproject.toml` or `setup.py` present - Python
+2. `package.json` or `tsconfig.json` present - JavaScript/TypeScript
+3. `*.csproj` or `*.sln` files present - .NET
+
+Run the full workflow once per detected language, and name every detected
+language in the report -- including any skipped because the skill does not
+support it.
+
+<!-- shared:language-detection end -->
+
+This skill supports Python and JavaScript/TypeScript only. If .NET is
+requested or detected, say it is not supported here and continue with the
+supported languages.
 
 ## Workflow
 
