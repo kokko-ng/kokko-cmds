@@ -56,6 +56,10 @@ jobs:
           exit "$status"
       - name: Check marketplace.json is in sync with plugin manifests
         run: bash scripts/check-marketplace-sync.sh
+      - name: Lint command and skill prompt files
+        run: bash scripts/lint-prompts.sh
+      - name: Check the shared skill sections are byte-identical
+        run: bash scripts/check-skill-sync.sh
       - name: Check every hooks.json command resolves to an executable file
         run: |
           status=0
