@@ -1,7 +1,7 @@
 ---
 description: Find and safely delete stale local/remote branches with confirmation.
 argument-hint: '[local|remote|merged|<days>]'
-allowed-tools: Bash(git:*), Bash(gh:*), AskUserQuestion
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(grep:*), Bash(date:*), AskUserQuestion
 disable-model-invocation: true
 ---
 
@@ -23,27 +23,32 @@ Resolve the default branch first — never hardcode `main` (`git branch
 --merged main` errors outright on a `master`/`trunk` repo):
 
 ```bash
-BASE=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
-[ -n "$BASE" ] || BASE=$(git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p')
-[ -n "$BASE" ] || BASE=main
+git symbolic-ref --short refs/remotes/origin/HEAD
+git remote show origin
 ```
+
+The first command prints `origin/<base>` — strip the `origin/` prefix. If it
+errors, take the `HEAD branch:` line from the second, and fall back to `main`
+only if both fail. Use the result as `<base>` everywhere below.
 
 ```bash
 # Merged into the default branch (safe to delete)
-git branch --merged "$BASE" | grep -v "main\|master\|\*"
-git branch -r --merged "origin/$BASE" | grep -v "main\|master\|HEAD"
+git branch --merged <base> | grep -v "main\|master\|\*"
+git branch -r --merged origin/<base> | grep -v "main\|master\|HEAD"
 
 # Orphaned (remote gone)
 git branch -vv | grep ': gone]'
-
-# Older than the age threshold (default 30 days)
-CUTOFF=$(date -d "30 days ago" +%s 2>/dev/null || date -v-30d +%s)
-git for-each-ref --sort=committerdate \
-  --format='%(refname:short) %(committerdate:unix) %(committerdate:relative)' refs/heads/ \
-  | awk -v cutoff="$CUTOFF" '$2 < cutoff {print $1, $3, $4, $5}'
 ```
 
-If an age threshold was passed in `$ARGUMENTS`, substitute it for `30` above and only report branches older than the cutoff.
+For the age check, print the cutoff epoch (default 30 days; substitute the
+`$ARGUMENTS` threshold when one was given), then list every branch's age and
+report the ones whose unix timestamp is below the cutoff:
+
+```bash
+date -d "30 days ago" +%s 2>/dev/null || date -v-30d +%s
+git for-each-ref --sort=committerdate \
+  --format='%(refname:short) %(committerdate:unix) %(committerdate:relative)' refs/heads/
+```
 
 **Squash-merge caveat:** `git branch --merged` misses squash-merged branches (the norm on GitHub), so treat its output as a lower bound. The `: gone]` orphan check is what usually catches them after the remote branch is deleted. When `gh` is available, confirm suspected-stale branches:
 

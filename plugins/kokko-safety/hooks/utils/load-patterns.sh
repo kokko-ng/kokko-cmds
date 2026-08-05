@@ -9,9 +9,15 @@
 _LOAD_PATTERNS_SCRIPT_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
 PATTERNS_DIR="$_LOAD_PATTERNS_SCRIPT_DIR/../dangerous-patterns"
 
-# Populated by load_patterns (parallel arrays)
+# Populated by load_patterns (parallel arrays). A pattern line starting with
+# "case:" lands in the case-sensitive arrays instead: everything after the
+# marker is matched WITHOUT grep -i. That is the only way to distinguish
+# flags that differ only by case (git branch -D force-deletes; -d refuses on
+# unmerged work and must pass).
 DANGEROUS_PATTERNS=()
 DANGEROUS_PATTERN_CATEGORIES=()
+DANGEROUS_CASE_PATTERNS=()
+DANGEROUS_CASE_PATTERN_CATEGORIES=()
 
 # Set by check_dangerous_pattern when a pattern matches; read by the sourcing
 # hook when it builds the permission-decision reason.
@@ -25,8 +31,13 @@ _append_pattern_file() {
     while IFS= read -r line || [[ -n "$line" ]]; do
         # Skip empty lines and comments
         [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-        DANGEROUS_PATTERNS+=("$line")
-        DANGEROUS_PATTERN_CATEGORIES+=("$category")
+        if [[ "$line" == case:* ]]; then
+            DANGEROUS_CASE_PATTERNS+=("${line#case:}")
+            DANGEROUS_CASE_PATTERN_CATEGORIES+=("$category")
+        else
+            DANGEROUS_PATTERNS+=("$line")
+            DANGEROUS_PATTERN_CATEGORIES+=("$category")
+        fi
     done < "$file"
 }
 
@@ -36,6 +47,8 @@ _append_pattern_file() {
 load_patterns() {
     DANGEROUS_PATTERNS=()
     DANGEROUS_PATTERN_CATEGORIES=()
+    DANGEROUS_CASE_PATTERNS=()
+    DANGEROUS_CASE_PATTERN_CATEGORIES=()
     local category file
     for category in "$@"; do
         file="$PATTERNS_DIR/${category}.txt"
@@ -65,31 +78,52 @@ check_dangerous_pattern() {
     local command="$1"
     MATCHED_PATTERN=""
     MATCHED_CATEGORY=""
-    # No patterns can never match; returning here also keeps grep -f from
-    # seeing an empty pattern file. load_patterns never stores an empty line
-    # (an empty pattern would match everything), so the batch file is safe.
-    if [[ ${#DANGEROUS_PATTERNS[@]} -eq 0 ]]; then
-        return 1
-    fi
-    local batch_status=0
-    grep -qiE -f <(printf '%s\n' "${DANGEROUS_PATTERNS[@]}") <<<"$command" 2>/dev/null \
-        || batch_status=$?
-    if [[ "$batch_status" -eq 1 ]]; then
-        return 1
-    fi
-    local i status
-    for i in "${!DANGEROUS_PATTERNS[@]}"; do
-        # Capture the pipeline status immediately: any command in between
-        # (even an assignment) would overwrite PIPESTATUS.
-        printf '%s\n' "$command" | grep -qiE -- "${DANGEROUS_PATTERNS[$i]}" \
-            && status=0 || status=${PIPESTATUS[1]}
-        if [[ "$status" -eq 0 ]]; then
-            MATCHED_PATTERN="${DANGEROUS_PATTERNS[$i]}"
-            MATCHED_CATEGORY="${DANGEROUS_PATTERN_CATEGORIES[$i]}"
-            return 0
-        elif [[ "$status" -ge 2 ]]; then
-            echo "kokko-safety: invalid pattern in ${DANGEROUS_PATTERN_CATEGORIES[$i]}.txt (grep exit $status): ${DANGEROUS_PATTERNS[$i]}" >&2
+    local batch_status i status
+
+    # Case-insensitive set first (the vast majority of the corpus). The
+    # empty-array guard also keeps grep -f from seeing an empty pattern
+    # file. load_patterns never stores an empty line (an empty pattern
+    # would match everything), so the batch file is safe. No namerefs or
+    # helper indirection here: these hooks must run on macOS bash 3.2.
+    if [[ ${#DANGEROUS_PATTERNS[@]} -gt 0 ]]; then
+        batch_status=0
+        grep -qiE -f <(printf '%s\n' "${DANGEROUS_PATTERNS[@]}") <<<"$command" 2>/dev/null \
+            || batch_status=$?
+        if [[ "$batch_status" -ne 1 ]]; then
+            for i in "${!DANGEROUS_PATTERNS[@]}"; do
+                # Capture the pipeline status immediately: any command in
+                # between (even an assignment) would overwrite PIPESTATUS.
+                printf '%s\n' "$command" | grep -qiE -- "${DANGEROUS_PATTERNS[$i]}" \
+                    && status=0 || status=${PIPESTATUS[1]}
+                if [[ "$status" -eq 0 ]]; then
+                    MATCHED_PATTERN="${DANGEROUS_PATTERNS[$i]}"
+                    MATCHED_CATEGORY="${DANGEROUS_PATTERN_CATEGORIES[$i]}"
+                    return 0
+                elif [[ "$status" -ge 2 ]]; then
+                    echo "kokko-safety: invalid pattern in ${DANGEROUS_PATTERN_CATEGORIES[$i]}.txt (grep exit $status): ${DANGEROUS_PATTERNS[$i]}" >&2
+                fi
+            done
         fi
-    done
+    fi
+
+    # Case-sensitive set: same shape, no -i.
+    if [[ ${#DANGEROUS_CASE_PATTERNS[@]} -gt 0 ]]; then
+        batch_status=0
+        grep -qE -f <(printf '%s\n' "${DANGEROUS_CASE_PATTERNS[@]}") <<<"$command" 2>/dev/null \
+            || batch_status=$?
+        if [[ "$batch_status" -ne 1 ]]; then
+            for i in "${!DANGEROUS_CASE_PATTERNS[@]}"; do
+                printf '%s\n' "$command" | grep -qE -- "${DANGEROUS_CASE_PATTERNS[$i]}" \
+                    && status=0 || status=${PIPESTATUS[1]}
+                if [[ "$status" -eq 0 ]]; then
+                    MATCHED_PATTERN="${DANGEROUS_CASE_PATTERNS[$i]}"
+                    MATCHED_CATEGORY="${DANGEROUS_CASE_PATTERN_CATEGORIES[$i]}"
+                    return 0
+                elif [[ "$status" -ge 2 ]]; then
+                    echo "kokko-safety: invalid pattern in ${DANGEROUS_CASE_PATTERN_CATEGORIES[$i]}.txt (grep exit $status): ${DANGEROUS_CASE_PATTERNS[$i]}" >&2
+                fi
+            done
+        fi
+    fi
     return 1
 }

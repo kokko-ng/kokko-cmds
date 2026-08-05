@@ -78,7 +78,10 @@ kokko-notifications copy; CI enforces this).
 
 1. Pick the right category file and add one ERE per line. Anchor command
    names with `(^|[[:space:]])` so `wipe` does not match `swipe`; patterns
-   are matched case-insensitively against the raw command string.
+   are matched case-insensitively against the raw command string. Prefix a
+   line with `case:` when only an exact-case match is destructive (`git
+   branch -D` force-deletes, `-d` refuses and must pass): the marker is
+   stripped and the rest of the line matches case-sensitively.
 2. Add two cases to `tests/hooks/run-tests.sh`: the dangerous form must
    produce `ask`, and the nearest legitimate look-alike must pass through.
 3. Run `bash tests/hooks/run-tests.sh` from the repo root; it feeds real JSON
