@@ -27,6 +27,10 @@ git merge origin/<base>    # preserves history
 git rebase origin/<base>   # linear history
 ```
 
+Rebase rewrites the branch, so pushing a rebased branch that was already
+pushed needs a force push — which git-guarded environments deny (see step 5).
+Reserve rebase for branches not yet pushed; default to merge otherwise.
+
 ### 3. Resolve conflicts (if any)
 
 Edit each conflicted file, pick the correct result, remove the `<<<<<<<`/`=======`/`>>>>>>>` markers, then `git add` it. Continue with `git merge --continue` or `git rebase --continue`. Useful: `git log --oneline origin/<base>..HEAD` and `HEAD..origin/<base>` to see diverging commits.
@@ -43,10 +47,23 @@ git status && git log --oneline -10
 
 ```bash
 git push origin <branch-name>
-git push origin <branch-name> --force-with-lease   # after a rebase
+```
+
+After a merge, a plain push suffices. After a rebase of an already-pushed
+branch, the push needs a force flag — and git-guarded environments
+(kokko-devcontainer) deny every force push outright, `--force-with-lease`
+included; the deny is not lifted by an in-session approval. Do not attempt
+it: report that the rebase is complete locally and print the exact command
+for the user to run themselves:
+
+```text
+# Must be run by you (the git guard denies force pushes for agents):
+git push origin <branch-name> --force-with-lease
 ```
 
 ## Notes
 
-- Dirty working tree → commit or stash before syncing.
+- Dirty working tree → commit before syncing. Do not stash to clear it:
+  guard environments deny `git stash` exactly when the tree is dirty, and a
+  forgotten stash was load-bearing in past data-loss incidents.
 - Rebase conflicting on every commit → prefer merge instead.

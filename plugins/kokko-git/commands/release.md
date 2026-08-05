@@ -1,7 +1,7 @@
 ---
 description: Bump version across all files and open/merge a PR; the Release workflow publishes.
 argument-hint: '[patch|minor|major] [--version x.y.z]'
-allowed-tools: Bash(git:*), Bash(gh:*), Read, Edit, Grep, Glob, AskUserQuestion, mcp__github__create_pull_request, mcp__github__merge_pull_request, mcp__github__pull_request_read, mcp__github__list_releases, mcp__github__actions_list, mcp__github__get_job_logs
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(bash:*), Bash(grep:*), Read, Edit, Grep, Glob, AskUserQuestion, mcp__github__create_pull_request, mcp__github__merge_pull_request, mcp__github__pull_request_read, mcp__github__list_releases, mcp__github__actions_list, mcp__github__get_job_logs
 disable-model-invocation: true
 ---
 
@@ -23,9 +23,9 @@ check common locations: `pyproject.toml`, `package.json`, `*/__init__.py`
 `.claude-plugin/marketplace.json`, `Cargo.toml`, `version.txt`/`VERSION`.
 
 ```bash
-grep -r '"version"' . --include="*.json" 2>/dev/null | head -20
-grep -E "^version\s*=" pyproject.toml Cargo.toml 2>/dev/null
-grep "__version__" **/__init__.py 2>/dev/null
+grep -rl '"version"' . --include="*.json"
+grep -E "^version\s*=" pyproject.toml Cargo.toml
+grep -rn "__version__" . --include="__init__.py"
 git describe --tags --abbrev=0
 ```
 
@@ -52,11 +52,14 @@ git diff
 
 ### 4. Create the version-bump PR
 
-Branch, commit, and push:
+Branch, commit, and push. Stage the modified files by explicit path from the
+`git status` output — never `git add .` (git-guarded environments deny it
+outright, and it sweeps in untracked files):
 
 ```bash
 git checkout -b version-bump-vX.Y.Z
-git add .
+git status --porcelain
+git add <each modified file, named explicitly>
 git commit -m "chore: bump version to vX.Y.Z"
 git push -u origin version-bump-vX.Y.Z
 ```

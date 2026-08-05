@@ -49,9 +49,12 @@ Never claim a rebuild-only change is live. Report it in the rebuild list.
 ```bash
 git rev-parse --show-toplevel
 git status --short
-ls -la .devcontainer/ 2>/dev/null || echo "NO .devcontainer IN THIS PROJECT"
-[ -f /.dockerenv ] && echo "inside a container" || echo "NOT inside a container"
+ls -la .devcontainer/
+ls /.dockerenv
 ```
+
+`ls -la .devcontainer/` failing means the project has no `.devcontainer/`;
+`ls /.dockerenv` succeeding means you are inside a container.
 
 - Run from the repo root; use it for every path below.
 - **Uncommitted changes under `.devcontainer/` → stop and ask.** This command
@@ -64,12 +67,14 @@ ls -la .devcontainer/ 2>/dev/null || echo "NO .devcontainer IN THIS PROJECT"
 
 ### 2. Fetch upstream into a temp clone
 
+The temp clone lives at `/tmp/kokko-devcontainer-upstream` — use that literal
+path in every command below.
+
 ```bash
-UPSTREAM=/tmp/kokko-devcontainer-upstream
-rm -rf "$UPSTREAM"
-git clone --depth=1 https://github.com/kokko-ng/kokko-devcontainer "$UPSTREAM"
+rm -rf /tmp/kokko-devcontainer-upstream
+git clone --depth=1 https://github.com/kokko-ng/kokko-devcontainer /tmp/kokko-devcontainer-upstream
 # with --ref: git clone --depth=1 --branch <ref> ...
-git -C "$UPSTREAM" log -1 --format='%h %ad %s' --date=short
+git -C /tmp/kokko-devcontainer-upstream log -1 --format='%h %ad %s' --date=short
 ```
 
 Clone failed (no network, private repo, bad ref) → report the actual error and
@@ -78,7 +83,7 @@ stop. Do not fall back to a cached copy.
 ### 3. Diff against the project
 
 ```bash
-diff -ruq "$UPSTREAM/.devcontainer" .devcontainer
+diff -ruq /tmp/kokko-devcontainer-upstream/.devcontainer .devcontainer
 ```
 
 Then, for every file that differs, `diff -u` it to see the actual change.
@@ -96,7 +101,7 @@ To tell bucket 2 from bucket 3, check whether the local edit exists in upstream
 history:
 
 ```bash
-git -C "$UPSTREAM" log --oneline -5 -- .devcontainer/<file>
+git -C /tmp/kokko-devcontainer-upstream log --oneline -5 -- .devcontainer/<file>
 ```
 
 If the local content is not any upstream version, it is a local customization.
@@ -113,7 +118,7 @@ Present a table before changing anything:
 Then the upstream commits you are pulling in:
 
 ```bash
-git -C "$UPSTREAM" log --oneline -20 -- .devcontainer
+git -C /tmp/kokko-devcontainer-upstream log --oneline -20 -- .devcontainer
 ```
 
 **Stop here if `--check`.**
@@ -126,7 +131,7 @@ refresh for the sake of it.
 Buckets 1 and 2: copy straight over.
 
 ```bash
-cp "$UPSTREAM/.devcontainer/<path>" .devcontainer/<path>
+cp /tmp/kokko-devcontainer-upstream/.devcontainer/<path> .devcontainer/<path>
 ```
 
 Bucket 3 (customized here): **never blind-copy.** For each file, show the diff,
@@ -144,15 +149,15 @@ without asking — a project may depend on one.
 so a bundled-CLAUDE.md change reaches a running container only here.
 
 ```bash
-diff -u /home/vscode/.claude/CLAUDE.md .devcontainer/config/claude/CLAUDE.md
+diff -u "$HOME/.claude/CLAUDE.md" .devcontainer/config/claude/CLAUDE.md
 ```
 
 - Identical → nothing to do.
 - Differs only by the upstream additions → back up and copy:
 
   ```bash
-  cp /home/vscode/.claude/CLAUDE.md /home/vscode/.claude/CLAUDE.md.bak
-  cp .devcontainer/config/claude/CLAUDE.md /home/vscode/.claude/CLAUDE.md
+  cp "$HOME/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md.bak"
+  cp .devcontainer/config/claude/CLAUDE.md "$HOME/.claude/CLAUDE.md"
   ```
 
 - Contains local edits → show them, and merge the upstream sections in rather
@@ -178,17 +183,18 @@ Say so and point at this repo's `post-create.sh`.
 Report in the reply — do not write an update report file:
 
 - Files updated, files merged by hand, files skipped and why
-- The upstream commit now matched (`git -C "$UPSTREAM" rev-parse --short HEAD`)
+- The upstream commit now matched (`git -C /tmp/kokko-devcontainer-upstream rev-parse --short HEAD`)
 - **What is live now** versus **what needs a rebuild**, explicitly
 - Plugin changes: run `/plugins-update` next if plugin versions also moved, and
   `/reload-plugins` to load them into this session
-- The rebuild command, if anything in the rebuild bucket changed:
+- The rebuild command, if anything in the rebuild bucket changed — printed
+  for the user to run on the host, never run from here:
 
-  ```bash
+  ```text
   devcontainer up --workspace-folder . --remove-existing-container
   ```
 
-Finally: `rm -rf "$UPSTREAM"`.
+Finally: `rm -rf /tmp/kokko-devcontainer-upstream`.
 
 The `.devcontainer/` changes are left uncommitted in the working tree for review.
 Do not commit or push them — that is the user's call.

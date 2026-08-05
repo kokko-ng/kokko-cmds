@@ -15,6 +15,18 @@
 #   4. references/... or ${CLAUDE_PLUGIN_ROOT}/... paths that do not exist on
 #      disk -- a renamed reference file silently orphans every prompt that
 #      cites it.
+#   5. Recommending a git command the kokko-devcontainer guard always denies
+#      (git add ., force pushes, stash as remediation, branch -D, ...).
+#      Prompts here have repeatedly drifted into advising commands agents
+#      cannot run in guarded environments. A hit only counts when neither
+#      its line nor the three lines above carry negation / human-only
+#      context (never, do not, denies, BLOCKED, "run by you", ...).
+#   6. Fenced bash blocks a command's own allowed-tools cannot cover. A
+#      Bash(<prefix>:*) allowlist matches by command prefix, so a block
+#      whose pipeline segment starts with an assignment (VAR=...), a test
+#      construct, or an unlisted binary still triggers a permission prompt
+#      mid-command -- silently defeating the allowlist's purpose. Commands
+#      granting bare unrestricted `Bash` are skipped.
 #
 # Run from the repo root: bash scripts/lint-prompts.sh
 set -euo pipefail
@@ -75,6 +87,128 @@ check_path_mentions() {
            | sed -E 's/^[^r]*(references\/)/\1/' | sort -u)
 }
 
+# --- check 5: guard-denied git commands recommended without negation -------
+
+# One ERE per line. These are the commands the kokko-devcontainer guard
+# always denies (or denies exactly when the advice would apply, as with
+# stash on a dirty tree); a prompt telling an agent to run one is drift.
+GUARD_DENIED_PATTERNS=(
+  'git add \.([^a-zA-Z0-9_/-]|$)'
+  'git add (-A|--all)([^a-zA-Z0-9_-]|$)'
+  'git push[^|;&]*--force'
+  'git push[^|;&]*[[:space:]]-f([[:space:]]|$)'
+  'git push[^|;&]*--delete'
+  'git stash([^a-zA-Z0-9_ -]|$)'
+  'git stash[[:space:]]+(push|pop|drop|clear)'
+  'git branch[[:space:]]+-D([[:space:]]|$)'
+  'git clean[[:space:]]+-[a-zA-Z]*f'
+  'git reset[[:space:]]+--hard'
+  'git checkout[^|;&]*[[:space:]]--([[:space:]]|$)'
+)
+# Words that mark a mention as a warning or a human-only instruction rather
+# than advice to the agent. Checked case-insensitively on the hit line and
+# the 3 lines above.
+NEGATION_CONTEXT="never|not[^a-z]|n't|avoid|den(y|ie)|blocked|refus|human|instead|run by you|cannot|will not"
+
+# guard_denied_hits <file> -> "line:pattern" for each unexcused hit
+guard_denied_hits() {
+  local f="$1" pat hit lineno ctx
+  for pat in "${GUARD_DENIED_PATTERNS[@]}"; do
+    while IFS= read -r hit; do
+      [ -n "$hit" ] || continue
+      lineno="${hit%%:*}"
+      ctx=$(sed -n "$((lineno > 3 ? lineno - 3 : 1)),${lineno}p" "$f")
+      if ! printf '%s\n' "$ctx" | grep -qiE "$NEGATION_CONTEXT"; then
+        echo "$lineno:$pat"
+      fi
+    done < <(grep -nE "$pat" "$f" | cut -d: -f1 | sed 's/$/:/')
+  done
+}
+
+# --- check 6: fenced bash the allowed-tools frontmatter cannot cover -------
+
+# bash_block_segments <file> -> "line<TAB>segment" for every command segment
+# inside ```bash / ```sh fences, continuations joined, comments dropped.
+bash_block_segments() {
+  awk '
+    /^[[:space:]]*```/ {
+      if (!fence) {
+        lang = $0; sub(/^[[:space:]]*```/, "", lang)
+        fence = 1; isbash = (lang ~ /^(bash|sh)[[:space:]]*$/)
+      } else { fence = 0; isbash = 0 }
+      next
+    }
+    fence && isbash {
+      line = $0
+      if (line ~ /^[[:space:]]*#/) next   # whole-line comment
+      # Join backslash continuations, and keep appending while a single- or
+      # double-quoted span is still open (multi-line jq/awk programs).
+      while (1) {
+        cont = (line ~ /\\$/)
+        tmp = line
+        nsq = gsub(/\047/, "", tmp)
+        ndq = gsub(/"/, "", tmp)
+        if (!cont && nsq % 2 == 0 && ndq % 2 == 0) break
+        if ((getline nxt) <= 0) break
+        if (cont) sub(/\\$/, "", line)
+        sub(/^[[:space:]]+/, "", nxt)
+        line = line " " nxt
+      }
+      gsub(/\\\|/, "\001", line)          # protect quoted \| (grep alternation)
+      # Blank quoted spans so operators inside them do not split segments.
+      gsub(/\047[^\047]*\047/, "\047Q\047", line)
+      gsub(/"[^"]*"/, "\"Q\"", line)
+      gsub(/\|\||&&|;|\|/, "\n", line)    # split on shell operators (not lone &)
+      n = split(line, segs, "\n")
+      for (i = 1; i <= n; i++) {
+        s = segs[i]
+        gsub(/\001/, "\\|", s)
+        sub(/^[[:space:]]+/, "", s); sub(/[[:space:]]+$/, "", s)
+        if (s == "" || s ~ /^#/) continue
+        printf "%d\t%s\n", FNR, s
+      }
+    }' "$1"
+}
+
+# check_allowed_tools_coverage <file>: every segment must start with an
+# allowed Bash prefix. Files granting bare `Bash` are exempt.
+check_allowed_tools_coverage() {
+  local file="$1" fm tools
+  fm=$(frontmatter "$file")
+  tools=$(printf '%s\n' "$fm" | sed -n 's/^allowed-tools:[[:space:]]*//p')
+
+  # Bare unrestricted Bash grant: nothing to check.
+  printf '%s' "$tools" | grep -qE '(^|,)[[:space:]]*Bash[[:space:]]*(,|$)' && return 0
+
+  local prefixes=()
+  while IFS= read -r p; do
+    [ -n "$p" ] && prefixes+=("$p")
+  done < <(printf '%s\n' "$tools" | grep -oE 'Bash\([^)]*\)' | sed -E 's/^Bash\(//; s/\)$//; s/:\*$//')
+
+  local lineno seg word ok p
+  while IFS=$'\t' read -r lineno seg; do
+    word="${seg%% *}"
+    case "$word" in
+      if|then|else|elif|fi|for|while|until|do|done|'case'|'esac'|'['|'[['|test|'!')
+        err "$file:$lineno bash block uses '$word' — compound/test constructs never match a Bash(<prefix>:*) allowlist, so this segment permission-prompts mid-command: $seg"
+        continue ;;
+    esac
+    if printf '%s' "$word" | grep -qE '^[A-Za-z_][A-Za-z_0-9]*='; then
+      err "$file:$lineno bash block starts a segment with an assignment — assignments never match a Bash(<prefix>:*) allowlist, so this segment permission-prompts mid-command: $seg"
+      continue
+    fi
+    ok=0
+    for p in ${prefixes[@]+"${prefixes[@]}"}; do
+      case "$seg" in
+        "$p" | "$p "*) ok=1; break ;;
+      esac
+    done
+    if [ "$ok" -eq 0 ]; then
+      err "$file:$lineno bash block runs '$word' but allowed-tools grants no Bash prefix covering it: $seg"
+    fi
+  done < <(bash_block_segments "$file")
+}
+
 for file in plugins/*/commands/*.md plugins/*/skills/*/SKILL.md; do
   [ -f "$file" ] || continue
   plugin_dir=$(echo "$file" | cut -d/ -f1-2)
@@ -110,6 +244,15 @@ for file in plugins/*/commands/*.md plugins/*/skills/*/SKILL.md; do
   done < <(pseudo_placeholders "$file")
 
   check_path_mentions "$file" "$plugin_dir"
+
+  while IFS= read -r finding; do
+    [ -n "$finding" ] || continue
+    err "$file:${finding%%:*} recommends a git command the devcontainer guard denies (matched: ${finding#*:}) with no negation/human-only context on the line or the 3 lines above"
+  done < <(guard_denied_hits "$file")
+
+  case "$file" in
+    */commands/*) check_allowed_tools_coverage "$file" ;;
+  esac
 done
 
 if [ "$FAIL" -eq 0 ]; then

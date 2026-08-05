@@ -22,6 +22,17 @@ Phase 4: Synthesis -> Phase 5: Files
 Each level depends on the previous. Execute sequentially, passing outputs
 forward.
 
+**Subagents cannot read this plugin's files.** Whenever a phase prompt below
+cites a `c4-templates.md#...` anchor, read that section yourself first and
+paste the schema or template into the Task prompt you spawn — a bare anchor
+citation gives the subagent nothing to follow, and phases then invent
+mismatched shapes that Phase 4 has to reconcile.
+
+The Task blocks below are pseudo-code. Do not pin model names in them —
+model ids go stale; inherit the session model unless a step is marked
+mechanical, where a smaller/faster model is fine if the harness supports
+per-Task selection.
+
 **Read the `c4` skill first:** `${CLAUDE_PLUGIN_ROOT}/skills/c4/SKILL.md`. It
 holds the authoring rules every generated document must follow — mandatory
 source-file hyperlinks and the ban on validation report files — and indexes the
@@ -59,7 +70,8 @@ Parameters:
     - Grep: "requests\.", "httpx\.", "import.*azure", "import.*aws"
     - Check docker-compose.yml for external services
 
-    OUTPUT: JSON per c4-templates.md#context-phase-output
+    OUTPUT: JSON matching the schema below
+    <paste the c4-templates.md#context-phase-output schema here before spawning>
     Include C4-PlantUML context diagram
 ```
 
@@ -95,7 +107,8 @@ Parameters:
     - Grep: "FastAPI", "Express", "Flask"
     - Analyze directory structure per container
 
-    OUTPUT: JSON per c4-templates.md#container-phase-output
+    OUTPUT: JSON matching the schema below
+    <paste the c4-templates.md#container-phase-output schema here before spawning>
     Include C4-PlantUML container diagram
 ```
 
@@ -130,7 +143,8 @@ Parameters:
     - Grep: "class \w+"
     - Analyze import statements
 
-    OUTPUT: JSON per c4-templates.md#component-phase-output
+    OUTPUT: JSON matching the schema below
+    <paste the c4-templates.md#component-phase-output schema here before spawning>
     Include C4-PlantUML component diagrams (one per container)
 ```
 
@@ -163,7 +177,8 @@ Parameters:
     OUTPUT:
     {
       "VALIDATION_PASSED": true/false,
-      "ISSUES": [<per c4-templates.md#validation-issue-schema>],
+      "ISSUES": [<issues in the schema below>],
+    <paste the c4-templates.md#validation-issue-schema definition here before spawning>
       "FINAL_STRUCTURE": {corrected model}
     }
 ```
