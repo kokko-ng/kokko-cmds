@@ -66,4 +66,13 @@ New branch:
 git push -u origin $(git branch --show-current)
 ```
 
-- Push rejected → `git pull --rebase` then push.
+- Push rejected (non-fast-forward) → the remote has commits you do not have.
+  A rejected push is usually correct: do NOT pull, rebase, merge, or force
+  anything on your own. Fetch and show the divergence, then stop and let the
+  user decide how to integrate:
+
+  ```bash
+  git fetch origin
+  git log --oneline HEAD..origin/$(git branch --show-current)   # remote-only
+  git log --oneline origin/$(git branch --show-current)..HEAD   # local-only
+  ```
