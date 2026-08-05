@@ -96,7 +96,22 @@ expect "$BASH_HOOK" 'drop table users' ask
 expect "$BASH_HOOK" 'psql -c "DROP TABLE users"' ask
 expect "$BASH_HOOK" 'dd if=/dev/zero of=/dev/sda' ask
 
+# Privilege escalation: root shells prompt, the destructive payload behind a
+# sudo still matches its own category, and routine sudo passes through
+expect "$BASH_HOOK" 'sudo -i' ask
+expect "$BASH_HOOK" 'sudo -s' ask
+expect "$BASH_HOOK" 'sudo su' ask
+expect "$BASH_HOOK" 'sudo bash -c "id"' ask
+expect "$BASH_HOOK" 'sudo -u root bash' ask
+expect "$BASH_HOOK" 'sudo --login' ask
+expect "$BASH_HOOK" 'sudo rm -rf /var/lib/data' ask '' 'payload behind sudo matches file-operations'
+expect "$BASH_HOOK" 'sudo systemctl stop nginx' ask '' 'payload behind sudo matches system-services'
+
 # False positives fixed in the pattern corpus must now pass through
+expect "$BASH_HOOK" 'sudo apt-get install -y jq' pass '' 'routine sudo install is not a prompt'
+expect "$BASH_HOOK" 'sudo apt-get update' pass
+expect "$BASH_HOOK" 'sudo -u vscode whoami' pass '' 'sudo -u with a non-shell command'
+expect "$BASH_HOOK" 'sudo tee /tmp/x' pass '' 'sudo with a non-shell command'
 expect "$BASH_HOOK" 'swipe left' pass '' 'swipe is not wipe'
 expect "$BASH_HOOK" 'git help swipe' pass
 expect "$BASH_HOOK" 'echo hi > /tmp/x' pass '' 'redirect to /tmp is routine'

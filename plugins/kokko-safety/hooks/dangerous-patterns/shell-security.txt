@@ -1,7 +1,19 @@
 # shell-security.txt - Shell, history, and security-sensitive operations
 
 # Privilege escalation
-(^|[[:space:]])sudo[[:space:]]+
+#
+# Deliberately NOT a bare-sudo match: prompting on every sudo (including
+# routine installs like `sudo apt-get install -y jq`) is pure noise, and
+# noisy guards get switched off. Destructive payloads behind sudo still
+# match their own category patterns -- matching is substring-based on the
+# raw command string, so `sudo rm -rf /` trips the rm -rf pattern and
+# `sudo systemctl stop nginx` trips system-services regardless. What IS
+# matched here is sudo used to open a root shell, where the eventual
+# payload is invisible to pattern matching.
+(^|[[:space:]])sudo[[:space:]]+(-[^[:space:]]+[[:space:]]+)*(su|bash|sh|zsh|ksh|dash)([[:space:]]|$)
+(^|[[:space:]])sudo[[:space:]]+-u[[:space:]]+[^[:space:]]+[[:space:]]+(su|bash|sh|zsh|ksh|dash)([[:space:]]|$)
+(^|[[:space:]])sudo[[:space:]]+(-[^[:space:]]+[[:space:]]+)*-[a-zA-Z]*[is][a-zA-Z]*([[:space:]]|$)
+(^|[[:space:]])sudo[[:space:]]+(-[^[:space:]]+[[:space:]]+)*--(login|shell)([[:space:]]|$)
 \bsu[[:space:]]+-
 \bsu[[:space:]]+root
 \bsu[[:space:]]+--login
