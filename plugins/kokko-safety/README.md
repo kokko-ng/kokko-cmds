@@ -40,7 +40,7 @@ per line, `#` for comments. The 18 category files:
 | `packages` | package-manager remove/purge across apt, dnf, brew, npm, pip, ... |
 | `permissions` | world-writable chmod, recursive chmod/chown on system paths, SUID |
 | `process` | kill -9, killall/pkill, OOM-killer manipulation |
-| `shell-security` | sudo, history wiping, curl-pipe-to-shell, credential deletion |
+| `shell-security` | root shells (`sudo -i`, `sudo su`, `su -`), history wiping, curl-pipe-to-shell, credential deletion — deliberately not bare `sudo`, which would prompt on routine installs |
 | `system-services` | systemctl stop/disable, shutdown/reboot, service managers |
 | `terraform` | terraform/tofu/pulumi destroy, auto-approve applies, state rm |
 | `users` | userdel, passwd locking, /etc/passwd and sudoers edits |
