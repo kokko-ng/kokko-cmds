@@ -15,8 +15,14 @@
 (^|[[:space:]])git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*d
 (^|[[:space:]])git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*x
 
-# Delete branch (any variant)
-(^|[[:space:]])git[[:space:]]+branch[[:space:]]+(-[dD]|--delete)
+# Force-delete branch. Plain `git branch -d` / `--delete` refuse on unmerged
+# work by themselves and are the cleanup path the janitor skill and the
+# kokko-devcontainer guard prescribe -- prompting on them is pure noise, and
+# noise gets safety hooks switched off. Only the force forms (-D, -d
+# clustered with -f, and --delete combined with --force) drop unmerged
+# commits, so only they ask. The case: marker makes the match case-sensitive
+# (grep -i cannot otherwise tell -D from -d).
+case:(^|[[:space:]])git[[:space:]]+branch[[:space:]]+(-[a-zA-Z]*D|--delete[[:space:]]+--force|--force[[:space:]]+--delete|-[a-zA-Z]*d[a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*d)([[:space:]]|$)
 
 # Delete remote branch
 (^|[[:space:]])git[[:space:]]+push[[:space:]]+(.*[[:space:]])?--delete
@@ -31,10 +37,13 @@
 # commit and plain (non-force) push on protected branches. Do not duplicate
 # either side or the same command double-prompts.
 
-# Checkout/restore that discards changes
+# Checkout/restore that discards changes. `restore --staged` WITHOUT
+# --worktree only touches the index (it is the standard unstage, and the
+# alternative the kokko-devcontainer guard recommends) so it passes; the
+# --worktree/-W forms overwrite working-tree files and ask.
 (^|[[:space:]])git[[:space:]]+checkout[[:space:]]+--[[:space:]]+\.
 (^|[[:space:]])git[[:space:]]+checkout[[:space:]]+\.
-(^|[[:space:]])git[[:space:]]+restore[[:space:]]+--staged[[:space:]]+\.
+(^|[[:space:]])git[[:space:]]+restore[[:space:]]+(.*[[:space:]])?(--worktree|-[a-zA-Z]*W)([[:space:]]|$)
 (^|[[:space:]])git[[:space:]]+restore[[:space:]]+\.
 
 # Stash destructive operations
@@ -58,12 +67,15 @@
 (^|[[:space:]])git[[:space:]]+gc[[:space:]]+--prune
 (^|[[:space:]])git[[:space:]]+prune
 
-# Submodule removal
+# Submodule removal. `git rm --cached` is deliberately NOT matched: it is
+# index-only (the file stays on disk) and is the exact alternative the
+# kokko-devcontainer guard's `git rm -f` deny message recommends.
 (^|[[:space:]])git[[:space:]]+submodule[[:space:]]+deinit
-(^|[[:space:]])git[[:space:]]+rm[[:space:]]+--cached
 
-# Worktree removal
-(^|[[:space:]])git[[:space:]]+worktree[[:space:]]+remove
+# Forced worktree removal. The plain form refuses on a dirty worktree by
+# itself and is the cleanup path the janitor skill prescribes -- only
+# --force/-f deletes a worktree along with its uncommitted changes.
+(^|[[:space:]])git[[:space:]]+worktree[[:space:]]+remove[[:space:]]+(.*[[:space:]])?(--force|-[a-zA-Z]*f)([[:space:]]|$)
 (^|[[:space:]])git[[:space:]]+worktree[[:space:]]+prune
 
 # Tag deletion

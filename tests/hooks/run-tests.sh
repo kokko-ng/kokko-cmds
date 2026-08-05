@@ -140,6 +140,12 @@ expect "$GIT_HOOK" 'git -C /repo push --force origin main' ask '' 'force push wi
 expect "$GIT_HOOK" 'git reset --hard HEAD~1' ask
 expect "$GIT_HOOK" 'git clean -fd' ask
 expect "$GIT_HOOK" 'git branch -D topic' ask
+expect "$GIT_HOOK" 'git branch --delete --force topic' ask '' 'long-form force delete'
+expect "$GIT_HOOK" 'git branch -df topic' ask '' 'clustered -d -f is a force delete'
+expect "$GIT_HOOK" 'git worktree remove --force /tmp/wt' ask '' 'forced removal deletes uncommitted work'
+expect "$GIT_HOOK" 'git worktree remove -f /tmp/wt' ask
+expect "$GIT_HOOK" 'git restore --staged --worktree .' ask '' 'restore --worktree overwrites files'
+expect "$GIT_HOOK" 'git restore .' ask
 expect "$GIT_HOOK" 'git rebase -i HEAD~3' ask
 expect "$GIT_HOOK" 'git rebase --onto main base topic' ask
 
@@ -147,6 +153,16 @@ expect "$GIT_HOOK" 'git rebase --onto main base topic' ask
 expect "$GIT_HOOK" 'git rebase --continue' pass
 expect "$GIT_HOOK" 'git rebase --abort' pass
 expect "$GIT_HOOK" 'git rebase --skip' pass
+
+# Safe forms that the janitor cleanup and the kokko-devcontainer guard
+# prescribe as THE alternatives: prompting on these is the noise that gets
+# safety hooks switched off. Each refuses dangerous cases by itself.
+expect "$GIT_HOOK" 'git branch -d merged-topic' pass '' 'plain -d refuses on unmerged work itself'
+expect "$GIT_HOOK" 'git branch --delete merged-topic' pass '' 'plain --delete refuses on unmerged work itself'
+expect "$GIT_HOOK" 'git worktree remove /tmp/wt' pass '' 'plain removal refuses on a dirty worktree itself'
+expect "$GIT_HOOK" 'git rm --cached tracked.file' pass '' 'index-only removal, file stays on disk'
+expect "$GIT_HOOK" 'git restore --staged src/app.py' pass '' 'index-only unstage'
+expect "$GIT_HOOK" 'git restore --staged .' pass '' 'index-only unstage of everything'
 # Direct push to main is owned by branch protection, not git.txt (no double prompt)
 expect "$GIT_HOOK" 'git push origin main' pass '' 'push to main owned by branch-protection'
 expect "$GIT_HOOK" 'git status' pass
@@ -373,6 +389,7 @@ total_patterns=0
 while IFS= read -r line || [ -n "$line" ]; do
     file="${line%%:*}"
     pattern="${line#*:}"
+    pattern="${pattern#case:}"   # the case-sensitivity marker is not part of the ERE
     total_patterns=$((total_patterns + 1))
     grep -qE -e "$pattern" <<<"" 2>/dev/null
     rc=$?
