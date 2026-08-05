@@ -1,3 +1,7 @@
+# Vendored third-party files stay byte-identical to upstream; no hook may
+# rewrite them (see plugins/kokko-viz/skills/c4/assets/c4-plantuml/README.md).
+exclude: ^plugins/kokko-viz/skills/c4/assets/c4-plantuml/
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

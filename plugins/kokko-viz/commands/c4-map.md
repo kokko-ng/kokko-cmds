@@ -8,6 +8,9 @@ allowed-tools: Task, Bash, Read, Write, Glob, Grep
 
 Map the codebase architecture as a hierarchical C4 model
 (Context -> Containers -> Components). No existing model required.
+`$1`, when given, is the directory to map (default when empty: the current
+project root) — scope every search to it and state it in every phase prompt
+below.
 
 ## Orchestration
 
@@ -178,10 +181,19 @@ named in any generated `.md` must be a markdown hyperlink to the actual file,
 per `c4-templates.md#source-file-links` — repo-relative so it resolves on
 GitHub. Verify each link target exists before writing it.
 
-### Step 0: Download C4-PlantUML Library
+### Step 0: Provision the C4-PlantUML Library
+
+The four library files ship with this plugin — copy them in; no network
+access needed:
 
 ```bash
 mkdir -p codemap/.c4-plantuml
+cp "${CLAUDE_PLUGIN_ROOT}/skills/c4/assets/c4-plantuml/"*.puml codemap/.c4-plantuml/
+```
+
+Fallback only if the bundled copies are missing (older plugin install):
+
+```bash
 BASE_URL="https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master"
 for f in C4 C4_Context C4_Container C4_Component; do
   [ -f codemap/.c4-plantuml/$f.puml ] || \

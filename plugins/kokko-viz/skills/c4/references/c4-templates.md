@@ -139,7 +139,9 @@ codemap/.c4-plantuml/
 └── C4_Component.puml
 ```
 
-**Download URLs** (fetch if not already present):
+**Source** (copy if not already present): the plugin bundles the four files
+at `${CLAUDE_PLUGIN_ROOT}/skills/c4/assets/c4-plantuml/` — copy from there,
+no network needed. Only if the bundled copies are missing, download:
 
 - `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml`
 - `https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml`
