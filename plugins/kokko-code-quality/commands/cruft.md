@@ -57,9 +57,13 @@ Offer: "Remove all and update .gitignore" / "Remove files only" / "Update
 
 ## 5. Execute
 
+Batch every approved untracked deletion into a single `rm` invocation, and
+every approved tracked removal into a single `git rm`: safety hooks prompt
+once per command, so one batch costs one prompt instead of one per file.
+
 ```bash
-rm -rf <file_or_dir>        # untracked
-git rm -r <file_or_dir>     # tracked
+rm -rf <every approved untracked file and dir, in one command>
+git rm -r <every approved tracked file and dir, in one command>
 ```
 
 ## 6. Update .gitignore (if selected)

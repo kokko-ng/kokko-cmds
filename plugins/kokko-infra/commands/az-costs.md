@@ -24,23 +24,26 @@ Also confirm the time period (default: MonthToDate).
 
 1. Get cost data. Cost queries use the `costmanagement` extension (`az extension add --name costmanagement` if missing; it is not part of core az):
 
-```bash
-SCOPE="/subscriptions/<subscription-id>"
+Use the confirmed subscription id in the `--scope` of every query below.
 
+```bash
 # Costs by resource group
-az costmanagement query --type ActualCost --scope "$SCOPE" \
+az costmanagement query --type ActualCost \
+  --scope "/subscriptions/<subscription-id>" \
   --timeframe MonthToDate \
   --dataset-grouping name=ResourceGroup type=Dimension \
   --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}'
 
 # Cost trend by service
-az costmanagement query --type ActualCost --scope "$SCOPE" \
+az costmanagement query --type ActualCost \
+  --scope "/subscriptions/<subscription-id>" \
   --timeframe MonthToDate \
   --dataset-grouping name=ServiceName type=Dimension \
   --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}'
 
 # Amortized view (reservations spread over usage)
-az costmanagement query --type AmortizedCost --scope "$SCOPE" \
+az costmanagement query --type AmortizedCost \
+  --scope "/subscriptions/<subscription-id>" \
   --timeframe MonthToDate \
   --dataset-aggregation '{"totalCost":{"name":"PreTaxCost","function":"Sum"}}'
 ```

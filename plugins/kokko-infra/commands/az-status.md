@@ -1,7 +1,7 @@
 ---
 description: Generate a daily Azure subscription activity and health summary.
 argument-hint: '[subscription-id] [--days N]'
-allowed-tools: Bash(az:*), AskUserQuestion
+allowed-tools: Bash(az:*), Bash(date:*), AskUserQuestion
 disable-model-invocation: true
 ---
 
@@ -56,13 +56,16 @@ az keyvault certificate list --vault-name <vault> --output table 2>/dev/null
 1. Cost summary (if enabled), covering the same lookback window (minimum 7 days for a useful trend):
 
 ```bash
-START=$(date -d "<days> days ago" +%Y-%m-%d 2>/dev/null || date -v-<days>d +%Y-%m-%d)
+date -d "<days> days ago" +%Y-%m-%d 2>/dev/null || date -v-<days>d +%Y-%m-%d
+date +%Y-%m-%d
 az consumption usage list \
-  --start-date "$START" \
-  --end-date "$(date +%Y-%m-%d)" \
-  --output table 2>/dev/null \
-  || echo "Cost data requires Cost Management permissions"
+  --start-date "<first date printed above>" \
+  --end-date "<second date printed above>" \
+  --output table
 ```
+
+If the consumption query fails with an authorization error, cost data
+requires Cost Management permissions — note it in the report and move on.
 
 ## Output Format
 

@@ -43,7 +43,8 @@ support it.
    - FALSE_POSITIVE: Suppress with documented justification
    - NEEDS_REFACTOR: Create safer abstraction first
 6. **Commit incrementally**: Use message format
-   `security(<tool>): mitigate <issue> in <file>`
+   `fix(security): mitigate <issue> in <file>` — `fix` is the Conventional
+   Commits type for vulnerability mitigations; `security` is not a valid type
 7. **Final validation**: Run security scanner again to confirm zero
    high/medium findings
 
