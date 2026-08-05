@@ -39,8 +39,19 @@ Update order:
 
 ### Step 1A: Identify System
 
+The system to update is `$1`. If an argument was given, use it as
+`SYSTEM_ID` and verify `codemap/<SYSTEM_ID>/` exists — report the error and
+stop if it does not. With no argument:
+
 ```bash
-SYSTEM_ID=$(ls codemap/ | head -1)
+ls codemap/
+```
+
+- Exactly one entry → that is `SYSTEM_ID`.
+- More than one → stop and list the systems; ask which one to update.
+  Never guess by taking the first.
+
+```bash
 echo "System ID: $SYSTEM_ID"
 find codemap/$SYSTEM_ID -type f \( -name "*.md" -o -name "*.puml" \) | sort
 ```
