@@ -6,6 +6,56 @@ Changelog](https://keepachangelog.com/). Releases before 3.6.0 are
 documented in [GitHub
 Releases](https://github.com/kokko-ng/kokko-cmds/releases) only.
 
+## 3.8.0 - 2026-08-05
+
+### Added
+
+- Prompt lint checks 5 and 6 (`scripts/lint-prompts.sh`): a command or
+  skill recommending a git command the kokko-devcontainer guard always
+  denies (without negation/human-only context on or near the line) is an
+  error, and so is a fenced bash block whose pipeline segments the
+  command's own `allowed-tools` cannot cover -- assignment-led segments,
+  test constructs, and unlisted binaries permission-prompt mid-command,
+  silently defeating the allowlist.
+- kokko-safety: `case:` pattern marker in `load-patterns.sh`. Everything
+  after the marker matches case-sensitively, which is what makes a
+  `git branch -D` vs `-d` distinction possible under case-insensitive
+  matching. macOS bash 3.2 compatible.
+
+### Changed
+
+- kokko-safety asks only on the force forms of branch and worktree
+  deletion (`-D`, `-d`/`-f` clusters, `--delete --force`,
+  `worktree remove --force`) and on `restore --worktree`. Plain
+  `git branch -d`, `git worktree remove`, `git rm --cached`, and
+  `git restore --staged` pass: each refuses the dangerous case by itself,
+  and they are the exact alternatives the kokko-devcontainer guard and
+  the janitor cleanup prescribe.
+- `/sync` hands the after-rebase force push to the human (git-guarded
+  environments deny every force push, `--force-with-lease` included) and
+  no longer suggests stashing a dirty tree; rebase is scoped to branches
+  not yet pushed.
+- `/compush` never stages with `git add .`/`-A`, stages mixed-concern
+  hunks via `git diff` + `git apply --cached` (interactive `git add -p`
+  has no TTY here), and uses `detect-secrets-hook --baseline` for
+  pass/fail secret scanning.
+- `/release` stages the version bump by explicit paths instead of
+  `git add .`.
+- `/prune`, `/az-costs`, `/az-status`, `/devcontainer-update`: script
+  blocks restructured so every pipeline segment starts with a binary the
+  command's `allowed-tools` actually covers. `/devcontainer-update` also
+  uses `$HOME` instead of a hardcoded `/home/vscode` and marks the
+  host-only rebuild command as display-only.
+- kokko-viz commands paste cited `c4-templates.md` schemas into subagent
+  prompts (subagents cannot read plugin files) and state model intent
+  instead of pinning model ids.
+- kokko-code-quality: the security skill commits as `fix(security)`
+  (`security` is not a Conventional Commits type); `/cruft` batches
+  approved deletions into one command so safety hooks prompt once, not
+  per file.
+- README documents that the built-in `/review` shadows the short name;
+  `/kokko-code-quality:review` is the reliable spelling.
+
 ## 3.7.0 - 2026-08-05
 
 ### Added
