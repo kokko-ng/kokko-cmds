@@ -56,9 +56,10 @@ az keyvault certificate list --vault-name <vault> --output table 2>/dev/null
 1. Cost summary (if enabled), covering the same lookback window (minimum 7 days for a useful trend):
 
 ```bash
+START=$(date -d "<days> days ago" +%Y-%m-%d 2>/dev/null || date -v-<days>d +%Y-%m-%d)
 az consumption usage list \
-  --start-date $(date -d "<days> days ago" +%Y-%m-%d) \
-  --end-date $(date +%Y-%m-%d) \
+  --start-date "$START" \
+  --end-date "$(date +%Y-%m-%d)" \
   --output table 2>/dev/null \
   || echo "Cost data requires Cost Management permissions"
 ```
