@@ -19,10 +19,19 @@ git fetch --all --prune
 
 ### 2. Categorize branches
 
+Resolve the default branch first — never hardcode `main` (`git branch
+--merged main` errors outright on a `master`/`trunk` repo):
+
 ```bash
-# Merged into main (safe to delete)
-git branch --merged main | grep -v "main\|master\|\*"
-git branch -r --merged origin/main | grep -v "main\|master\|HEAD"
+BASE=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
+[ -n "$BASE" ] || BASE=$(git remote show origin 2>/dev/null | sed -n 's/.*HEAD branch: //p')
+[ -n "$BASE" ] || BASE=main
+```
+
+```bash
+# Merged into the default branch (safe to delete)
+git branch --merged "$BASE" | grep -v "main\|master\|\*"
+git branch -r --merged "origin/$BASE" | grep -v "main\|master\|HEAD"
 
 # Orphaned (remote gone)
 git branch -vv | grep ': gone]'
@@ -53,8 +62,20 @@ Present branches recommended for deletion and let the user choose. Options: "Del
 ### 5. Execute approved deletions
 
 ```bash
-git branch -d branch-name              # -D only if not fully merged but approved
-git push origin --delete branch-name   # only with explicit approval
+git branch -d branch-name   # refuses on unmerged work — that refusal is a finding
+```
+
+Run only `git branch -d` yourself. Never `git branch -D` and never
+`git push origin --delete`: environments with the kokko-devcontainer git
+guard deny both outright, and the deny is not lifted by an in-session
+approval — the override is reserved for humans. For branches `-d` refuses
+and for remote deletions the user approved, print the exact commands for
+the user to run themselves in a terminal:
+
+```text
+# Approved but must be run by you (the git guard denies them for agents):
+git branch -D <branch>                # unmerged local branch
+git push origin --delete <branch>     # remote branch
 ```
 
 ### 6. Summarize
@@ -63,8 +84,8 @@ Report counts of deleted local, deleted remote, and kept branches. Optionally `g
 
 ## Safety Rules
 
-- NEVER delete main, master, or the current branch.
-- NEVER force-delete without explicit user approval.
+- NEVER delete the default branch, master, or the current branch.
+- NEVER run `git branch -D` or `git push origin --delete` yourself — print
+  approved force/remote deletions for the user to run (see step 5).
 - Always show what will be deleted before doing it.
-- Require confirmation for remote branch deletion.
 - Skip branches with unpushed commits unless the user confirms.
