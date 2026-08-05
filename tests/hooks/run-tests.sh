@@ -318,6 +318,18 @@ else
     record FAIL "$SS_HOOK: silent no-op on malformed payload" "rc=$rc output=$out"
 fi
 
+# A repo with several stacks must report every one, not just the first match
+MIXED_REPO="$TMPDIR_TESTS/mixedrepo"
+mkdir -p "$MIXED_REPO"
+touch "$MIXED_REPO/pyproject.toml" "$MIXED_REPO/package.json" "$MIXED_REPO/go.mod"
+out=$(jq -n --arg cwd "$MIXED_REPO" '{cwd: $cwd}' | "$HOOKS/$SS_HOOK" 2>/dev/null)
+rc=$?
+if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q 'Type: python nodejs go'; then
+    record PASS "$SS_HOOK: reports every detected language, not just one"
+else
+    record FAIL "$SS_HOOK: reports every detected language, not just one" "rc=$rc output=$out"
+fi
+
 # ---------------------------------------------------------------------------
 # play-sound.sh: both copies must stay quiet on stderr with no usable audio
 # backend and no controlling terminal (the /dev/tty fallback path)
