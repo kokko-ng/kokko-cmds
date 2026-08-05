@@ -16,52 +16,47 @@ cwd=$(printf '%s' "$HOOK_INPUT" | jq -r '.cwd // "."')
 
 cd "$cwd" 2>/dev/null || exit 0
 
-# Detect project type
-project_type="unknown"
+# Detect project types -- a repo can be more than one, and reporting only
+# the last match (as an overwrite would) hides the rest from the session.
+types=()
 detected_files=()
 
-# Check for Python project
+# Python
 if [ -f "pyproject.toml" ]; then
-    project_type="python"
+    types+=("python")
     detected_files+=("pyproject.toml")
 elif [ -f "requirements.txt" ]; then
-    project_type="python"
+    types+=("python")
     detected_files+=("requirements.txt")
 elif [ -f "setup.py" ]; then
-    project_type="python"
+    types+=("python")
     detected_files+=("setup.py")
 fi
 
-# Check for JavaScript/TypeScript project (can override or be mixed)
+# JavaScript/TypeScript
 if [ -f "package.json" ]; then
     if [ -f "tsconfig.json" ]; then
-        if [ "$project_type" = "python" ]; then
-            project_type="mixed"
-        else
-            project_type="typescript"
-        fi
+        types+=("typescript")
         detected_files+=("package.json" "tsconfig.json")
     else
-        if [ "$project_type" = "python" ]; then
-            project_type="mixed"
-        else
-            project_type="nodejs"
-        fi
+        types+=("nodejs")
         detected_files+=("package.json")
     fi
 fi
 
-# Check for Go project
+# Go
 if [ -f "go.mod" ]; then
-    project_type="go"
+    types+=("go")
     detected_files+=("go.mod")
 fi
 
-# Check for Rust project
+# Rust
 if [ -f "Cargo.toml" ]; then
-    project_type="rust"
+    types+=("rust")
     detected_files+=("Cargo.toml")
 fi
+
+project_type="${types[*]:-unknown}"
 
 # Get git info
 git_branch=""
