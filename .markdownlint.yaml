@@ -1,3 +1,7 @@
 # Config for markdownlint (pre-commit + CI).
 # Command/skill markdown legitimately uses long prose lines.
 MD013: false
+# Keep-a-Changelog repeats "### Added"/"### Changed"/"### Fixed" under every
+# release heading; only flag duplicates that share the same parent section.
+MD024:
+  siblings_only: true
