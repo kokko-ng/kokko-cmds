@@ -1,7 +1,7 @@
 ---
 description: Stage, commit (Conventional Commits), and push one logical change.
 argument-hint: '[files] [--message "msg"]'
-allowed-tools: Bash(git:*), Bash(detect-secrets:*), Bash(pre-commit:*), Bash(uv run pre-commit:*)
+allowed-tools: Bash(git:*), Bash(detect-secrets:*), Bash(detect-secrets-hook:*), Bash(ls:*), Bash(pre-commit:*), Bash(uv run pre-commit:*), Read, Edit
 disable-model-invocation: true
 ---
 
@@ -20,20 +20,45 @@ git diff --stat
 
 Keep commits small and modular — ONE logical change each. Split unrelated work (config vs code, refactor vs feature, file moves vs edits) into separate commits. If the subject needs an "and", split it. Never `--amend` to combine unrelated changes.
 
-Stage only the files for this change. Use `git add -p` for partial staging when a file mixes concerns; avoid `git add .` unless everything belongs together.
+Stage only the files for this change, by explicit path — never `git add .`
+or `-A` (git-guarded environments deny both outright, and they sweep in
+untracked files). When one file mixes concerns, `git add -p` will not work
+here (it needs an interactive terminal); stage hunks non-interactively
+instead: write the file's diff to a patch (`git diff <file> > /tmp/hunks.patch`),
+trim the patch to this change's hunks, then `git apply --cached /tmp/hunks.patch`.
 
 ### 2. Scan staged files for secrets
 
+List what is staged, then scan exactly those paths:
+
 ```bash
-if command -v detect-secrets >/dev/null 2>&1; then
-  git diff --cached --name-only --diff-filter=d | xargs -r detect-secrets scan --list-all-secrets
-else
-  echo "detect-secrets not installed - review the staged diff manually"
-  git diff --cached
-fi
+git diff --cached --name-only --diff-filter=d
+ls .secrets.baseline
 ```
 
-If anything is flagged, unstage and remove it (use env vars / secret management). NEVER commit secrets. When detect-secrets is unavailable, review the staged diff for keys, tokens, passwords, and connection strings before continuing.
+When the repo has a `.secrets.baseline`, use the hook entrypoint — it exits
+non-zero exactly when a staged file adds a secret the baseline does not know:
+
+```bash
+detect-secrets-hook --baseline .secrets.baseline <staged files>
+```
+
+Without a baseline, scan the staged paths and review the `results` object —
+any entry is a finding:
+
+```bash
+detect-secrets scan <staged files>
+```
+
+If detect-secrets is not installed (the commands above fail with "command
+not found"), review the staged diff manually for keys, tokens, passwords,
+and connection strings:
+
+```bash
+git diff --cached
+```
+
+If anything is flagged, unstage and remove it (use env vars / secret management). NEVER commit secrets.
 
 ### 3. Run quality checks
 

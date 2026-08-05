@@ -57,7 +57,9 @@ find codemap/$SYSTEM_ID -type f \
 Launch ALL FIVE subagents in parallel in a single message. Each is
 `Tool: Task`, `subagent_type: "Explore"`. Each receives `SYSTEM_ID` and the
 Phase 1 file listing, and outputs JSON with `check_type`, a score, `findings`,
-and `issues` (per c4-templates.md#validation-issue-schema).
+and `issues` (per c4-templates.md#validation-issue-schema). Subagents cannot
+read this plugin's files: read that schema section yourself and paste it into
+each of the five prompts you spawn.
 
 **1. Completeness** (`score: X/3`): All deployable units have folders; all
 major modules documented; all integrations in context.puml.
@@ -95,7 +97,8 @@ Wait for ALL FIVE to complete.
 Tool: Task
 Parameters:
   subagent_type: "general-purpose"
-  model: "opus"
+  # synthesis wants the strongest model available: inherit the session model
+  # rather than pinning an id that goes stale
   description: "Synthesize verification"
   prompt: |
     Synthesize findings from all five verification checks.
@@ -135,7 +138,8 @@ Execute `correction_plan` in order.
 for orphans.
 
 **4B. Diagrams:** for each fix, spawn a focused subagent
-(`Tool: Task`, `subagent_type: "Explore"`, `model: "haiku"`) given the file
+(`Tool: Task`, `subagent_type: "Explore"`; a mechanical rewrite — a
+smaller/faster model is fine when selectable) given the file
 path, current content, and fixes from the plan; it returns the complete
 updated file.
 
@@ -160,7 +164,7 @@ done
 Tool: Task
 Parameters:
   subagent_type: "Explore"
-  model: "haiku"
+  # mechanical re-check: a smaller/faster model is fine when selectable
   description: "Re-verify fixes"
   prompt: |
     Verify fixes were applied correctly.

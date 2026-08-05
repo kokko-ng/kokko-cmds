@@ -110,6 +110,12 @@ Code analysis commands and quality skills. See
 | `/cruft` | Remove cruft and dead files |
 | `/emojis` | Strip emojis from codebase |
 
+Claude Code ships a built-in `/review` (pull-request review), which shadows
+the short name: invoke this plugin's whole-codebase review as
+`/kokko-code-quality:review`. The namespaced form
+(`/kokko-code-quality:<command>`) is the reliable spelling for any command
+here whenever a built-in or another plugin claims the same short name.
+
 | Skill | Purpose |
 | ----- | ------- |
 | `architecture` | Architecture enforcement (import-linter / dep-cruiser) |
