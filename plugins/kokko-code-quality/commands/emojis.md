@@ -7,8 +7,8 @@ disable-model-invocation: true
 
 # Remove Emojis
 
-Remove emojis from `$target` (default: current project root) without changing
-behavior.
+Remove emojis from `$1` (default when empty: current project root) without
+changing behavior.
 
 ## 1. Find
 

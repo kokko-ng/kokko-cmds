@@ -6,9 +6,9 @@ allowed-tools: Read, Grep, Glob, Bash, Task
 
 # Technical Debt Analysis
 
-Deep-read `$target` (default: entire project) to surface technical debt and produce
-a prioritized remediation roadmap. For large targets, fan out with the Task
-tool (subagent_type: Explore) per module and synthesize results.
+Deep-read `$1` (default when empty: entire project) to surface technical debt
+and produce a prioritized remediation roadmap. For large targets, fan out with
+the Task tool (subagent_type: Explore) per module and synthesize results.
 
 ## Read Systematically
 
