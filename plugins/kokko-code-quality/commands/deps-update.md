@@ -31,9 +31,14 @@ For each package (critical first):
 
 1. Show current/latest version and changelog summary if available.
 2. Ask whether to update (AskUserQuestion).
-3. If yes: `uv add package@latest` or `npm install package@latest`, then validate
+3. If yes: record the currently installed version (from step 1), then
+   `uv add package@latest` or `npm install package@latest`, then validate
    (`uv run python -c "import package_name"` / `npm run build`). On failure,
-   rollback and report.
+   roll FORWARD to the recorded pin — `uv add 'package==<previous>'` /
+   `npm install package@<previous>` — and report. Never roll back with
+   `git restore`/`git checkout -- <lockfile>`: the tree is dirty at this
+   point and git-guarded environments deny those commands because they
+   overwrite uncommitted work.
 
 ## 4. Final validation
 
