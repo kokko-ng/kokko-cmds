@@ -5,15 +5,6 @@
   },
   "plugins": [
     {
-      "name": "kokko-safety",
-      "source": "./plugins/kokko-safety/",
-      "description": "Safety hooks for git operations, cloud commands, destructive bash commands, and session context.",
-      "version": "3.8.0",
-      "author": {
-        "name": "kokko-ng"
-      }
-    },
-    {
       "name": "kokko-git",
       "source": "./plugins/kokko-git/",
       "description": "Git workflow commands for commit+push, branch pruning, releases, and syncing.",

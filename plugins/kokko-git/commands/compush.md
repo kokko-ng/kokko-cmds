@@ -21,8 +21,7 @@ git diff --stat
 Keep commits small and modular — ONE logical change each. Split unrelated work (config vs code, refactor vs feature, file moves vs edits) into separate commits. If the subject needs an "and", split it. Never `--amend` to combine unrelated changes.
 
 Stage only the files for this change, by explicit path — never `git add .`
-or `-A` (git-guarded environments deny both outright, and they sweep in
-untracked files). When one file mixes concerns, `git add -p` will not work
+or `-A` (they sweep in untracked files). When one file mixes concerns, `git add -p` will not work
 here (it needs an interactive terminal); stage hunks non-interactively
 instead: write the file's diff to a patch (`git diff <file> > /tmp/hunks.patch`),
 trim the patch to this change's hunks, then `git apply --cached /tmp/hunks.patch`.

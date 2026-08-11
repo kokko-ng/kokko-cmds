@@ -15,13 +15,7 @@
 #   4. references/... or ${CLAUDE_PLUGIN_ROOT}/... paths that do not exist on
 #      disk -- a renamed reference file silently orphans every prompt that
 #      cites it.
-#   5. Recommending a git command the kokko-devcontainer guard always denies
-#      (git add ., force pushes, stash as remediation, branch -D, ...).
-#      Prompts here have repeatedly drifted into advising commands agents
-#      cannot run in guarded environments. A hit only counts when neither
-#      its line nor the three lines above carry negation / human-only
-#      context (never, do not, denies, BLOCKED, "run by you", ...).
-#   6. Fenced bash blocks a command's own allowed-tools cannot cover. A
+#   5. Fenced bash blocks a command's own allowed-tools cannot cover. A
 #      Bash(<prefix>:*) allowlist matches by command prefix, so a block
 #      whose pipeline segment starts with an assignment (VAR=...), a test
 #      construct, or an unlisted binary still triggers a permission prompt
@@ -87,45 +81,7 @@ check_path_mentions() {
            | sed -E 's/^[^r]*(references\/)/\1/' | sort -u)
 }
 
-# --- check 5: guard-denied git commands recommended without negation -------
-
-# One ERE per line. These are the commands the kokko-devcontainer guard
-# always denies (or denies exactly when the advice would apply, as with
-# stash on a dirty tree); a prompt telling an agent to run one is drift.
-GUARD_DENIED_PATTERNS=(
-  'git add \.([^a-zA-Z0-9_/-]|$)'
-  'git add (-A|--all)([^a-zA-Z0-9_-]|$)'
-  'git push[^|;&]*--force'
-  'git push[^|;&]*[[:space:]]-f([[:space:]]|$)'
-  'git push[^|;&]*--delete'
-  'git stash([^a-zA-Z0-9_ -]|$)'
-  'git stash[[:space:]]+(push|pop|drop|clear)'
-  'git branch[[:space:]]+-D([[:space:]]|$)'
-  'git clean[[:space:]]+-[a-zA-Z]*f'
-  'git reset[[:space:]]+--hard'
-  'git checkout[^|;&]*[[:space:]]--([[:space:]]|$)'
-)
-# Words that mark a mention as a warning or a human-only instruction rather
-# than advice to the agent. Checked case-insensitively on the hit line and
-# the 3 lines above.
-NEGATION_CONTEXT="never|not[^a-z]|n't|avoid|den(y|ie)|blocked|refus|human|instead|run by you|cannot|will not"
-
-# guard_denied_hits <file> -> "line:pattern" for each unexcused hit
-guard_denied_hits() {
-  local f="$1" pat hit lineno ctx
-  for pat in "${GUARD_DENIED_PATTERNS[@]}"; do
-    while IFS= read -r hit; do
-      [ -n "$hit" ] || continue
-      lineno="${hit%%:*}"
-      ctx=$(sed -n "$((lineno > 3 ? lineno - 3 : 1)),${lineno}p" "$f")
-      if ! printf '%s\n' "$ctx" | grep -qiE "$NEGATION_CONTEXT"; then
-        echo "$lineno:$pat"
-      fi
-    done < <(grep -nE "$pat" "$f" | cut -d: -f1 | sed 's/$/:/')
-  done
-}
-
-# --- check 6: fenced bash the allowed-tools frontmatter cannot cover -------
+# --- check 5: fenced bash the allowed-tools frontmatter cannot cover -------
 
 # bash_block_segments <file> -> "line<TAB>segment" for every command segment
 # inside ```bash / ```sh fences, continuations joined, comments dropped.
@@ -244,11 +200,6 @@ for file in plugins/*/commands/*.md plugins/*/skills/*/SKILL.md; do
   done < <(pseudo_placeholders "$file")
 
   check_path_mentions "$file" "$plugin_dir"
-
-  while IFS= read -r finding; do
-    [ -n "$finding" ] || continue
-    err "$file:${finding%%:*} recommends a git command the devcontainer guard denies (matched: ${finding#*:}) with no negation/human-only context on the line or the 3 lines above"
-  done < <(guard_denied_hits "$file")
 
   case "$file" in
     */commands/*) check_allowed_tools_coverage "$file" ;;

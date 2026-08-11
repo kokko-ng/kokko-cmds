@@ -18,15 +18,14 @@ the container**. Run it from inside the devcontainer.
 | ---- | ------ |
 | `--check` | Report the drift and stop. Change nothing. |
 | `--ref <branch-or-tag>` | Compare against that ref instead of the default branch. |
-| `--all` | Also offer the root-level docs (`README.md`, `INSTRUCTIONS.md`, `MANAGING.md`, `GIT-SAFETY.md`, `ghostty/`). Off by default — most projects have their own. |
+| `--all` | Also offer the root-level docs (`README.md`, `INSTRUCTIONS.md`, `MANAGING.md`, `ghostty/`). Off by default — most projects have their own. |
 
 ## What this can and cannot do
 
 Applied live by this command:
 
-- `.devcontainer/config/claude/**` — `CLAUDE.md`, `settings.json` hook and
-  plugin roster, the git safety hooks, `merge-hooks.jq`
-- `.devcontainer/config/bin/snaps`
+- `.devcontainer/config/claude/**` — `CLAUDE.md`, `settings.json` (permission
+  mode and plugin roster), `merge-settings.jq`, `prune-roster.jq`
 - `.devcontainer/config/zsh/**`
 - Global git configuration
 - The Claude Code plugin roster (marketplaces registered, enabled plugins
@@ -169,11 +168,11 @@ diff -u "$HOME/.claude/CLAUDE.md" .devcontainer/config/claude/CLAUDE.md
 bash .devcontainer/post-create.sh --config-only
 ```
 
-This re-installs the git safety hooks, re-merges the hook wiring and plugin
-roster into `~/.claude/settings.json` (keeping the user's own settings and any
-plugin they explicitly disabled), re-registers the marketplaces, installs any
-newly rostered plugin, re-applies the git configuration, and relinks the zsh
-config. It is idempotent.
+This re-merges the bundled settings and plugin roster into
+`~/.claude/settings.json` (keeping the user's own settings and any plugin they
+explicitly disabled), removes any leftovers of the retired git safety layer,
+re-registers the marketplaces, installs any newly rostered plugin, re-applies
+the git configuration, and relinks the zsh config. It is idempotent.
 
 Older config without that flag → the script exits 2 on the unknown argument.
 Say so and point at this repo's `post-create.sh`.

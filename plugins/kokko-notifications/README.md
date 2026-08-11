@@ -15,10 +15,9 @@ chime when Claude finishes a turn, so long-running work can be left alone.
 
 ## Environment variables
 
-Sounds go through `hooks/utils/play-sound.sh`, byte-identical to the
-kokko-safety copy (CI enforces this). It supports macOS (afplay), Linux
-(paplay/aplay), WSL and Git Bash (PowerShell system sounds), and falls back
-to a terminal bell in containers.
+Sounds go through `hooks/utils/play-sound.sh`. It supports macOS (afplay),
+Linux (paplay/aplay), WSL and Git Bash (PowerShell system sounds), and falls
+back to a terminal bell in containers.
 
 | Environment Variable | Default | Purpose |
 | -------------------- | ------- | ------- |
