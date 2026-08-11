@@ -37,8 +37,7 @@ For each package (critical first):
    roll FORWARD to the recorded pin — `uv add 'package==<previous>'` /
    `npm install package@<previous>` — and report. Never roll back with
    `git restore`/`git checkout -- <lockfile>`: the tree is dirty at this
-   point and git-guarded environments deny those commands because they
-   overwrite uncommitted work.
+   point and those commands overwrite uncommitted work unrecoverably.
 
 ## 4. Final validation
 

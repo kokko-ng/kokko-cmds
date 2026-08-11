@@ -71,14 +71,13 @@ git branch -d branch-name   # refuses on unmerged work — that refusal is a fin
 ```
 
 Run only `git branch -d` yourself. Never `git branch -D` and never
-`git push origin --delete`: environments with the kokko-devcontainer git
-guard deny both outright, and the deny is not lifted by an in-session
-approval — the override is reserved for humans. For branches `-d` refuses
-and for remote deletions the user approved, print the exact commands for
-the user to run themselves in a terminal:
+`git push origin --delete`: `-D` discards a branch's unmerged commits (and
+its reflog with them), and a remote deletion cannot be undone from here.
+For branches `-d` refuses and for remote deletions the user approved, print
+the exact commands for the user to run themselves in a terminal:
 
 ```text
-# Approved but must be run by you (the git guard denies them for agents):
+# Approved but must be run by you (this command never deletes these itself):
 git branch -D <branch>                # unmerged local branch
 git push origin --delete <branch>     # remote branch
 ```

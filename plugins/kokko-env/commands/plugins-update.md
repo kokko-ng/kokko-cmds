@@ -121,5 +121,5 @@ session:
 
 > Plugins updated. Run **`/reload-plugins`** to load them into this session.
 
-If a plugin ships hooks (`kokko-safety`, `kokko-notifications`), note that hook
+If a plugin ships hooks (`kokko-notifications`), note that hook
 changes need a full Claude Code restart, not just a reload.

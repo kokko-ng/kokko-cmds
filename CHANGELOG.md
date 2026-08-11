@@ -6,6 +6,22 @@ Changelog](https://keepachangelog.com/). Releases before 3.6.0 are
 documented in [GitHub
 Releases](https://github.com/kokko-ng/kokko-cmds/releases) only.
 
+## Unreleased
+
+### Removed
+
+- The kokko-safety plugin, in favor of Claude Code's built-in Auto
+  permission mode (`permissions.defaultMode: "auto"`). Its PreToolUse
+  ask-hooks (destructive-bash, destructive-git, cloud-ops,
+  branch-protection), the SessionStart context hook, the
+  dangerous-patterns corpus, and the `KOKKO_SAFETY_SKIP` variable are all
+  gone; kokko-notifications now owns the only `play-sound.sh` copy. The
+  marketplace drops from ten plugins to nine.
+- Prompt lint check 5 (guard-denied git commands): it enforced
+  compatibility with the retired kokko-devcontainer git guard. Command
+  prompts keep their own conservative git rules, now stated on their own
+  merits rather than as guard behavior.
+
 ## 3.8.0 - 2026-08-05
 
 ### Added

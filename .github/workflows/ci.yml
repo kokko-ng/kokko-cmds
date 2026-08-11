@@ -78,7 +78,3 @@ jobs:
             done < <(jq -r '.hooks | to_entries[] | .value[] | .hooks[] | .command' "$hooks_json")
           done
           exit "$status"
-      - name: Check the two play-sound.sh copies are byte-identical
-        run: |
-          cmp plugins/kokko-notifications/hooks/utils/play-sound.sh \
-              plugins/kokko-safety/hooks/utils/play-sound.sh
