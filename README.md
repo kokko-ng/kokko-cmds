@@ -12,7 +12,6 @@ Install individual plugins or all of them.
 Then install the plugins you want:
 
 ```bash
-/plugin install kokko-safety@kokko-ng-kokko-cmds
 /plugin install kokko-notifications@kokko-ng-kokko-cmds
 /plugin install kokko-git@kokko-ng-kokko-cmds
 /plugin install kokko-validation@kokko-ng-kokko-cmds
@@ -26,38 +25,21 @@ Then install the plugins you want:
 
 ## Versioning
 
-All ten plugins version in lock-step: every release bumps every plugin (and
+All nine plugins version in lock-step: every release bumps every plugin (and
 every marketplace entry) to the same version, even ones that did not change.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Environment variables
 
-Both kokko-safety (warning prompts) and kokko-notifications (completion
-chimes) play sounds through the same `play-sound.sh` utility and honor the
-same sound variables; `KOKKO_SAFETY_SKIP` is read by the kokko-safety hooks
-only:
+kokko-notifications plays its completion chimes through
+`hooks/utils/play-sound.sh` and honors:
 
 | Environment Variable | Default | Purpose |
 | -------------------- | ------- | ------- |
 | `KOKKO_SOUNDS` | `on` | Set to `off` to mute all hook sounds |
 | `KOKKO_SOUND_VOLUME` | `1.0` | afplay gain multiplier (macOS); `1.0` = system default |
-| `KOKKO_SAFETY_SKIP` | unset | Comma/space-separated kokko-safety hooks to disable (`destructive-git`, `branch-protection`, `cloud-ops`, `destructive-bash`); see [plugins/kokko-safety/README.md](plugins/kokko-safety/README.md) |
 
 ## Plugins
-
-### kokko-safety
-
-Safety hooks for all sessions. See
-[plugins/kokko-safety/README.md](plugins/kokko-safety/README.md) for the
-pattern categories, how to add patterns, and known limitations.
-
-| Hook | Purpose |
-| ---- | ------- |
-| `session-start-context` | Detects project type and git status |
-| `pre-tool-cloud-ops` | Prompts before destructive cloud operations |
-| `pre-tool-branch-protection` | Prompts before commits to protected branches |
-| `pre-tool-destructive-git` | Prompts before force push, hard reset |
-| `pre-tool-destructive-bash` | Prompts before rm -rf, mkfs, chmod 777 |
 
 ### kokko-notifications
 

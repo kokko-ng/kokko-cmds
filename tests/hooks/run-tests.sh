@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
-# run-tests.sh - Table-driven test harness for the kokko-safety hooks and the
-# shared play-sound utility. Plain bash, no test framework required.
+# run-tests.sh - Table-driven test harness for the kokko-notifications hooks
+# and their shared play-sound utility. Plain bash, no test framework required.
 #
 # Usage: bash tests/hooks/run-tests.sh
 #
-# Each case feeds a real JSON payload (built with jq) through the actual hook
-# script and asserts on the parsed permissionDecision:
-#   ask  -> the hook must emit a PreToolUse "ask" decision
-#   pass -> the hook must emit nothing (command allowed through)
-# Any non-empty hook output must also be valid JSON.
+# (The kokko-safety hook suite that used to live here was removed together
+# with that plugin — permission decisions are Claude Code Auto mode's job
+# now, not a pattern-matching hook layer's.)
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-HOOKS="$ROOT/plugins/kokko-safety/hooks"
+NOTIF_HOOKS="$ROOT/plugins/kokko-notifications/hooks"
 export KOKKO_SOUNDS=off
 
 PASS_COUNT=0
@@ -29,326 +27,44 @@ record() { # status name detail
     RESULTS+=("$(printf '%-4s  %s%s' "$status" "$name" "${detail:+  [$detail]}")")
 }
 
-payload() { # command -> JSON payload on stdout
-    jq -n --arg c "$1" \
-        '{session_id: "test", hook_event_name: "PreToolUse", tool_name: "Bash", tool_input: {command: $c}}'
-}
-
-# decision <hook> <command> [cwd] -> prints ask|pass|invalid-json|error:<rc>
-decision() {
-    local hook="$1" cmd="$2" cwd="${3:-$ROOT}" out rc
-    out=$( (cd "$cwd" && payload "$cmd" | "$HOOKS/$hook") 2>/dev/null )
-    rc=$?
-    if [ "$rc" -ne 0 ]; then
-        echo "error:$rc"
-        return
-    fi
-    if [ -z "$out" ]; then
-        echo "pass"
-        return
-    fi
-    if ! printf '%s' "$out" | jq -e . >/dev/null 2>&1; then
-        echo "invalid-json"
-        return
-    fi
-    printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision // "pass"'
-}
-
-expect() { # hook command expected(ask|pass) [cwd] [label]
-    local hook="$1" cmd="$2" want="$3" cwd="${4:-$ROOT}" label="${5:-}"
-    local got
-    got=$(decision "$hook" "$cmd" "$cwd")
-    local name="${hook%.sh}: ${label:-$cmd}"
-    if [ "$got" = "$want" ]; then
-        record PASS "$name"
-    else
-        record FAIL "$name" "want=$want got=$got"
-    fi
-}
-
-# ---------------------------------------------------------------------------
-# pre-tool-destructive-bash.sh
-# ---------------------------------------------------------------------------
-BASH_HOOK=pre-tool-destructive-bash.sh
-
-# Dangerous forms must still ask
-expect "$BASH_HOOK" 'rm -rf /tmp/build' ask
-expect "$BASH_HOOK" 'rm -rf ~/project' ask
-expect "$BASH_HOOK" '-n rm -rf /' ask '' 'command starting with echo-eating -n'
-expect "$BASH_HOOK" 'wipe /dev/sda' ask
-expect "$BASH_HOOK" 'rmdir old-dir' ask
-expect "$BASH_HOOK" 'shutdown now' ask
-expect "$BASH_HOOK" 'mkfs.ext4 /dev/sda1' ask
-expect "$BASH_HOOK" 'echo pwned > /etc/passwd' ask
-expect "$BASH_HOOK" 'chmod 777 file' ask
-expect "$BASH_HOOK" 'chmod 0777 file' ask
-expect "$BASH_HOOK" 'chmod 666 secrets.txt' ask
-expect "$BASH_HOOK" 'chmod -R 777 .' ask
-expect "$BASH_HOOK" 'chmod -R 755 /etc' ask
-expect "$BASH_HOOK" 'chmod -R 700 /' ask
-expect "$BASH_HOOK" 'docker-compose down' ask
-expect "$BASH_HOOK" 'docker-compose rm' ask
-expect "$BASH_HOOK" 'docker-compose kill' ask
-expect "$BASH_HOOK" 'docker-compose stop' ask
-expect "$BASH_HOOK" 'docker compose down -v' ask
-expect "$BASH_HOOK" 'docker compose stop web' ask
-expect "$BASH_HOOK" 'drop table users' ask
-expect "$BASH_HOOK" 'psql -c "DROP TABLE users"' ask
-expect "$BASH_HOOK" 'dd if=/dev/zero of=/dev/sda' ask
-
-# Privilege escalation: root shells prompt, the destructive payload behind a
-# sudo still matches its own category, and routine sudo passes through
-expect "$BASH_HOOK" 'sudo -i' ask
-expect "$BASH_HOOK" 'sudo -s' ask
-expect "$BASH_HOOK" 'sudo su' ask
-expect "$BASH_HOOK" 'sudo bash -c "id"' ask
-expect "$BASH_HOOK" 'sudo -u root bash' ask
-expect "$BASH_HOOK" 'sudo --login' ask
-expect "$BASH_HOOK" 'sudo rm -rf /var/lib/data' ask '' 'payload behind sudo matches file-operations'
-expect "$BASH_HOOK" 'sudo systemctl stop nginx' ask '' 'payload behind sudo matches system-services'
-
-# False positives fixed in the pattern corpus must now pass through
-expect "$BASH_HOOK" 'sudo apt-get install -y jq' pass '' 'routine sudo install is not a prompt'
-expect "$BASH_HOOK" 'sudo apt-get update' pass
-expect "$BASH_HOOK" 'sudo -u vscode whoami' pass '' 'sudo -u with a non-shell command'
-expect "$BASH_HOOK" 'sudo tee /tmp/x' pass '' 'sudo with a non-shell command'
-expect "$BASH_HOOK" 'swipe left' pass '' 'swipe is not wipe'
-expect "$BASH_HOOK" 'git help swipe' pass
-expect "$BASH_HOOK" 'echo hi > /tmp/x' pass '' 'redirect to /tmp is routine'
-expect "$BASH_HOOK" 'sort data.txt > /home/user/out.txt' pass '' 'redirect to home path'
-expect "$BASH_HOOK" 'chmod 0644 file' pass
-expect "$BASH_HOOK" 'chmod 0755 script.sh' pass
-expect "$BASH_HOOK" 'chmod 755 script.sh' pass
-expect "$BASH_HOOK" 'chmod -R 755 ./build' pass '' 'project-local chmod -R'
-expect "$BASH_HOOK" 'docker composer require foo/bar' pass
-expect "$BASH_HOOK" 'ls -la' pass
-expect "$BASH_HOOK" 'backdrop table settings' pass
-
-# ---------------------------------------------------------------------------
-# pre-tool-destructive-git.sh
-# ---------------------------------------------------------------------------
-GIT_HOOK=pre-tool-destructive-git.sh
-
-expect "$GIT_HOOK" 'git push --force origin main' ask
-# Force-push ownership is here for ALL branches and flag positions; the
-# branch-protection hook stays out of force pushes entirely.
-expect "$GIT_HOOK" 'git push origin --force main' ask '' 'force flag between remote and branch'
-expect "$GIT_HOOK" 'git push origin main --force' ask '' 'force flag after branch'
-expect "$GIT_HOOK" 'git push origin -f main' ask '' '-f between remote and branch'
-expect "$GIT_HOOK" 'git push origin --force-with-lease main' ask '' 'force-with-lease after remote'
-expect "$GIT_HOOK" 'git -C /repo push --force origin main' ask '' 'force push with git -C'
-expect "$GIT_HOOK" 'git reset --hard HEAD~1' ask
-expect "$GIT_HOOK" 'git clean -fd' ask
-expect "$GIT_HOOK" 'git branch -D topic' ask
-expect "$GIT_HOOK" 'git branch --delete --force topic' ask '' 'long-form force delete'
-expect "$GIT_HOOK" 'git branch -df topic' ask '' 'clustered -d -f is a force delete'
-expect "$GIT_HOOK" 'git worktree remove --force /tmp/wt' ask '' 'forced removal deletes uncommitted work'
-expect "$GIT_HOOK" 'git worktree remove -f /tmp/wt' ask
-expect "$GIT_HOOK" 'git restore --staged --worktree .' ask '' 'restore --worktree overwrites files'
-expect "$GIT_HOOK" 'git restore .' ask
-expect "$GIT_HOOK" 'git rebase -i HEAD~3' ask
-expect "$GIT_HOOK" 'git rebase --onto main base topic' ask
-
-# Recovery commands must never prompt (they get you OUT of a bad rebase)
-expect "$GIT_HOOK" 'git rebase --continue' pass
-expect "$GIT_HOOK" 'git rebase --abort' pass
-expect "$GIT_HOOK" 'git rebase --skip' pass
-
-# Safe forms that the janitor cleanup and the kokko-devcontainer guard
-# prescribe as THE alternatives: prompting on these is the noise that gets
-# safety hooks switched off. Each refuses dangerous cases by itself.
-expect "$GIT_HOOK" 'git branch -d merged-topic' pass '' 'plain -d refuses on unmerged work itself'
-expect "$GIT_HOOK" 'git branch --delete merged-topic' pass '' 'plain --delete refuses on unmerged work itself'
-expect "$GIT_HOOK" 'git worktree remove /tmp/wt' pass '' 'plain removal refuses on a dirty worktree itself'
-expect "$GIT_HOOK" 'git rm --cached tracked.file' pass '' 'index-only removal, file stays on disk'
-expect "$GIT_HOOK" 'git restore --staged src/app.py' pass '' 'index-only unstage'
-expect "$GIT_HOOK" 'git restore --staged .' pass '' 'index-only unstage of everything'
-# Direct push to main is owned by branch protection, not git.txt (no double prompt)
-expect "$GIT_HOOK" 'git push origin main' pass '' 'push to main owned by branch-protection'
-expect "$GIT_HOOK" 'git status' pass
-expect "$GIT_HOOK" 'git commit -m "docs: mention swipe gesture"' pass
-
-# ---------------------------------------------------------------------------
-# pre-tool-cloud-ops.sh
-# ---------------------------------------------------------------------------
-CLOUD_HOOK=pre-tool-cloud-ops.sh
-
-expect "$CLOUD_HOOK" 'aws s3 rm s3://bucket --recursive' ask
-expect "$CLOUD_HOOK" 'terraform destroy' ask
-expect "$CLOUD_HOOK" 'kubectl delete namespace prod' ask
-expect "$CLOUD_HOOK" 'az group delete -n rg-prod' ask
-expect "$CLOUD_HOOK" 'aws s3 ls' pass
-expect "$CLOUD_HOOK" 'terraform plan' pass
-expect "$CLOUD_HOOK" 'kubectl get pods' pass
-
-# ---------------------------------------------------------------------------
-# pre-tool-branch-protection.sh (needs real git repos)
-# ---------------------------------------------------------------------------
-BP_HOOK=pre-tool-branch-protection.sh
 TMPDIR_TESTS=$(mktemp -d)
 trap 'rm -rf "$TMPDIR_TESTS"' EXIT
 
-make_repo() { # dir branch
-    git init -q -b main "$1"
-    git -C "$1" -c user.email=t@test -c user.name=test commit -q --allow-empty -m init
-    if [ "$2" != main ]; then
-        git -C "$1" checkout -q -b "$2"
-    fi
-}
-MAIN_REPO="$TMPDIR_TESTS/mainrepo"
-FEAT_REPO="$TMPDIR_TESTS/featrepo"
-make_repo "$MAIN_REPO" main
-make_repo "$FEAT_REPO" feature
-
-expect "$BP_HOOK" 'git commit -m x' ask "$MAIN_REPO" 'commit while on main'
-expect "$BP_HOOK" 'git push origin main' ask "$MAIN_REPO" 'push while on main'
-expect "$BP_HOOK" 'git commit -m x' pass "$FEAT_REPO" 'commit on feature branch'
-expect "$BP_HOOK" 'git push origin feature' pass "$FEAT_REPO" 'plain push on feature branch'
-# Force pushes, resets, and rebases are owned by pre-tool-destructive-git on
-# every branch; branch-protection must stay quiet on them or one command
-# would prompt twice.
-expect "$BP_HOOK" 'git push --force origin main' pass "$FEAT_REPO" 'force push owned by destructive-git'
-expect "$BP_HOOK" 'git push --force origin main' pass "$MAIN_REPO" 'force push on main: no double prompt'
-expect "$BP_HOOK" 'git push --force-with-lease origin main' pass "$MAIN_REPO" 'force-with-lease: no double prompt'
-expect "$BP_HOOK" 'git reset --hard HEAD~1' pass "$MAIN_REPO" 'reset on main: no double prompt'
-expect "$BP_HOOK" 'git rebase -i HEAD~3' pass "$MAIN_REPO" 'rebase on main: no double prompt'
-expect "$BP_HOOK" 'git push origin feature --force' pass "$FEAT_REPO" 'force push to unprotected branch'
-# Directory parsing (item 14): cd <dir> && ... and git -C <dir>
-expect "$BP_HOOK" "cd $MAIN_REPO && git commit -m x" ask "$TMPDIR_TESTS" 'cd protected-repo && commit'
-expect "$BP_HOOK" "git -C $MAIN_REPO commit -m x" ask "$TMPDIR_TESTS" 'git -C protected-repo commit'
-expect "$BP_HOOK" "cd $FEAT_REPO && git commit -m x" pass "$MAIN_REPO" 'cd feature-repo && commit overrides cwd'
-# git -C has precedence over a leading cd, matching git's own semantics
-expect "$BP_HOOK" "cd $FEAT_REPO && git -C $MAIN_REPO commit -m x" ask "$TMPDIR_TESTS" 'git -C protected-repo wins over cd feature-repo'
-expect "$BP_HOOK" "cd $MAIN_REPO && git -C $FEAT_REPO commit -m x" pass "$TMPDIR_TESTS" 'git -C feature-repo wins over cd protected-repo'
-expect "$BP_HOOK" 'git commit -m x' pass "$TMPDIR_TESTS" 'not in a git repo'
-expect "$BP_HOOK" 'ls -la' pass "$MAIN_REPO" 'non-git command on main'
-
-# Detached HEAD: sitting on a protected branch's tip is still that branch
-DETACHED_MAIN="$TMPDIR_TESTS/detachedmain"
-make_repo "$DETACHED_MAIN" main
-git -C "$DETACHED_MAIN" checkout -q --detach
-DETACHED_FEAT="$TMPDIR_TESTS/detachedfeat"
-make_repo "$DETACHED_FEAT" feature
-git -C "$DETACHED_FEAT" -c user.email=t@test -c user.name=test commit -q --allow-empty -m feat
-git -C "$DETACHED_FEAT" checkout -q --detach
-expect "$BP_HOOK" 'git commit -m x' ask "$DETACHED_MAIN" 'detached HEAD at tip of main'
-expect "$BP_HOOK" 'git commit -m x' pass "$DETACHED_FEAT" 'detached HEAD at tip of feature branch'
-
 # ---------------------------------------------------------------------------
-# Fail-closed paths: jq missing and malformed JSON (all four PreToolUse hooks)
+# stop-notification.sh: quiet, zero-exit behavior on every payload shape
 # ---------------------------------------------------------------------------
-EMPTY_PATH_DIR="$TMPDIR_TESTS/emptybin"
-mkdir -p "$EMPTY_PATH_DIR"
+STOP_HOOK="$NOTIF_HOOKS/stop-notification.sh"
 
-for hook in "$BASH_HOOK" "$GIT_HOOK" "$CLOUD_HOOK" "$BP_HOOK"; do
-    out=$(payload 'rm -rf /' | env PATH="$EMPTY_PATH_DIR" "$HOOKS/$hook" 2>/dev/null)
-    rc=$?
-    if [ "$rc" -eq 0 ] \
-        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecision == "ask"' >/dev/null 2>&1 \
-        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecisionReason | test("jq is missing")' >/dev/null 2>&1; then
-        record PASS "${hook%.sh}: fails closed to ask when jq is missing"
-    else
-        record FAIL "${hook%.sh}: fails closed to ask when jq is missing" "rc=$rc output=$out"
-    fi
-
-    out=$(printf 'this is not json' | "$HOOKS/$hook" 2>/dev/null)
-    rc=$?
-    if [ "$rc" -eq 0 ] \
-        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecision == "ask"' >/dev/null 2>&1; then
-        record PASS "${hook%.sh}: fails closed to ask on malformed JSON payload"
-    else
-        record FAIL "${hook%.sh}: fails closed to ask on malformed JSON payload" "rc=$rc output=$out"
-    fi
-done
-
-# ---------------------------------------------------------------------------
-# Fail-closed: a hook that crashes before its preamble loads must still ask.
-# Copying the hook without its utils/ directory is the exact setup that used
-# to exit 1 with no output (= fail OPEN).
-# ---------------------------------------------------------------------------
-BROKEN_DIR="$TMPDIR_TESTS/broken-hooks"
-mkdir -p "$BROKEN_DIR"
-for hook in "$BASH_HOOK" "$GIT_HOOK" "$CLOUD_HOOK" "$BP_HOOK"; do
-    cp "$HOOKS/$hook" "$BROKEN_DIR/$hook"
-    out=$(payload 'rm -rf /' | "$BROKEN_DIR/$hook" 2>/dev/null)
-    rc=$?
-    if [ "$rc" -eq 0 ] \
-        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecision == "ask"' >/dev/null 2>&1 \
-        && printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecisionReason | test("crashed")' >/dev/null 2>&1; then
-        record PASS "${hook%.sh}: fails closed to ask when utils/ is missing"
-    else
-        record FAIL "${hook%.sh}: fails closed to ask when utils/ is missing" "rc=$rc output=$out"
-    fi
-done
-
-# ---------------------------------------------------------------------------
-# KOKKO_SAFETY_SKIP: disables exactly the named hook, nothing else
-# ---------------------------------------------------------------------------
-skip_case() { # skipval hook command expected label
-    local skipval="$1" hook="$2" cmd="$3" want="$4" label="$5" out rc got
-    out=$( (cd "$ROOT" && payload "$cmd" | env KOKKO_SAFETY_SKIP="$skipval" "$HOOKS/$hook") 2>/dev/null )
-    rc=$?
-    if [ "$rc" -ne 0 ]; then
-        got="error:$rc"
-    elif [ -z "$out" ]; then
-        got="pass"
-    else
-        got=$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision // "pass"' 2>/dev/null || echo invalid-json)
-    fi
-    if [ "$got" = "$want" ]; then
-        record PASS "${hook%.sh}: $label"
-    else
-        record FAIL "${hook%.sh}: $label" "want=$want got=$got"
-    fi
+run_stop() { # payload -> sets RC / OUT / ERR
+    OUT=$(printf '%s' "$1" | "$STOP_HOOK" 2>"$TMPDIR_TESTS/err")
+    RC=$?
+    ERR=$(cat "$TMPDIR_TESTS/err")
 }
 
-skip_case 'destructive-git' "$GIT_HOOK" 'git push --force origin main' pass \
-    'KOKKO_SAFETY_SKIP=destructive-git allows force push silently'
-skip_case 'destructive-git' "$BASH_HOOK" 'rm -rf /' ask \
-    'KOKKO_SAFETY_SKIP=destructive-git leaves destructive-bash asking'
-skip_case '' "$GIT_HOOK" 'git push --force origin main' ask \
-    'empty KOKKO_SAFETY_SKIP changes nothing'
-skip_case 'branch-protection, cloud-ops' "$GIT_HOOK" 'git push --force origin main' ask \
-    'KOKKO_SAFETY_SKIP with other tokens does not skip destructive-git'
-skip_case 'destructive-bash destructive-git' "$GIT_HOOK" 'git push --force origin main' pass \
-    'space-separated KOKKO_SAFETY_SKIP tokens are honored'
-skip_case 'destructive-bash,destructive-git' "$BASH_HOOK" 'rm -rf /' pass \
-    'comma-separated KOKKO_SAFETY_SKIP tokens are honored'
-
-# ---------------------------------------------------------------------------
-# session-start-context.sh basic behavior
-# ---------------------------------------------------------------------------
-SS_HOOK=session-start-context.sh
-out=$(jq -n --arg cwd "$MAIN_REPO" '{cwd: $cwd}' | "$HOOKS/$SS_HOOK" 2>/dev/null)
-rc=$?
-if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q 'PROJECT CONTEXT'; then
-    record PASS "$SS_HOOK: emits project context for valid payload"
+run_stop '{"session_id":"t","hook_event_name":"Stop","stop_hook_active":false}'
+if [ "$RC" -eq 0 ] && [ -z "$OUT" ] && [ -z "$ERR" ]; then
+    record PASS "stop-notification: normal Stop payload exits 0 with no output"
 else
-    record FAIL "$SS_HOOK: emits project context for valid payload" "rc=$rc"
-fi
-out=$(printf 'nope' | "$HOOKS/$SS_HOOK" 2>/dev/null)
-rc=$?
-if [ "$rc" -eq 0 ] && [ -z "$out" ]; then
-    record PASS "$SS_HOOK: silent no-op on malformed payload"
-else
-    record FAIL "$SS_HOOK: silent no-op on malformed payload" "rc=$rc output=$out"
+    record FAIL "stop-notification: normal Stop payload exits 0 with no output" "rc=$RC out=$OUT err=$ERR"
 fi
 
-# A repo with several stacks must report every one, not just the first match
-MIXED_REPO="$TMPDIR_TESTS/mixedrepo"
-mkdir -p "$MIXED_REPO"
-touch "$MIXED_REPO/pyproject.toml" "$MIXED_REPO/package.json" "$MIXED_REPO/go.mod"
-out=$(jq -n --arg cwd "$MIXED_REPO" '{cwd: $cwd}' | "$HOOKS/$SS_HOOK" 2>/dev/null)
-rc=$?
-if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q 'Type: python nodejs go'; then
-    record PASS "$SS_HOOK: reports every detected language, not just one"
+run_stop '{"session_id":"t","hook_event_name":"Stop","stop_hook_active":true}'
+if [ "$RC" -eq 0 ] && [ -z "$OUT" ] && [ -z "$ERR" ]; then
+    record PASS "stop-notification: stop_hook_active continuation is silent"
 else
-    record FAIL "$SS_HOOK: reports every detected language, not just one" "rc=$rc output=$out"
+    record FAIL "stop-notification: stop_hook_active continuation is silent" "rc=$RC out=$OUT err=$ERR"
+fi
+
+run_stop 'this is not json'
+if [ "$RC" -eq 0 ] && [ -z "$ERR" ]; then
+    record PASS "stop-notification: malformed payload does not crash"
+else
+    record FAIL "stop-notification: malformed payload does not crash" "rc=$RC err=$ERR"
 fi
 
 # ---------------------------------------------------------------------------
-# play-sound.sh: both copies must stay quiet on stderr with no usable audio
-# backend and no controlling terminal (the /dev/tty fallback path)
+# play-sound.sh: must stay quiet on stderr with no usable audio backend and
+# no controlling terminal (the /dev/tty fallback path)
 # ---------------------------------------------------------------------------
 FAKEBIN="$TMPDIR_TESTS/fakebin"
 mkdir -p "$FAKEBIN"
@@ -359,66 +75,13 @@ SETSID=()
 if command -v setsid >/dev/null 2>&1; then
     SETSID=("$(command -v setsid)" -w)
 fi
-for copy in \
-    "$ROOT/plugins/kokko-notifications/hooks/utils/play-sound.sh" \
-    "$ROOT/plugins/kokko-safety/hooks/utils/play-sound.sh"; do
-    err=$( { env KOKKO_SOUNDS=on PATH="$FAKEBIN" "${SETSID[@]}" "$BASH" -c "source '$copy'; play_sound warning" >/dev/null </dev/null; } 2>&1 )
-    rc=$?
-    if [ "$rc" -eq 0 ] && [ -z "$err" ]; then
-        record PASS "play-sound ($(basename "$(dirname "$(dirname "$(dirname "$copy")")")")): no stderr noise without a TTY"
-    else
-        record FAIL "play-sound ($(basename "$(dirname "$(dirname "$(dirname "$copy")")")")): no stderr noise without a TTY" "rc=$rc stderr=$err"
-    fi
-done
-
-# The two copies must be byte-identical
-if cmp -s "$ROOT/plugins/kokko-notifications/hooks/utils/play-sound.sh" \
-          "$ROOT/plugins/kokko-safety/hooks/utils/play-sound.sh"; then
-    record PASS "play-sound: notification and safety copies are byte-identical"
+PLAY_SOUND="$NOTIF_HOOKS/utils/play-sound.sh"
+err=$( { env KOKKO_SOUNDS=on PATH="$FAKEBIN" "${SETSID[@]}" "$BASH" -c "source '$PLAY_SOUND'; play_sound warning" >/dev/null </dev/null; } 2>&1 )
+rc=$?
+if [ "$rc" -eq 0 ] && [ -z "$err" ]; then
+    record PASS "play-sound: no stderr noise without a TTY"
 else
-    record FAIL "play-sound: notification and safety copies are byte-identical"
-fi
-
-# ---------------------------------------------------------------------------
-# Pattern corpus: every pattern must compile as an ERE. One bad pattern would
-# poison the batch grep and force every command through the slow path.
-# ---------------------------------------------------------------------------
-PATTERNS_DIR="$HOOKS/dangerous-patterns"
-bad_patterns=0
-total_patterns=0
-while IFS= read -r line || [ -n "$line" ]; do
-    file="${line%%:*}"
-    pattern="${line#*:}"
-    pattern="${pattern#case:}"   # the case-sensitivity marker is not part of the ERE
-    total_patterns=$((total_patterns + 1))
-    grep -qE -e "$pattern" <<<"" 2>/dev/null
-    rc=$?
-    if [ "$rc" -ge 2 ]; then
-        echo "invalid ERE in $(basename "$file"): $pattern" >&2
-        bad_patterns=$((bad_patterns + 1))
-    fi
-done < <(grep -H -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$PATTERNS_DIR"/*.txt)
-if [ "$bad_patterns" -eq 0 ] && [ "$total_patterns" -gt 0 ]; then
-    record PASS "dangerous-patterns: all $total_patterns patterns compile as EREs"
-else
-    record FAIL "dangerous-patterns: all $total_patterns patterns compile as EREs" "$bad_patterns invalid"
-fi
-
-# ---------------------------------------------------------------------------
-# Pattern-file coverage: every dangerous-patterns/*.txt must be loaded by
-# some hook, or a new category file would silently protect nothing.
-# ---------------------------------------------------------------------------
-unreferenced=""
-for file in "$PATTERNS_DIR"/*.txt; do
-    category="$(basename "$file" .txt)"
-    if ! grep -q "\"$category\"" "$HOOKS"/pre-tool-*.sh; then
-        unreferenced="$unreferenced $category"
-    fi
-done
-if [ -z "$unreferenced" ]; then
-    record PASS "dangerous-patterns: every category file is loaded by a hook"
-else
-    record FAIL "dangerous-patterns: every category file is loaded by a hook" "unreferenced:$unreferenced"
+    record FAIL "play-sound: no stderr noise without a TTY" "rc=$rc stderr=$err"
 fi
 
 # ---------------------------------------------------------------------------

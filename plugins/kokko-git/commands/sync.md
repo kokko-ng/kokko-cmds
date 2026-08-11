@@ -28,7 +28,7 @@ git rebase origin/<base>   # linear history
 ```
 
 Rebase rewrites the branch, so pushing a rebased branch that was already
-pushed needs a force push — which git-guarded environments deny (see step 5).
+pushed needs a force push — which this command never runs itself (see step 5).
 Reserve rebase for branches not yet pushed; default to merge otherwise.
 
 ### 3. Resolve conflicts (if any)
@@ -50,20 +50,18 @@ git push origin <branch-name>
 ```
 
 After a merge, a plain push suffices. After a rebase of an already-pushed
-branch, the push needs a force flag — and git-guarded environments
-(kokko-devcontainer) deny every force push outright, `--force-with-lease`
-included; the deny is not lifted by an in-session approval. Do not attempt
-it: report that the rebase is complete locally and print the exact command
-for the user to run themselves:
+branch, the push needs a force flag — and a force push rewrites the remote
+branch, which can silently drop commits others (or another session) pushed
+on top. Do not run one yourself: report that the rebase is complete locally
+and print the exact command for the user to run themselves:
 
 ```text
-# Must be run by you (the git guard denies force pushes for agents):
+# Must be run by you (this command never force-pushes):
 git push origin <branch-name> --force-with-lease
 ```
 
 ## Notes
 
-- Dirty working tree → commit before syncing. Do not stash to clear it:
-  guard environments deny `git stash` exactly when the tree is dirty, and a
+- Dirty working tree → commit before syncing. Do not stash to clear it: a
   forgotten stash was load-bearing in past data-loss incidents.
 - Rebase conflicting on every commit → prefer merge instead.

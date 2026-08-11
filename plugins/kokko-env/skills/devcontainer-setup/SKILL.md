@@ -24,7 +24,7 @@ Colima as the Docker runtime and the `devcontainer` CLI as the launcher.
 | -------- | ------ |
 | `[target-directory]` | Where to install. Defaults to the current working directory. |
 | `--ref <branch-or-tag>` | Take the starter from that ref instead of the default branch. |
-| `--docs` | Also copy the root-level docs (`INSTRUCTIONS.md`, `MANAGING.md`, `GIT-SAFETY.md`) and `ghostty/config`. Off by default. |
+| `--docs` | Also copy the root-level docs (`INSTRUCTIONS.md`, `MANAGING.md`) and `ghostty/config`. Off by default. |
 | `--no-up` | Install and tailor the files, then stop. Do not build or start the container. |
 
 ## Steps
@@ -56,8 +56,9 @@ Stop and ask when any of these is true:
   what is there and recommend `/devcontainer-update`, which merges instead.
 - **Inside a container.** The build has to happen on the host. Say so and stop.
 - **Target is not a git repo.** Not fatal — the starter works in a plain
-  directory — but the bundled git safety hooks and `snaps` do nothing outside
-  one. For a directory this skill just created, `git init` it rather than
+  directory — but without a repo there is no version control and no reflog to
+  recover from, and the container's git recoverability settings protect
+  nothing. For a directory this skill just created, `git init` it rather than
   merely reporting the gap; for a pre-existing directory, say so and let the
   user decide.
 
@@ -122,7 +123,7 @@ hand-write a `.devcontainer/` as a fallback.
 cp -R "$UPSTREAM/.devcontainer" "$TARGET/.devcontainer"
 ```
 
-With `--docs`, also copy `INSTRUCTIONS.md`, `MANAGING.md`, `GIT-SAFETY.md` and
+With `--docs`, also copy `INSTRUCTIONS.md`, `MANAGING.md` and
 `ghostty/config` — but never overwrite a file the project already has. Name any
 skipped file in the report.
 
@@ -193,7 +194,7 @@ devcontainer up --workspace-folder .
 
 First build downloads the base image and runs `post-create.sh` — 3-8 minutes is
 normal. It installs zsh plugins, Claude Code, Copilot CLI, the Playwright CLI
-and Chromium, the bundled Claude config, the git safety hooks and `snaps`, the
+and Chromium, the bundled Claude config (Auto permission mode by default), the
 Claude Code plugin roster, git recoverability settings, and then the project's
 own dependencies (`uv sync`, `npm ci` in the frontend directory, pre-commit
 hooks, `.env` from `.env.example`).
@@ -254,5 +255,6 @@ Finally: `rm -rf "$UPSTREAM"`.
 - `/devcontainer-update` pulls later upstream changes into this project.
 - `/plugins-update` moves the installed Claude Code plugins to their published
   versions.
-- Snapshots and the destructive-git guard are on by default inside the
-  container; `snaps` lists them. See `GIT-SAFETY.md` in the starter.
+- Claude Code runs in Auto permission mode by default
+  (`permissions.defaultMode: "auto"` in the bundled settings.json); edit
+  `~/.claude/settings.json` inside the container to change it.

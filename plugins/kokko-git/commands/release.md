@@ -53,8 +53,7 @@ git diff
 ### 4. Create the version-bump PR
 
 Branch, commit, and push. Stage the modified files by explicit path from the
-`git status` output — never `git add .` (git-guarded environments deny it
-outright, and it sweeps in untracked files):
+`git status` output — never `git add .` (it sweeps in untracked files):
 
 ```bash
 git checkout -b version-bump-vX.Y.Z
